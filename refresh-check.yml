@@ -1,0 +1,86 @@
+name: Weekly refresh check
+
+# Measures how stale the dataset has become and files the result as a single
+# rolling GitHub Issue.
+#
+# It does NOT fetch data. Every source behind this dataset resists scraping in a
+# documented way — MOPS is robots-disallowed, wearn.com serves the wrong company
+# from a path-level cache unless walked sequentially with a name check on every
+# page, stockanalysis caps its free quarterly table at 20 columns, Japanese
+# tanshin filings are PDFs, and the fab construction block needs someone to
+# judge whether a date was disclosed or inferred. A cron job that guessed at
+# those would produce confidently wrong numbers, which is strictly worse than
+# an openly stale dashboard.
+#
+# What it does instead: tells you exactly what is overdue, which fab projects
+# have sailed past their stated first-output date, and which inferred dates may
+# now be public. Take the issue into a refresh session.
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'   # Mondays 07:00 UTC, an hour after the rebuild
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compute staleness
+        run: |
+          python3 tools/staleness.py --dataset dataset.json > report.md
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run validation and append the result
+        # Warnings are informational, so this must not fail the job.
+        continue-on-error: true
+        run: |
+          {
+            echo ''
+            echo '<details><summary>Dataset validation output</summary>'
+            echo ''
+            echo '```'
+            python3 tools/validate.py --dataset dataset.json || true
+            echo '```'
+            echo ''
+            echo '</details>'
+          } >> report.md
+
+      - name: File or update the rolling issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('report.md', 'utf8');
+            const title = 'Dashboard refresh check';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'refresh-check',
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              // Update in place rather than opening a new issue every Monday —
+              // 52 near-identical issues a year is noise, not signal.
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body,
+              });
+              core.notice(`Updated issue #${existing.number}`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: ['refresh-check'],
+              });
+              core.notice(`Opened issue #${created.number}`);
+            }

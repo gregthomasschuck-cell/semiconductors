@@ -1,0 +1,87 @@
+name: Build and deploy
+
+# Rebuilds the dashboard and publishes it to GitHub Pages.
+#
+# The build is deterministic and offline — it only inlines dataset.json into
+# template.html — so the weekly run is a safety net that guarantees the live
+# site always matches what is committed, not a data refresh. Data refreshing is
+# handled by the refresh-check workflow, which measures staleness and opens an
+# issue rather than pretending it can scrape these sources.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'dataset.json'
+      - 'template.html'
+      - 'build.py'
+      - 'tools/**'
+      - '.github/workflows/deploy.yml'
+  schedule:
+    # Mondays 06:00 UTC. Deliberately after the weekend so a Friday commit is
+    # live before the week starts.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate dataset
+        run: python3 tools/validate.py --dataset dataset.json
+
+      - name: Build
+        run: python3 build.py --out site/index.html
+
+      - name: Check the output is actually self-contained
+        # The whole value of this artifact is that it is one file with no
+        # external loads. A stray CDN import would break offline use and add a
+        # third-party dependency to a page that currently has none.
+        run: |
+          python3 - <<'EOF'
+          import pathlib, re, sys
+          html = pathlib.Path('site/index.html').read_text()
+          bad = re.findall(r'(?:src|href)\s*=\s*["\'](https?:)?//[^"\']+', html)
+          bad = [b for b in bad if 'schema.org' not in str(b)]
+          if bad:
+              print('external references found:', bad[:10]); sys.exit(1)
+          size = len(html.encode()) / 1024
+          print(f'ok — self-contained, {size:,.0f} KB')
+          if size > 4096:
+              print('WARNING: page is over 4 MB, consider trimming history depth')
+          EOF
+
+      - name: Add .nojekyll
+        # Without this, GitHub Pages runs Jekyll and drops files beginning with
+        # an underscore. Cheap insurance.
+        run: touch site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

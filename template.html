@@ -1,0 +1,3002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asia Semiconductor &amp; Hardware Dashboard</title>
+<meta name="description" content="Monthly revenue, quarterly KPIs and unit volumes for 122 semiconductor and hardware companies across Taiwan, Japan, China, Korea and the US — with industry-level wafer area, WSTS billings and global chip sales. Self-contained, no tracking, no server.">
+<meta name="author" content="Asia Semiconductor &amp; Hardware Dashboard">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111110" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Asia Semiconductor &amp; Hardware Dashboard">
+<meta property="og:title" content="Asia Semiconductor &amp; Hardware Dashboard">
+<meta property="og:description" content="122 companies across Taiwan, Japan, China, Korea and the US — monthly revenue back to 2018, quarterly KPIs, wafer area, WSTS billings and category momentum, all in one page.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Asia Semiconductor &amp; Hardware Dashboard">
+<meta name="twitter:description" content="122 companies across Taiwan, Japan, China, Korea and the US — monthly revenue back to 2018, quarterly KPIs, wafer area, WSTS billings and category momentum, all in one page.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='6'%20fill='%230b0b0b'/%3E%3Cg%20fill='none'%20stroke='%23e8e6e1'%20stroke-width='2'%20stroke-linecap='round'%3E%3Cpath%20d='M7%2023l5-7%205%204%208-11'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root, .viz-root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page:           #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --good:           #006300;
+    --series-1:       #2a78d6;
+    --series-2:       #eb6834;
+    --series-3:       #1baf7a;
+    --series-4:       #eda100;
+    --series-5:       #e87ba4;
+    --series-6:       #008300;
+    --series-7:       #4a3aa7;
+    --series-8:       #e34948;
+    --seq-100:        #cde2fb;
+    --seq-400:        #3987e5;
+    --seq-500:        #256abf;
+  }
+  :root[data-theme="dark"], [data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page:           #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --good:           #0ca30c;
+    --series-1:       #3987e5;
+    --series-2:       #d95926;
+    --series-3:       #199e70;
+    --series-4:       #c98500;
+    --series-5:       #d55181;
+    --series-6:       #008300;
+    --series-7:       #9085e9;
+    --series-8:       #e66767;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page:           #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --good:           #0ca30c;
+      --series-1:       #3987e5;
+      --series-2:       #d95926;
+      --series-3:       #199e70;
+      --series-4:       #c98500;
+      --series-5:       #d55181;
+      --series-6:       #008300;
+      --series-7:       #9085e9;
+      --series-8:       #e66767;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--page);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  body { padding: 24px 20px 64px; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .subtitle { color: var(--text-secondary); font-size: 13.5px; max-width: 640px; line-height: 1.5; margin: 0 0 6px; }
+  .meta-line { color: var(--text-muted); font-size: 12px; }
+  .top-actions { display: flex; align-items: center; gap: 8px; }
+  button.toggle {
+    background: var(--surface-1); border: 1px solid var(--border); color: var(--text-primary);
+    border-radius: 8px; padding: 7px 12px; font-size: 12.5px; cursor: pointer; font-family: inherit;
+  }
+  button.toggle:hover { border-color: var(--text-muted); }
+
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px 20px;
+    margin-bottom: 18px;
+  }
+  .card h2 { font-size: 14.5px; margin: 0 0 2px; }
+  .card .card-sub { color: var(--text-secondary); font-size: 12px; margin: 0 0 16px; }
+
+  /* KPI row */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+  .kpi {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .kpi .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+  .kpi .value { font-size: 26px; font-weight: 600; line-height: 1.1; }
+  .kpi .delta { font-size: 12.5px; margin-top: 6px; color: var(--text-secondary); }
+  .kpi .delta.up { color: var(--good); }
+  .kpi .foot { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+
+  /* Bar chart (single-hue magnitude) */
+  .barchart { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: 130px 1fr 74px; align-items: center; gap: 10px; }
+  .bar-row .name { font-size: 12.5px; color: var(--text-secondary); text-align: right; }
+  .bar-track { position: relative; height: 22px; background: transparent; }
+  .bar-fill {
+    position: relative; height: 22px; border-radius: 4px; background: var(--series-1);
+    min-width: 3px; transition: filter .15s ease;
+  }
+  .bar-fill:hover { filter: brightness(1.08); cursor: pointer; }
+  .bar-row .val { font-size: 12.5px; color: var(--text-primary); font-variant-numeric: tabular-nums; text-align: right; }
+  .bar-axis-zero { position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--baseline); }
+
+  /* tooltip */
+  .tt {
+    position: fixed; pointer-events: none; z-index: 50;
+    background: var(--text-primary); color: var(--page);
+    font-size: 11.5px; padding: 6px 9px; border-radius: 6px;
+    max-width: 240px; line-height: 1.45; opacity: 0; transform: translateY(4px);
+    transition: opacity .1s ease, transform .1s ease;
+  }
+  .tt.show { opacity: 1; transform: translateY(0); }
+
+  /* category line charts */
+  .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .cat-chart { border: 1px solid var(--border); border-radius: 10px; padding: 14px 14px 10px; cursor: pointer; transition: border-color .12s ease, transform .12s ease; }
+  .cat-chart:hover { border-color: var(--text-muted); }
+  .cat-chart:hover .cat-expand-hint { opacity: 1; }
+  .cat-expand-hint { font-size: 10.5px; color: var(--text-muted); opacity: 0; transition: opacity .12s ease; float: right; }
+  .cat-chart .cat-title { font-size: 12.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 1px; }
+  .cat-chart .cat-members { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+  .cat-chart .cat-latest { font-size: 17px; font-weight: 600; color: var(--text-primary); }
+  .cat-chart .cat-delta { font-size: 11.5px; color: var(--text-secondary); margin-bottom: 6px; }
+  .cat-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .cat-line-path { fill: none; stroke-width: 2px; stroke-linejoin: round; stroke-linecap: round; }
+  .cat-area-path { stroke: none; }
+  .cat-dot { cursor: pointer; }
+  .cat-dot-hit { fill: transparent; cursor: pointer; }
+  .cat-axis-label { font-size: 8.5px; fill: var(--text-muted); font-family: system-ui, sans-serif; }
+  @media (max-width: 1100px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .cat-grid { grid-template-columns: 1fr; } }
+
+  .kpi-clickable { cursor: pointer; transition: border-color .12s ease; }
+  .kpi-clickable:hover { border-color: var(--text-muted); }
+  .kpi-clickable:hover .cat-expand-hint { opacity: 1; }
+  .modal-card.wide { max-width: 940px; }
+
+  /* category momentum scorecard */
+  .mom-row { display: grid; grid-template-columns: 210px 1fr 92px 92px 104px; align-items: center; gap: 12px;
+             padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .mom-row:last-child { border-bottom: none; }
+  .mom-head { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted);
+              font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .mom-name { font-size: 12.5px; color: var(--text-primary); font-weight: 600; }
+  .mom-stage { font-size: 10.5px; color: var(--text-muted); font-weight: 400; }
+  .mom-track { position: relative; height: 18px; }
+  .mom-zero { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--baseline); }
+  .mom-bar { position: absolute; height: 18px; border-radius: 3px; }
+  .mom-num { font-size: 12.5px; text-align: right; font-variant-numeric: tabular-nums; }
+  .mom-delta { font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
+  @media (max-width: 860px) { .mom-row { grid-template-columns: 150px 1fr 74px 74px 84px; } }
+  /* below ~620px the five columns cannot fit; stack the name above the bar + numbers */
+  @media (max-width: 620px) {
+    .mom-row {
+      grid-template-columns: 1fr 58px 58px 66px;
+      grid-template-areas: "nm nm nm nm" "tk n1 n2 n3";
+      gap: 4px 8px;
+    }
+    .mom-row > *:nth-child(1) { grid-area: nm; }
+    .mom-row > *:nth-child(2) { grid-area: tk; }
+    .mom-row > *:nth-child(3) { grid-area: n1; }
+    .mom-row > *:nth-child(4) { grid-area: n2; }
+    .mom-row > *:nth-child(5) { grid-area: n3; }
+    .mom-head > *:nth-child(2) { font-size: 9.5px; }
+    .mom-num, .mom-delta { font-size: 11.5px; }
+    .mom-members { padding-left: 0; }
+  }
+
+  .mom-sortable { cursor: pointer; user-select: none; }
+  .mom-sortable:hover { color: var(--text-secondary); }
+  .mom-caret { color: var(--text-muted); font-size: 10px; }
+  .mom-members { display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+                 padding: 8px 0 12px 22px; border-bottom: 1px solid var(--border); }
+  .mom-member {
+    display: inline-flex; align-items: baseline; gap: 7px; font: inherit; font-size: 11.5px;
+    padding: 4px 10px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--border); background: transparent; color: var(--text-secondary);
+  }
+  .mom-member:hover { border-color: var(--text-muted); }
+  .mom-member.off { opacity: .4; text-decoration: line-through; }
+  .mom-member-val { font-variant-numeric: tabular-nums; color: var(--text-primary); }
+  .mom-member.off .mom-member-val { color: var(--text-muted); }
+
+  /* supply-chain linkage panels */
+  .link-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .link-card { border: 1px solid var(--border); border-radius: 10px; padding: 13px 14px 9px; }
+  .link-title { font-size: 12.5px; font-weight: 600; color: var(--text-primary); }
+  .link-why { font-size: 11px; color: var(--text-muted); margin: 2px 0 7px; line-height: 1.45; }
+  .link-stats { display: flex; gap: 14px; align-items: baseline; margin-bottom: 4px; }
+  .link-r { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .link-lag { font-size: 11.5px; color: var(--text-secondary); }
+  .link-legend { display: flex; gap: 12px; flex-wrap: wrap; margin: 4px 0 2px; }
+  .link-leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
+  .link-sw { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+  .link-card svg { display: block; width: 100%; height: auto; overflow: visible; }
+  @media (max-width: 1000px) { .link-grid { grid-template-columns: 1fr; } }
+
+  /* snapshot bars */
+  .snap-group { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+                color: var(--text-muted); margin: 16px 0 2px; }
+  .snap-group:first-child { margin-top: 4px; }
+  .snap-sub { font-size: 11.5px; color: var(--text-secondary); margin: 0 0 8px; line-height: 1.5; }
+  .snap-child .snap-name, .snap-child .snap-val { color: var(--text-muted); }
+  .snap-child .snap-bar { opacity: .55; }
+  .snap-row { display: grid; grid-template-columns: 210px 1fr 128px; align-items: center; gap: 12px; padding: 4px 0; }
+  .snap-name { font-size: 12.5px; color: var(--text-primary); }
+  .snap-track { height: 20px; }
+  .snap-bar { height: 20px; border-radius: 3px; min-width: 2px; }
+  .snap-val { font-size: 12.5px; text-align: right; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+  @media (max-width: 800px) { .snap-row { grid-template-columns: 140px 1fr 104px; } }
+
+  /* correlation matrix */
+  .cm-grid { display: grid; gap: 2px; }
+  .cm-cell { position: relative; height: 26px; border-radius: 3px; cursor: pointer;
+             display: flex; align-items: center; justify-content: center;
+             font-size: 10px; font-variant-numeric: tabular-nums; }
+  .cm-cell.sel { outline: 2px solid var(--text-primary); outline-offset: -2px; }
+  .cm-rowlab { font-size: 11px; color: var(--text-secondary); text-align: right; padding-right: 8px;
+               white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 26px; }
+  .cm-collab { font-size: 10.5px; color: var(--text-muted); writing-mode: vertical-rl;
+               transform: rotate(180deg); height: 132px; white-space: nowrap; overflow: hidden; }
+  .cm-diag { background: var(--gridline); }
+  .cm-scale { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); margin: 12px 0 0; }
+  .cm-scale-bar { height: 10px; width: 190px; border-radius: 3px;
+    background: linear-gradient(to right, var(--series-2), var(--gridline), var(--series-1)); }
+  .cm-detail-card { border: 1px solid var(--border); border-radius: 10px; padding: 13px 15px 9px; margin-top: 16px; }
+
+  /* collapsible notes — these run long by necessity (sourcing, caveats, basis) but must not
+     dominate the chart they annotate */
+  .note { font-size: 12px; color: var(--text-secondary); margin: 12px 0 0; line-height: 1.55; }
+  .note-lead { display: inline; }
+  .note-rest { display: none; }
+  .note.open .note-rest { display: inline; }
+  .note-toggle {
+    display: inline; background: none; border: none; padding: 0 0 0 4px; margin: 0;
+    font: inherit; color: var(--series-1); cursor: pointer; white-space: nowrap;
+  }
+  .note-toggle:hover { text-decoration: underline; }
+
+  /* KPI explorer */
+  .kpi-controls { display: flex; flex-wrap: wrap; gap: 18px; margin: 4px 0 16px; }
+  .kpi-control-group { display: flex; flex-direction: column; gap: 6px; }
+  .kpi-control-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); font-weight: 600; }
+  .kpi-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .kpi-chip {
+    font-size: 11.5px; padding: 4px 10px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--border); background: transparent; color: var(--text-secondary);
+    transition: border-color .12s ease, background .12s ease, color .12s ease;
+  }
+  .kpi-chip:hover { border-color: var(--text-muted); }
+  .kpi-chip.active { background: var(--series-1); border-color: var(--series-1); color: #fff; font-weight: 600; }
+  .kpi-chart-wrap { margin-top: 4px; }
+  .kpi-chart-wrap svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .kpi-empty { font-size: 12.5px; color: var(--text-muted); padding: 30px 0; text-align: center; }
+
+  /* shipments sparse line chart */
+  .ship-chart-wrap svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+  /* drill-down modal */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    display: none; align-items: center; justify-content: center; z-index: 100; padding: 24px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px 24px 20px; max-width: 780px; width: 100%; max-height: 88vh; overflow-y: auto;
+  }
+  .modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 4px; }
+  .modal-title { font-size: 16px; font-weight: 600; margin: 0 0 2px; }
+  .modal-sub { font-size: 12px; color: var(--text-secondary); margin: 0; }
+  .modal-close {
+    background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+    border-radius: 8px; width: 28px; height: 28px; font-size: 15px; cursor: pointer; flex: none; line-height: 1;
+  }
+  .modal-close:hover { color: var(--text-primary); border-color: var(--text-muted); }
+  .modal-legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 14px 0 6px; }
+  .modal-legend-item {
+    display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary);
+    cursor: pointer; user-select: none; padding: 3px 8px 3px 6px; border-radius: 100px; border: 1px solid transparent;
+  }
+  .modal-legend-item:hover { border-color: var(--border); }
+  .modal-legend-item.off { opacity: 0.35; }
+  .modal-legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .modal-chart-wrap { margin-top: 6px; }
+  .modal-chart-wrap svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .modal-foot { font-size: 11.5px; color: var(--text-muted); margin-top: 14px; }
+
+  /* dumbbell chart (2-period shipment comparison) */
+  .dumbbell-row { display: grid; grid-template-columns: 130px 1fr 150px; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .dumbbell-row .name { font-size: 12.5px; color: var(--text-secondary); text-align: right; }
+  .dumbbell-track { position: relative; height: 22px; }
+  .dumbbell-track svg { width: 100%; height: 22px; overflow: visible; display: block; }
+  .dumbbell-row .delta { font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
+  .dumbbell-legend { display: flex; gap: 16px; margin-bottom: 14px; }
+  .dumbbell-legend .legend-item { font-size: 12px; }
+
+  /* stacked mix bars */
+  .mix-block { margin-bottom: 18px; }
+  .mix-title { font-size: 12.5px; color: var(--text-secondary); margin-bottom: 8px; }
+  .mix-bar { display: flex; height: 28px; border-radius: 6px; overflow: hidden; }
+  .mix-seg { height: 100%; position: relative; }
+  .mix-seg + .mix-seg { border-left: 2px solid var(--surface-1); }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px 18px; margin-top: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+
+  /* two-col grid for charts */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+  /* table */
+  .table-scroll { overflow-x: auto; }
+  table.data-table { width: 100%; min-width: 920px; border-collapse: collapse; font-size: 12.5px; table-layout: auto; }
+  table.data-table th, table.data-table td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--gridline); vertical-align: top; white-space: nowrap; }
+  table.data-table th { color: var(--text-muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; cursor: pointer; user-select: none; }
+  table.data-table th:hover { color: var(--text-secondary); }
+  table.data-table td.num { font-variant-numeric: tabular-nums; text-align: right; }
+  table.data-table td.up { color: var(--good); }
+  table.data-table tr:hover td { background: color-mix(in srgb, var(--text-primary) 3%, transparent); }
+  table.data-table a { color: var(--series-1); text-decoration: none; }
+  table.data-table a:hover { text-decoration: underline; }
+  table.data-table td.name-cell { cursor: help; }
+  .sector-tag { display: inline-block; font-size: 10.5px; padding: 2px 7px; border-radius: 100px; border: 1px solid var(--border); color: var(--text-secondary); white-space: nowrap; }
+
+  footer { color: var(--text-muted); font-size: 11.5px; line-height: 1.7; margin-top: 28px; border-top: 1px solid var(--gridline); padding-top: 16px; }
+  footer a { color: var(--text-secondary); }
+  .src-list { columns: 2; column-gap: 32px; margin: 8px 0 0; padding-left: 18px; }
+  .src-list li { break-inside: avoid; margin-bottom: 4px; }
+
+  @media (max-width: 900px) {
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .two-col { grid-template-columns: 1fr; }
+    .src-list { columns: 1; }
+  }
+  @media (max-width: 560px) {
+    .kpi-row { grid-template-columns: 1fr; }
+    .bar-row { grid-template-columns: 90px 1fr 60px; }
+  }
+
+  /* ---------- fab construction timeline ---------- */
+  .fab-card { --fab-lw: 218px; }
+  .fab-toolbar { display:flex; flex-wrap:wrap; gap:10px 22px; align-items:flex-end; margin:14px 0 4px; }
+  .fab-legend { display:flex; flex-wrap:wrap; gap:6px 16px; margin:14px 0 10px; align-items:center; }
+  .fab-legend-item { display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--text-secondary); }
+  .fab-key { width:22px; height:11px; border-radius:2px; flex:none; }
+  .fab-key.start     { background:var(--baseline); }
+  .fab-key.build     { background:var(--seq-100); border:1px solid var(--seq-400); }
+  .fab-key.fitout    { background:var(--seq-400); }
+  .fab-key.production{ background:var(--good); }
+  .fab-key.paused    { background:repeating-linear-gradient(45deg,var(--series-8),var(--series-8) 3px,transparent 3px,transparent 6px); border:1px solid var(--series-8); }
+
+  .fab-scroll { overflow-x:auto; overflow-y:hidden; margin:0 -4px; padding:0 4px; }
+  .fab-chart { min-width:820px; position:relative; padding-right:18px; }
+
+  .fab-axis { position:relative; height:34px; margin-left:var(--fab-lw); border-bottom:1px solid var(--baseline); }
+  .fab-axis-tick { position:absolute; top:0; font-size:10.5px; color:var(--text-muted); transform:translateX(-50%);
+                   font-variant-numeric:tabular-nums; letter-spacing:.02em; white-space:nowrap; }
+  .fab-body { position:relative; padding-top:4px; }
+  .fab-grid { position:absolute; left:var(--fab-lw); right:0; top:0; bottom:0; pointer-events:none; }
+  .fab-gl { position:absolute; top:0; bottom:0; width:1px; background:var(--gridline); }
+  .fab-now { position:absolute; top:0; bottom:0; width:0; border-left:2px dashed var(--text-secondary); opacity:.55; }
+  .fab-now-tag { position:absolute; bottom:2px; font-size:9.5px; letter-spacing:.06em; text-transform:uppercase;
+                 color:var(--text-secondary); padding:0 5px; transform:translateX(-50%); white-space:nowrap; }
+  .fab-now-tag::before { content:''; position:absolute; left:50%; bottom:-4px; width:0; height:0;
+                         border:3px solid transparent; border-top-color:var(--text-secondary);
+                         transform:translateX(-50%); opacity:.55; }
+
+  .fab-group { display:flex; align-items:baseline; gap:10px; margin:16px 0 5px; }
+  .fab-group:first-child { margin-top:2px; }
+  .fab-group-name { font-size:11px; font-weight:650; letter-spacing:.09em; text-transform:uppercase; color:var(--text-primary); }
+  .fab-group-meta { font-size:11px; color:var(--text-muted); }
+  .fab-group-rule { flex:1; height:1px; background:var(--border); }
+
+  .fab-row { display:grid; grid-template-columns:var(--fab-lw) 1fr; align-items:center; height:23px; cursor:pointer; }
+  .fab-row:hover { background:color-mix(in srgb, var(--text-primary) 5%, transparent); }
+  .fab-row:focus-visible { outline:2px solid var(--seq-400); outline-offset:-2px; }
+  .fab-label { padding-right:12px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+               font-size:11.5px; color:var(--text-secondary); }
+  .fab-label b { font-weight:600; color:var(--text-primary); }
+  .fab-track { position:relative; height:100%; }
+
+  .fab-bar { position:absolute; top:50%; transform:translateY(-50%); border-radius:2px; min-width:2px; }
+  .fab-bar.start      { height:5px;  background:var(--baseline); }
+  .fab-bar.build      { height:9px;  background:var(--seq-100); border:1px solid var(--seq-400); box-sizing:border-box; }
+  .fab-bar.fitout     { height:11px; background:var(--seq-400); }
+  .fab-bar.production { height:13px; background:var(--good); }
+  .fab-bar.paused     { height:9px;  border:1px solid var(--series-8); box-sizing:border-box;
+                        background:repeating-linear-gradient(45deg,var(--series-8),var(--series-8) 3px,transparent 3px,transparent 6px); }
+  .fab-row.soft .fab-bar.production { opacity:.42; border:1px dashed var(--good); box-sizing:border-box; }
+  .fab-row.soft .fab-bar.build,
+  .fab-row.soft .fab-bar.fitout { opacity:.5; }
+  .fab-row.dead .fab-bar { opacity:.4; }
+  .fab-first { position:absolute; top:50%; transform:translate(-50%,-50%); width:3px; height:19px;
+               background:var(--text-primary); border-radius:1px; }
+  .fab-row.dead .fab-x { position:absolute; top:50%; transform:translate(-50%,-50%); font-size:12px;
+                         color:var(--series-8); font-weight:700; }
+
+  /* revision overlay — hidden until the toggle is on */
+  .fab-rev { display:none; }
+  .fab-chart.revs .fab-rev { display:block; }
+  .fab-ghost { position:absolute; top:50%; transform:translateY(-50%); height:13px; box-sizing:border-box;
+               border:1.5px dashed var(--text-secondary); border-radius:2px; }
+  .fab-arrow { position:absolute; top:50%; transform:translateY(-50%); height:2px; }
+  .fab-arrow.later   { background:var(--series-8); }
+  .fab-arrow.earlier { background:var(--good); }
+  .fab-arrow::after { content:''; position:absolute; top:-4px; border:5px solid transparent; }
+  .fab-arrow.later::after   { right:-6px; border-left-color:var(--series-8); }
+  .fab-arrow.earlier::after { left:-6px; border-right-color:var(--good); }
+  .fab-delta { display:none; margin-left:6px; font-size:10.5px; font-weight:650; font-variant-numeric:tabular-nums; }
+  .fab-delta.later   { color:var(--series-8); }
+  .fab-delta.earlier { color:var(--good); }
+  .fab-chart.revs .fab-delta { display:inline; }
+
+  .fab-stats { display:flex; flex-wrap:wrap; gap:6px 26px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
+  .fab-stat { font-size:11.5px; color:var(--text-secondary); }
+  .fab-stat b { display:block; font-size:19px; font-weight:600; color:var(--text-primary);
+                font-variant-numeric:tabular-nums; letter-spacing:-.01em; line-height:1.25; }
+  .fab-empty { padding:26px 0; font-size:12.5px; color:var(--text-muted); }
+
+  .fab-detail dt { font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--text-muted); margin-top:12px; }
+  .fab-detail dd { margin:3px 0 0; font-size:13px; color:var(--text-primary); }
+  .fab-detail .fab-flag { display:inline-block; font-size:10.5px; padding:2px 7px; border-radius:3px;
+                          border:1px solid var(--border); color:var(--text-secondary); margin-right:6px; }
+
+  :root[data-theme="dark"] .fab-bar.build,
+  [data-theme="dark"] .fab-bar.build,
+  :root[data-theme="dark"] .fab-key.build,
+  [data-theme="dark"] .fab-key.build { background:color-mix(in srgb, var(--seq-400) 26%, transparent); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .fab-bar.build,
+    :root:not([data-theme="light"]) .fab-key.build { background:color-mix(in srgb, var(--seq-400) 26%, transparent); }
+  }
+
+  @media (max-width: 720px) {
+    .fab-card { --fab-lw: 148px; }
+    .fab-label { font-size:11px; }
+  }
+
+  /* ---------- collapsible card body ---------- */
+  .reveal > summary {
+    list-style:none; cursor:pointer; display:inline-flex; align-items:center; gap:7px;
+    font-size:11.5px; color:var(--text-secondary); border:1px solid var(--border);
+    border-radius:999px; padding:5px 13px; margin-top:4px; background:transparent;
+    transition:border-color .12s ease, color .12s ease;
+  }
+  .reveal > summary::-webkit-details-marker { display:none; }
+  .reveal > summary:hover { border-color:var(--text-muted); color:var(--text-primary); }
+  .reveal > summary:focus-visible { outline:2px solid var(--seq-400); outline-offset:2px; }
+  .reveal > summary::before {
+    content:''; width:0; height:0; border:4px solid transparent;
+    border-left-color:currentColor; margin-left:1px; transition:transform .15s ease;
+  }
+  .reveal[open] > summary::before { transform:rotate(90deg) translateX(-1px); }
+  .reveal > summary .reveal-open  { display:inline; }
+  .reveal > summary .reveal-close { display:none; }
+  .reveal[open] > summary .reveal-open  { display:none; }
+  .reveal[open] > summary .reveal-close { display:inline; }
+  .reveal .barchart { margin-top:14px; }
+  /* Grid items stretch to row height by default, so the collapsed monthly card
+     rendered as a tall empty box next to the taller regional chart. */
+  .two-col { align-items:start; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal > summary, .reveal > summary::before { transition:none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap viz-root">
+
+  <header class="top">
+    <div>
+      <h1>Asia Semiconductor &amp; Hardware Dashboard</h1>
+      <p class="subtitle" id="subtitle"></p>
+      <p class="meta-line" id="meta-line"></p>
+    </div>
+    <div class="top-actions">
+      <button class="toggle" id="theme-toggle" type="button">Dark mode</button>
+    </div>
+  </header>
+
+  <div class="kpi-row" id="kpi-row"></div>
+
+  <div class="card fab-card">
+    <h2>Fab construction &mdash; what is being built, and when it actually produces</h2>
+    <p class="card-sub" id="fab-sub"></p>
+    <div class="kpi-controls fab-toolbar">
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Region</span>
+        <div class="kpi-chips" id="fab-region-chips"></div>
+      </div>
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Segment</span>
+        <div class="kpi-chips" id="fab-device-chips"></div>
+      </div>
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Order</span>
+        <div class="kpi-chips" id="fab-sort-chips"></div>
+      </div>
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Audit</span>
+        <div class="kpi-chips" id="fab-rev-chips"></div>
+      </div>
+    </div>
+    <div class="fab-legend" id="fab-legend"></div>
+    <div class="fab-scroll">
+      <div class="fab-chart" id="fab-chart"></div>
+    </div>
+    <div class="fab-stats" id="fab-stats"></div>
+    <p class="card-sub note" id="fab-note" style="margin-top:16px;margin-bottom:0;"></p>
+  </div>
+
+
+  <div class="card">
+    <h2>Category momentum &mdash; latest quarter vs. the one before</h2>
+    <p class="card-sub" id="mom-sub"></p>
+    <div class="kpi-controls">
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Sort by</span>
+        <div class="kpi-chips" id="mom-sort-chips"></div>
+      </div>
+    </div>
+    <div id="mom-table"></div>
+    <p class="card-sub note" id="mom-note" style="margin-top:14px;margin-bottom:0;"></p>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <h2>July 2026 monthly revenue &mdash; YoY growth</h2>
+      <p class="card-sub">Taiwan-listed companies disclose revenue monthly by regulation; sorted high to low.</p>
+      <details class="reveal">
+        <summary>
+          <span class="reveal-open">Show all 49 companies</span>
+          <span class="reveal-close">Hide company list</span>
+        </summary>
+        <div class="barchart" id="chart-monthly"></div>
+      </details>
+    </div>
+    <div class="card">
+      <h2>Global chip sales &mdash; regional YoY growth</h2>
+      <p class="card-sub">June 2026, per SIA/WSTS (3-month moving average methodology).</p>
+      <div class="barchart" id="chart-regional"></div>
+    </div>
+  </div>
+
+
+  <div class="card">
+    <h2>Category trends &mdash; combined monthly revenue by supply-chain segment</h2>
+    <p class="card-sub" id="cat-grid-sub"></p>
+    <div class="kpi-controls">
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Timeframe</span>
+        <div class="kpi-chips" id="cat-range-chips"></div>
+      </div>
+    </div>
+    <div class="cat-grid" id="cat-grid"></div>
+    <p class="card-sub" id="cat-grid-note" style="margin-top:14px;margin-bottom:0;"></p>
+  </div>
+
+  <div class="card">
+    <h2>Supply-chain linkages &mdash; do these segments actually move together?</h2>
+    <p class="card-sub" id="link-sub"></p>
+    <div class="kpi-controls">
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Window</span>
+        <div class="kpi-chips" id="link-range-chips"></div>
+      </div>
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Sort by</span>
+        <div class="kpi-chips" id="link-sort-chips"></div>
+      </div>
+    </div>
+    <div class="link-grid" id="link-grid"></div>
+    <p class="card-sub note" id="link-note" style="margin-top:14px;margin-bottom:0;"></p>
+  </div>
+
+  <div class="card">
+    <h2>Correlation matrix &mdash; every segment against every other</h2>
+    <p class="card-sub" id="cm-sub"></p>
+    <div class="kpi-controls">
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Window</span>
+        <div class="kpi-chips" id="cm-range-chips"></div>
+      </div>
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Order</span>
+        <div class="kpi-chips" id="cm-order-chips"></div>
+      </div>
+    </div>
+    <div id="cm-wrap" style="overflow-x:auto;"><div id="cm-grid"></div></div>
+    <div id="cm-detail"></div>
+    <p class="card-sub note" id="cm-note" style="margin-top:14px;margin-bottom:0;"></p>
+  </div>
+
+  <div class="card">
+    <h2>Quarterly KPI explorer</h2>
+    <p class="card-sub" id="kpi-explorer-sub"></p>
+    <div class="kpi-controls">
+      <div class="kpi-control-group" style="flex:1 1 100%;">
+        <span class="kpi-control-label">1 &middot; Supply-chain category</span>
+        <div class="kpi-chips" id="kpi-cat-chips"></div>
+      </div>
+      <div class="kpi-control-group" style="flex:1 1 100%;">
+        <span class="kpi-control-label">2 &middot; Metric</span>
+        <div class="kpi-chips" id="kpi-metric-chips"></div>
+      </div>
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">3 &middot; Timeframe</span>
+        <div class="kpi-chips" id="kpi-range-chips"></div>
+      </div>
+      <div class="kpi-control-group" id="kpi-cap-group" style="display:none;">
+        <span class="kpi-control-label">Series</span>
+        <div class="kpi-chips" id="kpi-cap-chips"></div>
+      </div>
+    </div>
+    <div class="modal-legend" id="kpi-legend"></div>
+    <div class="kpi-chart-wrap" id="kpi-chart"></div>
+    <p class="card-sub" id="kpi-explorer-note" style="margin-top:12px;margin-bottom:0;"></p>
+  </div>
+
+  <div class="card">
+    <h2>Industry volumes &amp; product mix</h2>
+    <p class="card-sub" id="ind-sub"></p>
+    <div class="kpi-controls">
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Dataset</span>
+        <div class="kpi-chips" id="ind-view-chips"></div>
+      </div>
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Measure</span>
+        <div class="kpi-chips" id="ind-measure-chips"></div>
+      </div>
+    </div>
+    <div class="modal-legend" id="ind-legend"></div>
+    <div class="kpi-chart-wrap" id="ind-chart"></div>
+    <p class="card-sub" id="ind-note" style="margin-top:12px;margin-bottom:0;"></p>
+  </div>
+
+  <div class="card">
+    <h2>PC shipments by vendor</h2>
+    <p class="card-sub" id="pcs-sub"></p>
+    <div class="kpi-controls">
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Measure</span>
+        <div class="kpi-chips" id="pcs-measure-chips"></div>
+      </div>
+    </div>
+    <div class="modal-legend" id="pcs-legend"></div>
+    <div class="kpi-chart-wrap" id="pcs-chart"></div>
+    <p class="card-sub" id="pcs-note" style="margin-top:12px;margin-bottom:0;"></p>
+  </div>
+
+
+  <div class="card">
+    <h2>TSMC revenue mix &mdash; Q2 2026</h2>
+    <p class="card-sub">By customer billing location (not manufacturing site) and by end-market platform. TSMC is the only tracked company that discloses both breakdowns.</p>
+    <div class="two-col">
+      <div class="mix-block">
+        <div class="mix-title">By geography</div>
+        <div class="mix-bar" id="mix-geo"></div>
+        <div class="legend" id="legend-geo"></div>
+      </div>
+      <div class="mix-block">
+        <div class="mix-title">By platform</div>
+        <div class="mix-bar" id="mix-platform"></div>
+        <div class="legend" id="legend-platform"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Company detail</h2>
+    <p class="card-sub">Grouped by category by default &mdash; click a column header to sort (e.g. by company or monthly YoY). Figures are as originally reported by each company (native currency) &mdash; not currency-converted. Hover a company name for context notes.</p>
+    <div class="kpi-controls">
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Filter by region</span>
+        <div class="kpi-chips" id="region-chips"></div>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table class="data-table" id="company-table">
+        <thead>
+          <tr>
+            <th data-key="name">Company</th>
+            <th data-key="hq">HQ</th>
+            <th data-key="categoryLabel">Category</th>
+            <th data-key="sector">Sector</th>
+            <th data-key="monthly">Latest monthly rev.</th>
+            <th data-key="monthlyYoy" class="num">Monthly YoY</th>
+            <th data-key="quarterly">Latest quarterly rev.</th>
+            <th data-key="quarterlyGrowth" class="num">Quarterly growth</th>
+            <th data-key="grossMargin" class="num">Gross margin</th>
+            <th data-key="opMargin" class="num">Op. margin</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer id="footer"></footer>
+
+</div>
+
+<div class="tt" id="tooltip"></div>
+
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal-card" id="modal-card" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div>
+        <p class="modal-title" id="modal-title"></p>
+        <p class="modal-sub" id="modal-sub"></p>
+      </div>
+      <button class="modal-close" id="modal-close" type="button" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-legend" id="modal-legend"></div>
+    <div class="modal-chart-wrap" id="modal-chart"></div>
+    <p class="modal-foot" id="modal-foot"></p>
+  </div>
+</div>
+
+<script>
+const DATA = __DATA_JSON__;
+
+// ---------- helpers ----------
+// A line needs enough points to show a shape. Below this a "series" is really just a dot or two:
+// it clutters the legend without telling you anything, so it is dropped rather than drawn, and the
+// chart's note names what was excluded and why.
+const MIN_SERIES_POINTS = 3;
+function fmtNum(n, digits) {
+  if (n === null || n === undefined) return '—';
+  digits = digits === undefined ? 1 : digits;
+  return n.toLocaleString('en-US', {maximumFractionDigits: digits, minimumFractionDigits: 0});
+}
+function fmtPct(n, digits) {
+  if (n === null || n === undefined) return '—';
+  digits = digits === undefined ? 1 : digits;
+  const sign = n > 0 ? '+' : '';
+  return sign + n.toFixed(digits) + '%';
+}
+function fmtMoney(val, unit) {
+  if (val === null || val === undefined) return '—';
+  return fmtNum(val, val < 100 ? 2 : 0) + ' ' + unit;
+}
+
+// ---------- snapshot bars ----------
+// For data that is a LEVEL at a point in time rather than a series. Drawing two-point snapshots as
+// lines implies a trend that does not exist and, worse, invites the eye to extrapolate it. Bars
+// state a magnitude and stop. Groups are separated so figures from different vintages are never
+// visually chained.
+function renderSnapshotBars(container, groups, unit) {
+  const all = groups.flatMap(g => g.rows.map(r => r.value));
+  const max = Math.max(...all, 0) || 1;
+  groups.forEach(g => {
+    if (g.title) {
+      const h = document.createElement('div');
+      h.className = 'snap-group';
+      h.textContent = g.title;
+      container.appendChild(h);
+    }
+    if (g.sub) {
+      const sub = document.createElement('div');
+      sub.className = 'snap-sub';
+      sub.textContent = g.sub;
+      container.appendChild(sub);
+    }
+    g.rows.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'snap-row';
+      if (r.dim) row.classList.add('snap-child');
+      row.innerHTML = `<div class="snap-name">${r.name}</div>
+        <div class="snap-track"><div class="snap-bar" style="width:${(r.value / max) * 100}%; background:${r.color || 'var(--series-1)'};"></div></div>
+        <div class="snap-val">${fmtNum(r.value, r.decimals != null ? r.decimals : 1)}${unit ? ' ' + unit : ''}${r.suffix || ''}</div>`;
+      if (r.title) row.title = r.title;
+      container.appendChild(row);
+    });
+  });
+}
+
+// ---------- long-note disclosure ----------
+// Sourcing notes and data caveats have to be available — they are what makes a number trustworthy —
+// but printed in full they swamp the chart. Show the first sentence or two, hide the rest behind a
+// toggle, and never truncate the actual text.
+function setNote(el, text, leadChars) {
+  if (!el) return;
+  text = (text || '').replace(/\s+/g, ' ').trim();
+  el.className = 'note';
+  el.innerHTML = '';
+  if (!text) return;
+  const limit = leadChars || 190;
+  if (text.length <= limit) { el.textContent = text; return; }
+  // Break at a sentence end where possible so the lead reads as a complete thought.
+  let cut = -1;
+  for (const m of text.matchAll(/\.\s/g)) { if (m.index + 1 <= limit) cut = m.index + 1; else break; }
+  if (cut < limit * 0.5) cut = text.lastIndexOf(' ', limit);
+  if (cut <= 0) cut = limit;
+
+  const lead = document.createElement('span');
+  lead.className = 'note-lead';
+  lead.textContent = text.slice(0, cut);
+  const rest = document.createElement('span');
+  rest.className = 'note-rest';
+  rest.textContent = text.slice(cut);
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'note-toggle';
+  const words = text.slice(cut).split(' ').length;
+  btn.textContent = `Show more (${words} words)`;
+  btn.addEventListener('click', () => {
+    const open = el.classList.toggle('open');
+    btn.textContent = open ? 'Show less' : `Show more (${words} words)`;
+  });
+  el.appendChild(lead); el.appendChild(rest); el.appendChild(btn);
+}
+
+// ---------- header meta ----------
+document.getElementById('subtitle').textContent = DATA.meta.subtitle;
+document.getElementById('meta-line').textContent =
+  'Data as of: ' + DATA.meta.data_as_of + '  ·  Data last updated: ' + DATA.meta.last_updated +
+  (DATA.meta.built_at ? '  ·  Site rebuilt ' + DATA.meta.built_at : '') +
+  '  ·  Rebuilds weekly from the committed dataset; data is refreshed on demand.';
+
+// ---------- theme toggle ----------
+const themeBtn = document.getElementById('theme-toggle');
+function applyTheme(t) {
+  if (t === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); themeBtn.textContent = 'Light mode'; }
+  else { document.documentElement.setAttribute('data-theme', 'light'); themeBtn.textContent = 'Dark mode'; }
+}
+let currentTheme = 'light';
+applyTheme(currentTheme);
+themeBtn.addEventListener('click', () => {
+  currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+  applyTheme(currentTheme);
+});
+
+// ---------- tooltip ----------
+const tt = document.getElementById('tooltip');
+function showTip(evt, html) {
+  tt.innerHTML = html;
+  tt.classList.add('show');
+  moveTip(evt);
+}
+function moveTip(evt) {
+  const pad = 14;
+  let x = evt.clientX + pad, y = evt.clientY + pad;
+  tt.style.left = x + 'px';
+  tt.style.top = y + 'px';
+}
+function hideTip() { tt.classList.remove('show'); }
+
+// ---------- KPI row ----------
+const macro = DATA.macro.global_semiconductor_sales;
+const wafers = DATA.macro.silicon_wafer_shipments;
+const kpis = [
+  {
+    drill: 'sales_q',
+    label: 'Global chip sales — Q2 2026',
+    value: '$' + fmtNum(macro.q2_2026.total, 1) + 'B',
+    delta: fmtPct(macro.q2_2026.qoq_pct) + ' vs Q1 2026',
+    up: macro.q2_2026.qoq_pct > 0,
+    foot: 'Source: SIA / WSTS'
+  },
+  {
+    drill: 'sales_m',
+    label: 'June 2026 monthly sales',
+    value: '$' + fmtNum(macro.june_2026_monthly.total, 1) + 'B',
+    delta: fmtPct(macro.june_2026_monthly.yoy_pct) + ' YoY · ' + fmtPct(macro.june_2026_monthly.mom_pct) + ' MoM',
+    up: macro.june_2026_monthly.yoy_pct > 0,
+    foot: '3-month moving avg., WSTS methodology'
+  },
+  {
+    drill: 'outlook',
+    label: 'FY2026 global outlook',
+    value: '>$1.5T',
+    delta: 'vs $791.7B in FY2025 (+25.6% YoY)',
+    up: true,
+    foot: 'SIA/WSTS commentary, AI/memory-driven'
+  },
+  {
+    label: 'Silicon wafer shipments — Q2 2026',
+    value: fmtNum(wafers.total, 0) + ' MSI',
+    delta: fmtPct(wafers.yoy_pct) + ' YoY · ' + fmtPct(wafers.qoq_pct) + ' QoQ',
+    up: wafers.yoy_pct > 0,
+    foot: 'Source: SEMI',
+    drill: 'wafer'
+  }
+];
+const kpiRow = document.getElementById('kpi-row');
+kpis.forEach(k => {
+  const el = document.createElement('div');
+  el.className = 'kpi' + (k.drill ? ' kpi-clickable' : '');
+  el.innerHTML = `<div class="label">${k.label}${k.drill ? ' <span class="cat-expand-hint">expand &#8599;</span>' : ''}</div>
+    <div class="value">${k.value}</div>
+    <div class="delta ${k.up ? 'up' : ''}">${k.delta}</div><div class="foot">${k.foot}</div>`;
+  if (k.drill === 'wafer') el.addEventListener('click', openWaferModal);
+  else if (k.drill) el.addEventListener('click', () => openMacroModal(k.drill));
+  kpiRow.appendChild(el);
+});
+
+// ---------- monthly revenue YoY bar chart ----------
+const monthlyCompanies = DATA.companies
+  .filter(c => c.monthly_revenue && c.monthly_revenue.yoy_pct !== null && c.monthly_revenue.yoy_pct !== undefined)
+  .map(c => ({ name: c.name, yoy: c.monthly_revenue.yoy_pct, mom: c.monthly_revenue.mom_pct,
+               value: c.monthly_revenue.value, unit: c.monthly_revenue.unit, period: c.monthly_revenue.period }))
+  .sort((a, b) => b.yoy - a.yoy);
+
+function renderMagnitudeBars(containerId, rows, valueKey, labelKey, tooltipFn) {
+  const container = document.getElementById(containerId);
+  const max = Math.max(...rows.map(r => Math.abs(r[valueKey])), 1);
+  rows.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    const pct = Math.max((Math.abs(r[valueKey]) / max) * 100, 1.5);
+    row.innerHTML = `
+      <div class="name">${r[labelKey]}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div class="val">${fmtPct(r[valueKey])}</div>
+    `;
+    const fill = row.querySelector('.bar-fill');
+    fill.addEventListener('mousemove', (e) => showTip(e, tooltipFn(r)));
+    fill.addEventListener('mouseleave', hideTip);
+    container.appendChild(row);
+  });
+}
+
+renderMagnitudeBars('chart-monthly', monthlyCompanies, 'yoy', 'name', (r) => `
+  <strong>${r.name}</strong><br>
+  ${r.period}: ${fmtNum(r.value,0)} ${r.unit}<br>
+  YoY: ${fmtPct(r.yoy)}${r.mom !== null && r.mom !== undefined ? '<br>MoM: ' + fmtPct(r.mom) : ''}
+`);
+
+// ---------- regional YoY bar chart ----------
+const regional = macro.regional_yoy_june_2026.slice().sort((a, b) => b.yoy_pct - a.yoy_pct);
+renderMagnitudeBars('chart-regional', regional, 'yoy_pct', 'region', (r) => `
+  <strong>${r.region}</strong><br>YoY growth (June 2026): ${fmtPct(r.yoy_pct)}
+`);
+
+// ---------- TSMC mix bars ----------
+const seriesVars = ['--series-1','--series-2','--series-3','--series-4','--series-5','--series-6','--series-7','--series-8'];
+function renderMixBar(barId, legendId, breakdown, labelKey) {
+  const bar = document.getElementById(barId);
+  const legend = document.getElementById(legendId);
+  breakdown.forEach((seg, i) => {
+    const color = `var(${seriesVars[i % seriesVars.length]})`;
+    const el = document.createElement('div');
+    el.className = 'mix-seg';
+    el.style.width = seg.pct + '%';
+    el.style.background = color;
+    el.addEventListener('mousemove', (e) => showTip(e, `<strong>${seg[labelKey]}</strong><br>${seg.pct}% of revenue`));
+    el.addEventListener('mouseleave', hideTip);
+    bar.appendChild(el);
+
+    const li = document.createElement('div');
+    li.className = 'legend-item';
+    li.innerHTML = `<span class="legend-swatch" style="background:${color}"></span>${seg[labelKey]} — ${seg.pct}%`;
+    legend.appendChild(li);
+  });
+}
+const tsmc = DATA.companies.find(c => c.id === 'tsmc');
+renderMixBar('mix-geo', 'legend-geo', tsmc.geography.breakdown, 'region');
+renderMixBar('mix-platform', 'legend-platform', tsmc.platform_mix.breakdown, 'platform');
+
+// ---------- category trend line charts ----------
+const catColorSlots = ['--series-1','--series-2','--series-3','--series-4','--series-5','--series-6','--series-7','--series-8'];
+const companyById = Object.fromEntries(DATA.companies.map(c => [c.id, c]));
+// Union of every period any company reports, sorted chronologically (Vanguard's history starts later than
+// TSMC's, for example — don't assume one company's array defines the shared axis or that array position i
+// means the same calendar month across companies; always look up by period string, never by index).
+const AXIS_MONTHS = (() => {
+  const seen = new Map(); // period string -> {y, m} for sorting
+  const MONTH_NUM = {Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+  DATA.companies.forEach(c => (c.monthly_history || []).forEach(p => {
+    if (!seen.has(p.period)) {
+      const [mon, yr] = p.period.split(' ');
+      seen.set(p.period, { y: +yr, m: MONTH_NUM[mon] });
+    }
+  }));
+  return [...seen.keys()].sort((a, b) => (seen.get(a).y - seen.get(b).y) || (seen.get(a).m - seen.get(b).m));
+})();
+
+function categorySeries(cat) {
+  const allMembers = cat.members.map(id => companyById[id]).filter(Boolean);
+  const monthlyMembers = allMembers.filter(c => c.monthly_history && c.monthly_history.length);
+  if (!monthlyMembers.length) return null;
+  // Look up each member's value by period string (a Map per company) — never by array index, since
+  // members can have histories of different lengths/start points.
+  const byPeriod = monthlyMembers.map(c => new Map(c.monthly_history.map(p => [p.period, p.value])));
+  const series = AXIS_MONTHS.map(period => ({
+    period,
+    value: byPeriod.reduce((sum, m) => sum + (m.get(period) || 0), 0)
+  }));
+  return { series, monthlyMembers, allMembers };
+}
+
+function shortMonth(period) { return period.split(' ')[0]; }
+
+// Generic multi-series line chart, plotted against a shared `axisPeriods` x-axis. Series may have fewer
+// points than the axis (e.g. a quarterly reporter plotted at just 2 of the 7 monthly x-positions) — each
+// point is placed by looking up its own period in axisPeriods, so sparse series just draw shorter lines.
+// `seriesList` = [{ label, color, points: [{period, value}] }, ...]. Single-series callers get an area
+// fill; multi-series (>=2) rely on the legend for identity (per dataviz guidance, area fill is a
+// single-series device). opts.zeroLine draws a reference line at value 0 (for % charts that can go negative).
+function renderMultiSeriesChart(container, axisPeriods, seriesList, unitLabel, opts) {
+  opts = opts || {};
+  const W = opts.width || 300, H = opts.height || 108;
+  const padTop = 14, padBottom = 18, padX = 6;
+  // A y-axis needs room on the left for its tick labels; the small card charts skip it
+  // (they print the latest value as text instead) and keep the full width for the line.
+  const padLeft = opts.yAxis ? 42 : padX;
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('preserveAspectRatio', 'none');
+
+  const allValues = seriesList.flatMap(s => s.points.map(p => p.value));
+  let max = Math.max(...allValues), min = Math.min(...allValues);
+  if (opts.zeroLine) { max = Math.max(max, 0); min = Math.min(min, 0); }
+  if (max === min) { max += 1; min -= 1; }
+  let yTickCount = 5;
+  if (opts.yAxis) {
+    // Snap the axis to round numbers so ticks read as 0/20/40/60 rather than 0/17.9/35.9/53.8.
+    const rawStep = (max - min) / 4;
+    const mag = Math.pow(10, Math.floor(Math.log10(rawStep || 1)));
+    const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => s >= rawStep) || 10 * mag;
+    min = Math.floor(min / step) * step;
+    yTickCount = Math.max(2, Math.ceil((max - min) / step) + 1);
+    max = min + step * (yTickCount - 1);
+  }
+  const range = (max - min) || 1;
+  const n = axisPeriods.length;
+  const xAt = i => padLeft + (n === 1 ? 0 : (i / (n - 1)) * (W - padLeft - padX));
+  const yAt = v => padTop + (1 - (v - min) / range) * (H - padTop - padBottom);
+  const singleSeries = seriesList.length === 1;
+  const periodIndex = p => axisPeriods.indexOf(p);
+  const fmtAxisVal = v => opts.isPercent
+    ? (Math.abs(v) >= 100 ? Math.round(v) : Math.round(v * 10) / 10) + '%'
+    : fmtNum(v, opts.decimals != null ? Math.min(opts.decimals, 1) : 0);
+
+  if (opts.yAxis) {
+    // Horizontal gridlines at evenly spaced values, labelled on the left.
+    for (let t = 0; t < yTickCount; t++) {
+      const v = min + (range * t) / (yTickCount - 1);
+      const y = yAt(v);
+      const grid = document.createElementNS(svgNS, 'line');
+      grid.setAttribute('x1', padLeft); grid.setAttribute('x2', W - padX);
+      grid.setAttribute('y1', y); grid.setAttribute('y2', y);
+      grid.setAttribute('stroke', 'var(--border)');
+      grid.setAttribute('stroke-width', '1');
+      svg.appendChild(grid);
+      const lbl = document.createElementNS(svgNS, 'text');
+      lbl.setAttribute('x', padLeft - 6); lbl.setAttribute('y', y + 3);
+      lbl.setAttribute('text-anchor', 'end');
+      lbl.setAttribute('class', 'cat-axis-label');
+      lbl.textContent = fmtAxisVal(v);
+      svg.appendChild(lbl);
+    }
+  }
+
+  if (opts.zeroLine && min < 0 && max > 0) {
+    const zy = yAt(0);
+    const zeroLine = document.createElementNS(svgNS, 'line');
+    zeroLine.setAttribute('x1', padLeft); zeroLine.setAttribute('x2', W - padX);
+    zeroLine.setAttribute('y1', zy); zeroLine.setAttribute('y2', zy);
+    zeroLine.setAttribute('stroke', 'var(--text-muted)');
+    zeroLine.setAttribute('stroke-width', '1');
+    svg.appendChild(zeroLine);
+  }
+
+  seriesList.forEach((s, si) => {
+    const pts = s.points.filter(p => periodIndex(p.period) !== -1).slice().sort((a, b) => periodIndex(a.period) - periodIndex(b.period));
+    const linePts = pts.map(p => `${xAt(periodIndex(p.period))},${yAt(p.value)}`).join(' ');
+    const g = document.createElementNS(svgNS, 'g');
+    g.setAttribute('data-series-idx', si);
+
+    if (singleSeries && !opts.noArea) {
+      // Filled per contiguous run, for the same reason the line is broken per run.
+      const gaps0 = [];
+      for (let k = 1; k < pts.length; k++) gaps0.push(periodIndex(pts[k].period) - periodIndex(pts[k - 1].period));
+      const modal0 = gaps0.length
+        ? +Object.entries(gaps0.reduce((a, g2) => (a[g2] = (a[g2] || 0) + 1, a), {}))
+               .sort((a, b) => b[1] - a[1])[0][0]
+        : 1;
+      const runs0 = [[]];
+      pts.forEach((p, k) => {
+        if (k > 0 && (periodIndex(p.period) - periodIndex(pts[k - 1].period)) > modal0 * 1.9) runs0.push([]);
+        runs0[runs0.length - 1].push(p);
+      });
+      runs0.forEach(run => {
+        if (run.length < 2) return;
+        const rp = run.map(p => `${xAt(periodIndex(p.period))},${yAt(p.value)}`).join(' ');
+        const x0 = xAt(periodIndex(run[0].period)), xN = xAt(periodIndex(run[run.length - 1].period));
+        const area = document.createElementNS(svgNS, 'polygon');
+        area.setAttribute('points', `${x0},${H - padBottom} ${rp} ${xN},${H - padBottom}`);
+        area.setAttribute('class', 'cat-area-path');
+        area.setAttribute('fill', s.color);
+        area.setAttribute('opacity', '0.10');
+        g.appendChild(area);
+      });
+    }
+
+    // Break the line across real gaps instead of drawing straight through them. A series has its own
+    // natural spacing (1 for monthly, 3 for a quarterly reporter plotted on a monthly axis), so the
+    // threshold is relative: anything materially wider than that company's own cadence is a hole in
+    // the data, not a data point, and joining across it would invent a trend.
+    const gaps = [];
+    for (let k = 1; k < pts.length; k++) gaps.push(periodIndex(pts[k].period) - periodIndex(pts[k - 1].period));
+    const modal = gaps.length
+      ? +Object.entries(gaps.reduce((a, g2) => (a[g2] = (a[g2] || 0) + 1, a), {}))
+             .sort((a, b) => b[1] - a[1])[0][0]
+      : 1;
+    const runs = [[]];
+    pts.forEach((p, k) => {
+      if (k > 0 && (periodIndex(p.period) - periodIndex(pts[k - 1].period)) > modal * 1.9) runs.push([]);
+      runs[runs.length - 1].push(p);
+    });
+    runs.forEach(run => {
+      if (run.length < 2) return;
+      const line = document.createElementNS(svgNS, 'polyline');
+      line.setAttribute('points', run.map(p => `${xAt(periodIndex(p.period))},${yAt(p.value)}`).join(' '));
+      line.setAttribute('class', 'cat-line-path');
+      line.setAttribute('stroke', s.color);
+      line.setAttribute('stroke-dasharray', pts.length <= 2 ? '4 3' : 'none');
+      g.appendChild(line);
+    });
+
+    pts.forEach((p, i) => {
+      const idx = periodIndex(p.period);
+      const cx = xAt(idx), cy = yAt(p.value);
+      const isLast = i === pts.length - 1;
+      const dot = document.createElementNS(svgNS, 'circle');
+      dot.setAttribute('cx', cx); dot.setAttribute('cy', cy);
+      dot.setAttribute('r', isLast ? 4 : 2.5);
+      if (p.derived) {
+        // Hollow marker = value was derived from a reported % change, not independently disclosed.
+        dot.setAttribute('fill', 'var(--surface-1)');
+        dot.setAttribute('stroke', s.color);
+        dot.setAttribute('stroke-width', '1.6');
+      } else {
+        dot.setAttribute('fill', s.color);
+        if (isLast) { dot.setAttribute('stroke', 'var(--surface-1)'); dot.setAttribute('stroke-width', '2'); }
+      }
+      g.appendChild(dot);
+
+      const hit = document.createElementNS(svgNS, 'circle');
+      hit.setAttribute('cx', cx); hit.setAttribute('cy', cy);
+      hit.setAttribute('r', 9);
+      hit.setAttribute('class', 'cat-dot-hit');
+      const displayVal = opts.isPercent
+        ? fmtPct(p.value, 1)
+        : (fmtNum(p.value, opts.decimals != null ? opts.decimals : 0) + ' ' + unitLabel);
+      const derivedTag = p.derived ? '<br><em>derived from a reported % change</em>' : '';
+      hit.addEventListener('mousemove', (e) => showTip(e, `<strong>${s.label}</strong><br>${p.label || p.period}<br>${displayVal}${derivedTag}`));
+      hit.addEventListener('mouseleave', hideTip);
+      g.appendChild(hit);
+    });
+
+    svg.appendChild(g);
+  });
+
+  // Axis labels: independent of any one series (series may have different point sets), sparse by stride
+  // so a 19+ month axis doesn't collide — always show the first and last month, plus evenly-spaced ticks.
+  const labelWidth = opts.showYear ? 48 : 34;
+  const maxTicks = Math.max(2, Math.floor((W - padLeft - padX) / labelWidth));
+  const stride = Math.max(1, Math.ceil((n - 1) / (maxTicks - 1)));
+  axisPeriods.forEach((period, idx) => {
+    if (idx !== 0 && idx !== n - 1 && idx % stride !== 0) return;
+    // Drop a strided tick that would sit on top of the always-shown final tick.
+    if (idx !== 0 && idx !== n - 1 && (n - 1 - idx) < stride * 0.6) return;
+    const label = document.createElementNS(svgNS, 'text');
+    label.setAttribute('x', xAt(idx));
+    label.setAttribute('y', H - 4);
+    label.setAttribute('text-anchor', idx === 0 ? 'start' : (idx === n - 1 ? 'end' : 'middle'));
+    label.setAttribute('class', 'cat-axis-label');
+    // Over a multi-year axis a bare month abbreviation is ambiguous — show "Sep '24" instead.
+    label.textContent = opts.showYear
+      ? `${shortMonth(period)} '${period.split(' ')[1].slice(2)}`
+      : shortMonth(period);
+    svg.appendChild(label);
+  });
+
+  container.appendChild(svg);
+  return svg;
+}
+
+// Category trend grid, grouped by supply-chain stage and re-renderable at a chosen timeframe.
+const CAT_RANGES = [{ id: '12m', label: '1Y', months: 12 }, { id: '24m', label: '2Y', months: 24 },
+                    { id: '36m', label: '3Y', months: 36 }, { id: '60m', label: '5Y', months: 60 },
+                    { id: '96m', label: '8Y', months: 96 }, { id: 'all', label: 'All', months: null }];
+let catRange = 'all';
+const catGrid = document.getElementById('cat-grid');
+const catRangeChips = document.getElementById('cat-range-chips');
+let skippedCats = [];
+
+function renderCatRangeChips() {
+  catRangeChips.innerHTML = '';
+  // Hide a window longer than the data actually spans — offering "8Y" on a 3-year series is a lie.
+  CAT_RANGES.filter(r => !r.months || r.months < AXIS_MONTHS.length)
+            .forEach(r => chip(catRangeChips, r.label, catRange === r.id, () => {
+    catRange = r.id; renderCatRangeChips(); renderCatGrid();
+  }));
+}
+
+function renderCatGrid() {
+  catGrid.innerHTML = '';
+  skippedCats = [];
+  const r = CAT_RANGES.find(x => x.id === catRange);
+  const axis = r.months && AXIS_MONTHS.length > r.months ? AXIS_MONTHS.slice(-r.months) : AXIS_MONTHS;
+  const axisSet = new Set(axis);
+
+  document.getElementById('cat-grid-sub').textContent =
+    `${axis[0]}–${axis[axis.length - 1]}. Each panel sums the monthly revenue of the companies in that category that disclose monthly (single-company categories show that company's own trend). Panels are ordered by position in the supply chain. Click a panel to break it out by company; hover a point for the exact month.`;
+
+  let lastStage = null;
+  DATA.categories.forEach((cat, idx) => {
+    const result = categorySeries(cat);
+    if (!result) { skippedCats.push(cat.label); return; }
+    const { monthlyMembers, allMembers } = result;
+    const series = result.series.filter(p => axisSet.has(p.period));
+    if (!series.length) { skippedCats.push(cat.label); return; }
+
+    // A full-width stage heading breaks the grid into supply-chain sections.
+    if (cat.stage && cat.stage !== lastStage) {
+      lastStage = cat.stage;
+      const h = document.createElement('div');
+      h.textContent = cat.stage;
+      h.style.cssText = 'grid-column:1/-1;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-top:6px;';
+      catGrid.appendChild(h);
+    }
+
+    const colorVar = catColorSlots[idx % catColorSlots.length];
+    const first = series[0].value, last = series[series.length - 1].value;
+    const growth = ((last - first) / first) * 100;
+    const extra = allMembers.filter(m => !monthlyMembers.includes(m));
+
+    const card = document.createElement('div');
+    card.className = 'cat-chart';
+    card.innerHTML = `
+      <div class="cat-title">${cat.label} <span class="cat-expand-hint">expand &#8599;</span></div>
+      <div class="cat-members">${allMembers.map(m => m.name).join(' + ')}</div>
+      <div class="cat-latest">${fmtNum(last, 0)} NT$M</div>
+      <div class="cat-delta ${growth > 0 ? 'up' : ''}" style="color:${growth > 0 ? 'var(--good)' : 'var(--text-secondary)'}">${fmtPct(growth)} since ${series[0].period}${extra.length ? ' &middot; ' + monthlyMembers.map(m => m.name).join('+') + ' only' : ''}</div>
+    `;
+    const holder = document.createElement('div');
+    card.appendChild(holder);
+    catGrid.appendChild(card);
+    renderMultiSeriesChart(holder, axis, [{ label: cat.label, color: `var(${colorVar})`, points: series }], 'NT$M',
+      { showYear: axis.length > 18 });
+    card.addEventListener('click', () => openCategoryModal(cat, allMembers));
+  });
+}
+renderCatRangeChips();
+renderCatGrid();
+
+setNote(document.getElementById('cat-grid-note'), skippedCats.length
+  ? `Not charted (no monthly disclosure — quarterly only): ${skippedCats.join(', ')}. See the company table below for their latest quarterly figures. ${DATA.categories_note}`
+  : DATA.categories_note);
+
+// ---------- category momentum scorecard ----------
+// Answers "what changed, and versus what" in one screen: each category's growth in the latest
+// broadly-reported quarter, the quarter before it, and the delta (acceleration), ranked so
+// categories read against each other. Growth is the MEDIAN of member YoY rather than a summed
+// total, because members report in five currencies — a median is currency-agnostic and is not
+// dominated by whichever member happens to be largest.
+//
+// Rows expand to list their members, and any member can be excluded; the median recomputes live.
+// That matters because several categories contain a genuine outlier (Nanya at +720% inside Memory,
+// Alchip inside ASIC Design) and the useful question is often "what does this look like without it".
+const MOM_COLS = [
+  { id: 'label',  label: 'Category',   align: 'left'  },
+  { id: 'prior',  label: null,         align: 'right' },
+  { id: 'latest', label: null,         align: 'right' },
+  { id: 'accel',  label: 'Change',     align: 'right' }
+];
+let momSort = 'latest', momDir = -1;
+const momExcluded = {};   // categoryId -> Set of excluded company ids
+const momExpanded = new Set();
+
+function quarterYoYFor(company, period) {
+  const q = (company.quarterly_history || []).find(x => x.period === period);
+  return q && q.yoy_pct !== null && q.yoy_pct !== undefined ? q.yoy_pct : null;
+}
+const median = a2 => {
+  if (!a2.length) return null;
+  const s2 = a2.slice().sort((x, y) => x - y), h = Math.floor(s2.length / 2);
+  return s2.length % 2 ? s2[h] : (s2[h - 1] + s2[h]) / 2;
+};
+
+// Use the most recent quarter where a decent share of companies report, not simply the newest
+// quarter present — several China A-share names file H1 in late August, so the very latest
+// quarter is thin and would misrepresent every category containing one.
+const MOM_QUARTERS = (() => {
+  const counts = new Map();
+  DATA.companies.forEach(c => (c.quarterly_history || []).forEach(q => {
+    if (q.yoy_pct === null || q.yoy_pct === undefined) return;
+    counts.set(q.period, (counts.get(q.period) || 0) + 1);
+  }));
+  const MNn = { Jan:1, Feb:2, Mar:3, Apr:4, May:5, Jun:6, Jul:7, Aug:8, Sep:9, Oct:10, Nov:11, Dec:12 };
+  const stp = p => { const [m, y] = p.split(' '); return (+y) * 12 + MNn[m]; };
+  const peak = Math.max(...counts.values());
+  const good = [...counts.entries()].filter(([, n]) => n >= peak * 0.6).map(([p]) => p).sort((a2, b2) => stp(a2) - stp(b2));
+  return { latest: good[good.length - 1], prior: good[good.length - 2] };
+})();
+
+function momMembers(cat) {
+  const { latest, prior } = MOM_QUARTERS;
+  return cat.members.map(id => companyById[id]).filter(Boolean).map(c => ({
+    c, now: quarterYoYFor(c, latest), then: quarterYoYFor(c, prior)
+  })).filter(m => m.now !== null || m.then !== null);
+}
+
+function momRows() {
+  return DATA.categories.map(cat => {
+    const ex = momExcluded[cat.id] || new Set();
+    const members = momMembers(cat);
+    const kept = members.filter(m => !ex.has(m.c.id));
+    const now = kept.map(m => m.now).filter(v => v !== null);
+    const then = kept.map(m => m.then).filter(v => v !== null);
+    const nowMed = median(now), thenMed = median(then);
+    return { cat, stage: cat.stage, label: cat.label, members, excluded: ex,
+             n: now.length, latest: nowMed, prior: thenMed,
+             accel: (nowMed !== null && thenMed !== null) ? nowMed - thenMed : null };
+  }).filter(r => r.latest !== null && r.n >= 2);
+}
+
+function renderMomentum() {
+  const { latest, prior } = MOM_QUARTERS;
+  const rows = momRows();
+  const stageOrder = Object.fromEntries(DATA.stages.map((s2, i) => [s2, i]));
+  const key = momSort;
+  rows.sort((x, y) => {
+    if (key === 'label') return momDir * x.label.localeCompare(y.label);
+    if (key === 'stage') return momDir * (stageOrder[x.stage] - stageOrder[y.stage]);
+    const xv = x[key], yv = y[key];
+    if (xv === null) return 1;
+    if (yv === null) return -1;
+    return momDir * (yv - xv) * -1 * -1;
+  });
+  if (key !== 'label' && key !== 'stage') rows.sort((x, y) => {
+    const xv = x[key], yv = y[key];
+    if (xv === null) return 1;
+    if (yv === null) return -1;
+    return momDir === -1 ? yv - xv : xv - yv;
+  });
+
+  const chipsEl = document.getElementById('mom-sort-chips');
+  chipsEl.innerHTML = '';
+  chip(chipsEl, 'Supply-chain order', momSort === 'stage', () => { momSort = 'stage'; momDir = 1; renderMomentum(); });
+  const anyEx = Object.values(momExcluded).some(x => x && x.size);
+  if (anyEx) chip(chipsEl, 'Reset exclusions', false, () => {
+    Object.keys(momExcluded).forEach(k => delete momExcluded[k]); renderMomentum();
+  });
+
+  const vals = rows.flatMap(r => [r.latest, r.prior].filter(v => v !== null));
+  const lo = Math.min(0, ...vals), hi = Math.max(0, ...vals), span = (hi - lo) || 1;
+  const xPct = v => ((v - lo) / span) * 100;
+  const arrow = id => momSort === id ? (momDir === -1 ? ' ▾' : ' ▴') : '';
+
+  const el = document.getElementById('mom-table');
+  el.innerHTML = '';
+  const head = document.createElement('div');
+  head.className = 'mom-row mom-head';
+  head.innerHTML = `
+    <div class="mom-sortable" data-k="label">Category${arrow('label')}</div>
+    <div>Median member YoY revenue growth</div>
+    <div class="mom-sortable" style="text-align:right;" data-k="prior">${prior || '—'}${arrow('prior')}</div>
+    <div class="mom-sortable" style="text-align:right;" data-k="latest">${latest}${arrow('latest')}</div>
+    <div class="mom-sortable" style="text-align:right;" data-k="accel">Change${arrow('accel')}</div>`;
+  head.querySelectorAll('.mom-sortable').forEach(h => h.addEventListener('click', () => {
+    const k = h.getAttribute('data-k');
+    if (momSort === k) momDir *= -1; else { momSort = k; momDir = k === 'label' ? 1 : -1; }
+    renderMomentum();
+  }));
+  el.appendChild(head);
+
+  rows.forEach(r => {
+    const open = momExpanded.has(r.cat.id);
+    const row = document.createElement('div');
+    row.className = 'mom-row';
+    const x0 = xPct(0), xNow = xPct(r.latest);
+    const left = Math.min(x0, xNow), width = Math.abs(xNow - x0);
+    const up = r.latest >= 0;
+    const priorMark = r.prior !== null
+      ? `<div class="mom-bar" style="left:calc(${xPct(r.prior)}% - 1px); width:2px; background:var(--text-muted); opacity:.75;"></div>` : '';
+    const exCount = r.excluded.size;
+    row.innerHTML = `
+      <div>
+        <div class="mom-name"><span class="mom-caret">${open ? '▾' : '▸'}</span> ${r.cat.label}</div>
+        <div class="mom-stage">${r.stage} &middot; ${r.n} reporting${exCount ? ` &middot; ${exCount} excluded` : ''}</div>
+      </div>
+      <div class="mom-track">
+        <div class="mom-bar" style="left:${left}%; width:${width}%; background:${up ? 'var(--good)' : 'var(--series-2)'}; opacity:.30;"></div>
+        ${priorMark}<div class="mom-zero" style="left:${x0}%;"></div>
+      </div>
+      <div class="mom-num" style="color:var(--text-secondary)">${r.prior !== null ? fmtPct(r.prior, 1) : '—'}</div>
+      <div class="mom-num" style="color:${up ? 'var(--good)' : 'var(--text-primary)'}">${fmtPct(r.latest, 1)}</div>
+      <div class="mom-delta" style="color:${r.accel === null ? 'var(--text-muted)' : (r.accel >= 0 ? 'var(--good)' : 'var(--text-secondary)')}">
+        ${r.accel === null ? '—' : (r.accel >= 0 ? '▲ ' : '▼ ') + fmtPct(Math.abs(r.accel), 1).replace('+', '')}
+      </div>`;
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', () => {
+      if (open) momExpanded.delete(r.cat.id); else momExpanded.add(r.cat.id);
+      renderMomentum();
+    });
+    el.appendChild(row);
+
+    if (open) {
+      const panel = document.createElement('div');
+      panel.className = 'mom-members';
+      r.members.forEach(m => {
+        const off = r.excluded.has(m.c.id);
+        const b2 = document.createElement('button');
+        b2.type = 'button';
+        b2.className = 'mom-member' + (off ? ' off' : '');
+        b2.innerHTML = `<span class="mom-member-name">${m.c.name}</span>
+          <span class="mom-member-val">${m.now !== null ? fmtPct(m.now, 1) : '—'}</span>`;
+        b2.title = off ? 'Excluded from the median — click to include' : 'Click to exclude from the median';
+        b2.addEventListener('click', ev => {
+          ev.stopPropagation();
+          if (!momExcluded[r.cat.id]) momExcluded[r.cat.id] = new Set();
+          const set = momExcluded[r.cat.id];
+          if (set.has(m.c.id)) set.delete(m.c.id); else set.add(m.c.id);
+          renderMomentum();
+        });
+        panel.appendChild(b2);
+      });
+      const link = document.createElement('button');
+      link.type = 'button';
+      link.className = 'note-toggle';
+      link.textContent = 'Break out by company ↗';
+      link.addEventListener('click', ev => {
+        ev.stopPropagation();
+        openCategoryModal(r.cat, r.cat.members.map(id => companyById[id]).filter(Boolean));
+      });
+      panel.appendChild(link);
+      el.appendChild(panel);
+    }
+  });
+
+  document.getElementById('mom-sub').textContent =
+    `Every supply-chain category ranked by revenue growth in ${latest}, against its own ${prior} reading and against the other categories. The grey tick on each bar is ${prior}, so the gap between tick and bar end is the acceleration. Click a column header to sort; click a row to expand it and exclude individual companies from the median.`;
+  setNote(document.getElementById('mom-note'),
+    `Growth is the MEDIAN year-over-year revenue growth of the companies in each category that reported ${latest}, not a summed total — members report in NT$, JPY, KRW, RMB and US$, so a currency-agnostic median is the only honest cross-category aggregate, and it also stops one very large member speaking for the whole category. Excluding a company recomputes the median immediately, which is the quickest way to test whether a category's reading depends on a single outlier. Categories with fewer than two reporting members are omitted. ${latest} was chosen as the latest quarter with broad coverage rather than simply the newest quarter present, because several China A-share companies file H1 results in late August and the newest quarter is therefore thin. ${DATA.categories_note}`);
+}
+renderMomentum();
+
+// ---------- category drill-down modal (YoY growth %) ----------
+const modalBackdrop = document.getElementById('modal-backdrop');
+const modalCard = document.getElementById('modal-card');
+const modalTitle = document.getElementById('modal-title');
+const modalSub = document.getElementById('modal-sub');
+const modalLegend = document.getElementById('modal-legend');
+const modalChart = document.getElementById('modal-chart');
+const modalFoot = document.getElementById('modal-foot');
+
+function closeModal() {
+  modalCard.classList.remove('wide');
+  modalBackdrop.classList.remove('open');
+  modalChart.innerHTML = '';
+  modalLegend.innerHTML = '';
+}
+document.getElementById('modal-close').addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', (e) => { if (e.target === modalBackdrop) closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+// Build a {period, value, label} series of YoY% for one company, whether it reports monthly or quarterly.
+// Quarterly reporters (quarterly_history) are plotted at the axis month matching their quarter's end month
+// (already encoded as `period` in quarterly_history, e.g. "Jun 2026" for Q2) — sparse points, dashed line.
+function yoySeriesForCompany(m) {
+  if (m.monthly_history && m.monthly_history.length) {
+    return m.monthly_history
+      .filter(p => p.yoy_pct !== undefined && p.yoy_pct !== null)
+      .map(p => ({ period: p.period, value: p.yoy_pct }));
+  }
+  if (m.quarterly_history && m.quarterly_history.length) {
+    return m.quarterly_history.map(p => ({ period: p.period, value: p.yoy_pct, label: p.label + ' (quarterly)' }));
+  }
+  return [];
+}
+
+function openCategoryModal(cat, members) {
+  modalTitle.textContent = cat.label + ' — YoY growth by company';
+  modalSub.textContent = `Year-over-year revenue growth, %, ${AXIS_MONTHS[0]}–${AXIS_MONTHS[AXIS_MONTHS.length - 1]}. Monthly reporters show every available month; quarterly-only reporters (dashed line, fewer points) are plotted at their quarter-end month.`;
+  modalChart.innerHTML = '';
+  modalLegend.innerHTML = '';
+
+  const seriesList = members
+    .map((m, i) => ({ label: m.name, color: `var(${catColorSlots[i % catColorSlots.length]})`, points: yoySeriesForCompany(m) }))
+    .filter(s => s.points.length);
+
+  const svg = renderMultiSeriesChart(modalChart, AXIS_MONTHS, seriesList, '%', { width: 700, height: 260, zeroLine: true, isPercent: true, noArea: true, yAxis: true, showYear: true });
+
+  if (seriesList.length > 1) {
+    seriesList.forEach((s, i) => {
+      const item = document.createElement('div');
+      item.className = 'modal-legend-item';
+      item.innerHTML = `<span class="modal-legend-swatch" style="background:${s.color}"></span>${s.label}`;
+      item.addEventListener('click', () => {
+        item.classList.toggle('off');
+        const g = svg.querySelector(`g[data-series-idx="${i}"]`);
+        if (g) g.style.display = item.classList.contains('off') ? 'none' : '';
+      });
+      modalLegend.appendChild(item);
+    });
+  }
+
+  const extraNote = cat.mixed_currency_note ? ' ' + cat.mixed_currency_note : '';
+  // Per-company caveats matter more than the generic note — a reader looking at a step change
+  // needs to know it was an acquisition before they read it as demand.
+  const caveats = members.filter(m => m.data_gap_note).map(m => `${m.name}: ${m.data_gap_note}`);
+  setNote(modalFoot, 'Click a legend item to isolate a company.' + extraNote
+    + (caveats.length ? ' DATA CAVEATS — ' + caveats.join(' ') : '')
+    + ' ' + DATA.categories_note);
+  modalBackdrop.classList.add('open');
+}
+
+// ---------- supply-chain linkages ----------
+// The category grid shows each segment in isolation; this asks whether segments that SHOULD be
+// coupled by industrial logic actually are. Each pair is stated as a hypothesis with a rationale,
+// then tested against the data — correlation of the two categories' YoY growth, and the lead/lag
+// at which that correlation is strongest. A pair that scores badly is as informative as one that
+// scores well, so weak results are shown rather than hidden.
+const LINK_PAIRS = [
+  { a: 'foundry',    b: 'osat',              why: 'Every wafer a foundry starts has to be packaged and tested a few months later, so OSAT should trail foundry.' },
+  { a: 'memory',     b: 'substrate',         why: 'HBM stacks are substrate-hungry, and ABF substrate has been the recurring bottleneck of the AI build-out.' },
+  { a: 'ai_servers', b: 'server_components', why: 'Thermal, power and connector content scales directly with the number of AI servers built.' },
+  { a: 'ai_servers', b: 'networking',        why: 'An AI cluster is not just accelerators — every rack needs switches and optical transceivers alongside it.' },
+  { a: 'ai_servers', b: 'pcb',               why: 'AI server boards are high-layer-count PCB with low-loss laminate; board demand should track server demand.' },
+  { a: 'pc_brand',   b: 'pc_notebook',       why: 'Brands place the orders that the contract ODMs build, so ODM revenue should follow brand revenue with a short lag.' },
+  { a: 'memory',     b: 'storage_controllers', why: 'Controllers ship attached to NAND, so controller revenue should move with the memory cycle.' },
+  { a: 'display',    b: 'fabless',           why: 'Display driver ICs are a large slice of the Taiwan fabless names, so panels and fabless should be coupled.' },
+  { a: 'materials',  b: 'foundry',           why: 'Silicon wafer demand is derived demand from foundry output — it should follow, not lead.' },
+  { a: 'asic_design', b: 'ai_servers',       why: 'Custom accelerators are designed a long way ahead of the servers they ship in, so design services should LEAD servers.' }
+];
+const LINK_RANGES = [
+  { id: '24m', label: '2Y', months: 24 }, { id: '36m', label: '3Y', months: 36 },
+  { id: '60m', label: '5Y', months: 60 }, { id: 'all', label: 'All', months: null }
+];
+const LINK_SORTS = [{ id: 'r', label: 'Strength' }, { id: 'order', label: 'Listed order' }];
+let linkRange = '36m', linkSort = 'r';
+
+// Category-level YoY: sum the monthly members, then compare against the same month a year earlier.
+const catYoYCache = {};
+function categoryYoY(catId) {
+  if (catYoYCache[catId]) return catYoYCache[catId];
+  const cat = DATA.categories.find(c => c.id === catId);
+  const res = cat && categorySeries(cat);
+  if (!res) return (catYoYCache[catId] = null);
+  const byP = new Map(res.series.map(p => [p.period, p.value]));
+  const MNn = { Jan:1, Feb:2, Mar:3, Apr:4, May:5, Jun:6, Jul:7, Aug:8, Sep:9, Oct:10, Nov:11, Dec:12 };
+  const out = res.series.map(p => {
+    const [m, y] = p.period.split(' ');
+    const prev = byP.get(`${m} ${+y - 1}`);
+    return prev && prev > 0 ? { period: p.period, value: (p.value / prev - 1) * 100 } : null;
+  }).filter(Boolean);
+  return (catYoYCache[catId] = out.length ? out : null);
+}
+
+function pearson(xs, ys) {
+  const n = xs.length;
+  if (n < 6) return null;
+  const mx = xs.reduce((s2, v) => s2 + v, 0) / n, my = ys.reduce((s2, v) => s2 + v, 0) / n;
+  let sxy = 0, sxx = 0, syy = 0;
+  for (let i = 0; i < n; i++) { const dx = xs[i] - mx, dy = ys[i] - my; sxy += dx * dy; sxx += dx * dx; syy += dy * dy; }
+  return (sxx && syy) ? sxy / Math.sqrt(sxx * syy) : null;
+}
+
+// Test lags from -6 to +6 months and report where the relationship is strongest. A positive lag
+// means B follows A, which is what the industrial logic usually predicts.
+function bestLag(aPts, bPts) {
+  const aMap = new Map(aPts.map(p => [p.period, p.value]));
+  const bMap = new Map(bPts.map(p => [p.period, p.value]));
+  const MNn = { Jan:1, Feb:2, Mar:3, Apr:4, May:5, Jun:6, Jul:7, Aug:8, Sep:9, Oct:10, Nov:11, Dec:12 };
+  const MNAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const stp = p => { const [m, y] = p.split(' '); return (+y) * 12 + (MNn[m] - 1); };
+  const unstp = v => `${MNAMES[v % 12]} ${Math.floor(v / 12)}`;
+  let best = { r: null, lag: 0, n: 0 };
+  for (let lag = -6; lag <= 6; lag++) {
+    const xs = [], ys = [];
+    aPts.forEach(p => {
+      const bp = unstp(stp(p.period) + lag);
+      if (bMap.has(bp)) { xs.push(p.value); ys.push(bMap.get(bp)); }
+    });
+    const r = pearson(xs, ys);
+    if (r !== null && (best.r === null || Math.abs(r) > Math.abs(best.r))) best = { r, lag, n: xs.length };
+  }
+  return best;
+}
+
+function renderLinks() {
+  const rangeEl = document.getElementById('link-range-chips');
+  rangeEl.innerHTML = '';
+  LINK_RANGES.forEach(r => chip(rangeEl, r.label, linkRange === r.id, () => { linkRange = r.id; renderLinks(); }));
+  const sortEl = document.getElementById('link-sort-chips');
+  sortEl.innerHTML = '';
+  LINK_SORTS.forEach(x => chip(sortEl, x.label, linkSort === x.id, () => { linkSort = x.id; renderLinks(); }));
+
+  const months = (LINK_RANGES.find(r => r.id === linkRange) || {}).months;
+  const built = LINK_PAIRS.map(p => {
+    const catA = DATA.categories.find(c => c.id === p.a), catB = DATA.categories.find(c => c.id === p.b);
+    let A = categoryYoY(p.a), B = categoryYoY(p.b);
+    if (!A || !B || !catA || !catB) return null;
+    if (months) { A = A.slice(-months); B = B.slice(-months); }
+    const lag = bestLag(A, B);
+    if (lag.r === null) return null;
+    return { p, catA, catB, A, B, ...lag };
+  }).filter(Boolean);
+
+  if (linkSort === 'r') built.sort((x, y) => Math.abs(y.r) - Math.abs(x.r));
+
+  const grid = document.getElementById('link-grid');
+  grid.innerHTML = '';
+  built.forEach(d => {
+    const card = document.createElement('div');
+    card.className = 'link-card';
+    const strength = Math.abs(d.r) >= 0.8 ? 'very strong' : Math.abs(d.r) >= 0.6 ? 'strong'
+                    : Math.abs(d.r) >= 0.4 ? 'moderate' : Math.abs(d.r) >= 0.2 ? 'weak' : 'none';
+    // If the best fit sits on the edge of the tested range the true lag may be longer, so say so
+    // rather than presenting a boundary hit as a precise estimate.
+    const atLimit = Math.abs(d.lag) === 6;
+    const lagTxt = (d.lag === 0 ? 'move together, no lag'
+      : d.lag > 0 ? `${d.catB.label} follows by ${d.lag} mo` : `${d.catB.label} leads by ${-d.lag} mo`)
+      + (atLimit ? ' (at test limit — could be longer)' : '');
+    const col = Math.abs(d.r) >= 0.6 ? 'var(--good)' : Math.abs(d.r) >= 0.3 ? 'var(--text-primary)' : 'var(--text-muted)';
+    card.innerHTML = `
+      <div class="link-title">${d.catA.label} <span style="color:var(--text-muted);font-weight:400;">vs</span> ${d.catB.label}</div>
+      <div class="link-why">${d.p.why}</div>
+      <div class="link-stats">
+        <span class="link-r" style="color:${col}">r = ${d.r >= 0 ? '' : '−'}${Math.abs(d.r).toFixed(2)}</span>
+        <span class="link-lag">${strength} &middot; ${lagTxt} &middot; n=${d.n}</span>
+      </div>
+      <div class="link-legend">
+        <span class="link-leg"><span class="link-sw" style="background:var(--series-1)"></span>${d.catA.label}</span>
+        <span class="link-leg"><span class="link-sw" style="background:var(--series-2)"></span>${d.catB.label}</span>
+      </div>`;
+    const holder = document.createElement('div');
+    card.appendChild(holder);
+    grid.appendChild(card);
+    const axis = [...new Set([...d.A, ...d.B].map(p2 => p2.period))]
+      .sort((x, y) => AXIS_MONTHS.indexOf(x) - AXIS_MONTHS.indexOf(y));
+    renderMultiSeriesChart(holder, axis, [
+      { label: d.catA.label, color: 'var(--series-1)', points: d.A },
+      { label: d.catB.label, color: 'var(--series-2)', points: d.B }
+    ], '%', { width: 330, height: 128, isPercent: true, zeroLine: true, noArea: true, showYear: axis.length > 18 });
+  });
+
+  document.getElementById('link-sub').textContent =
+    'Pairs of segments that industrial logic says should be coupled, tested against the data. Each panel plots both categories\' year-over-year growth and reports the correlation, plus the lead/lag at which it is strongest — so you can see not just whether two segments move together but which one turns first.';
+  setNote(document.getElementById('link-note'),
+    'Correlation is Pearson r on the two categories\' monthly YoY growth over the selected window, tested at every lag from -6 to +6 months with the strongest reported; where the best fit lands on the edge of that range it is flagged, because the true lag may be longer than the test window can see. A positive lag means the second segment follows the first. Both series are category aggregates of the NT$-reporting monthly disclosers only, so a category\'s non-Taiwan members do not contribute here even though they appear elsewhere on this dashboard — the linkage view trades breadth for a consistent monthly cadence. Correlation is not causation and these windows are short: a high r on a two-year window mostly says both segments rode the same AI cycle, which is worth knowing but is not evidence of a supply relationship on its own. Pairs that score weakly are deliberately left visible, because a broken link is as informative as an intact one.');
+}
+renderLinks();
+
+// ---------- correlation matrix ----------
+// The linkage panels above test ten hypotheses I wrote down in advance. This does the opposite:
+// it correlates every segment against every other so relationships nobody predicted can surface.
+// Both views are needed — a hypothesis view alone confirms what you already believe, and a matrix
+// alone will happily hand you spurious pairs with no mechanism behind them.
+const CM_RANGES = [
+  { id: '24m', label: '2Y', months: 24 }, { id: '36m', label: '3Y', months: 36 },
+  { id: '60m', label: '5Y', months: 60 }, { id: 'all', label: 'All', months: null }
+];
+const CM_ORDERS = [{ id: 'stage', label: 'Supply-chain order' }, { id: 'cluster', label: 'Group similar' }];
+let cmRange = '36m', cmOrder = 'stage', cmSel = null;
+
+function cmCats() {
+  return DATA.categories.filter(c => {
+    const y = categoryYoY(c.id);
+    return y && y.length >= 12;
+  });
+}
+
+function cmMatrix(cats, months) {
+  const series = cats.map(c => {
+    let y = categoryYoY(c.id);
+    return months ? y.slice(-months) : y;
+  });
+  const M = cats.map(() => cats.map(() => null));
+  for (let i = 0; i < cats.length; i++) {
+    for (let j = 0; j < cats.length; j++) {
+      if (i === j) { M[i][j] = 1; continue; }
+      if (j < i) { M[i][j] = M[j][i]; continue; }
+      const bMap = new Map(series[j].map(p => [p.period, p.value]));
+      const xs = [], ys = [];
+      series[i].forEach(p => { if (bMap.has(p.period)) { xs.push(p.value); ys.push(bMap.get(p.period)); } });
+      M[i][j] = pearson(xs, ys);
+    }
+  }
+  return M;
+}
+
+function cmColor(r) {
+  if (r === null) return 'var(--gridline)';
+  const a = Math.min(1, Math.abs(r)) * 0.85;
+  // Diverging, not sequential: sign carries meaning, so positive and negative get distinct hues
+  // and zero fades to neutral rather than to one end of a ramp.
+  return r >= 0 ? `color-mix(in srgb, var(--series-1) ${Math.round(a * 100)}%, transparent)`
+                : `color-mix(in srgb, var(--series-2) ${Math.round(a * 100)}%, transparent)`;
+}
+
+function renderMatrix() {
+  const rangeEl = document.getElementById('cm-range-chips');
+  rangeEl.innerHTML = '';
+  CM_RANGES.forEach(r => chip(rangeEl, r.label, cmRange === r.id, () => { cmRange = r.id; cmSel = null; renderMatrix(); }));
+  const ordEl = document.getElementById('cm-order-chips');
+  ordEl.innerHTML = '';
+  CM_ORDERS.forEach(o => chip(ordEl, o.label, cmOrder === o.id, () => { cmOrder = o.id; renderMatrix(); }));
+
+  const months = (CM_RANGES.find(r => r.id === cmRange) || {}).months;
+  let cats = cmCats();
+  const stageOrder = Object.fromEntries(DATA.stages.map((s2, i) => [s2, i]));
+  cats.sort((a, b) => stageOrder[a.stage] - stageOrder[b.stage]);
+  let M = cmMatrix(cats, months);
+
+  if (cmOrder === 'cluster') {
+    // Greedy seriation: start from the most-connected category, then repeatedly append whichever
+    // remaining category correlates best with the one just placed. Not a real clustering algorithm,
+    // but enough to pull related blocks adjacent so structure is visible.
+    const n = cats.length;
+    const score = i => M[i].reduce((s2, v, j) => s2 + (i === j ? 0 : Math.abs(v || 0)), 0);
+    const left = new Set(cats.map((_, i) => i));
+    let cur = [...left].sort((a, b) => score(b) - score(a))[0];
+    const order = [cur]; left.delete(cur);
+    while (left.size) {
+      let best = null, bv = -Infinity;
+      left.forEach(j => { const v = Math.abs(M[cur][j] || 0); if (v > bv) { bv = v; best = j; } });
+      order.push(best); left.delete(best); cur = best;
+    }
+    cats = order.map(i => cats[i]);
+    M = cmMatrix(cats, months);
+  }
+
+  const n = cats.length;
+  const grid = document.getElementById('cm-grid');
+  grid.className = 'cm-grid';
+  grid.style.gridTemplateColumns = `170px repeat(${n}, minmax(30px, 1fr))`;
+  grid.style.minWidth = (170 + n * 32) + 'px';
+  grid.innerHTML = '';
+
+  grid.appendChild(document.createElement('div'));
+  cats.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'cm-collab';
+    d.textContent = c.label;
+    d.title = c.label;
+    grid.appendChild(d);
+  });
+
+  cats.forEach((rc, i) => {
+    const lab = document.createElement('div');
+    lab.className = 'cm-rowlab';
+    lab.textContent = rc.label;
+    lab.title = `${rc.label} — ${rc.stage}`;
+    grid.appendChild(lab);
+    cats.forEach((cc, j) => {
+      const cell = document.createElement('div');
+      const r = M[i][j];
+      cell.className = 'cm-cell' + (i === j ? ' cm-diag' : '');
+      if (cmSel && cmSel.i === i && cmSel.j === j) cell.classList.add('sel');
+      if (i !== j) {
+        cell.style.background = cmColor(r);
+        cell.textContent = r === null ? '' : (Math.abs(r) >= 0.45 ? (r >= 0 ? '' : '−') + Math.abs(r).toFixed(1).replace('0.', '.') : '');
+        cell.title = `${rc.label} vs ${cc.label}: r = ${r === null ? 'n/a' : r.toFixed(2)}`;
+        cell.addEventListener('click', () => { cmSel = { i, j, a: rc, b: cc, r }; renderMatrix(); });
+      } else {
+        cell.title = rc.label;
+      }
+      grid.appendChild(cell);
+    });
+  });
+
+  // Detail panel for the selected pair
+  const det = document.getElementById('cm-detail');
+  det.innerHTML = '';
+  if (cmSel) {
+    const a = cats.find(c => c.id === cmSel.a.id), b = cats.find(c => c.id === cmSel.b.id);
+    if (a && b) {
+      let A = categoryYoY(a.id), B = categoryYoY(b.id);
+      if (months) { A = A.slice(-months); B = B.slice(-months); }
+      const lag = bestLag(A, B);
+      const card = document.createElement('div');
+      card.className = 'cm-detail-card';
+      const lagTxt = lag.lag === 0 ? 'move together, no lag'
+        : lag.lag > 0 ? `${b.label} follows by ${lag.lag} mo` : `${b.label} leads by ${-lag.lag} mo`;
+      card.innerHTML = `<div class="link-title">${a.label} <span style="color:var(--text-muted);font-weight:400;">vs</span> ${b.label}</div>
+        <div class="link-stats" style="margin-top:6px;">
+          <span class="link-r" style="color:${Math.abs(cmSel.r) >= 0.6 ? 'var(--good)' : 'var(--text-primary)'}">r = ${cmSel.r >= 0 ? '' : '−'}${Math.abs(cmSel.r).toFixed(2)}</span>
+          <span class="link-lag">best fit at ${lagTxt} (r = ${lag.r === null ? 'n/a' : lag.r.toFixed(2)}) &middot; n=${lag.n}</span>
+        </div>
+        <div class="link-legend">
+          <span class="link-leg"><span class="link-sw" style="background:var(--series-1)"></span>${a.label}</span>
+          <span class="link-leg"><span class="link-sw" style="background:var(--series-2)"></span>${b.label}</span>
+        </div>`;
+      const holder = document.createElement('div');
+      card.appendChild(holder);
+      det.appendChild(card);
+      const axis = [...new Set([...A, ...B].map(p => p.period))]
+        .sort((x, y) => AXIS_MONTHS.indexOf(x) - AXIS_MONTHS.indexOf(y));
+      renderMultiSeriesChart(holder, axis, [
+        { label: a.label, color: 'var(--series-1)', points: A },
+        { label: b.label, color: 'var(--series-2)', points: B }
+      ], '%', { width: 820, height: 190, isPercent: true, zeroLine: true, noArea: true, yAxis: true, showYear: true });
+    }
+  }
+
+  // Strongest and most negative pairs, so the eye has somewhere to start
+  const pairs = [];
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) if (M[i][j] !== null) pairs.push({ i, j, r: M[i][j] });
+  pairs.sort((x, y) => y.r - x.r);
+  const top = pairs.slice(0, 3).map(p => `${cats[p.i].label} & ${cats[p.j].label} (${p.r.toFixed(2)})`);
+  const bot = pairs.slice(-3).reverse().map(p => `${cats[p.i].label} & ${cats[p.j].label} (${p.r.toFixed(2)})`);
+
+  const wrap = document.getElementById('cm-wrap');
+  wrap.querySelectorAll('.cm-scale').forEach(n2 => n2.remove());
+  const scale = document.createElement('div');
+  scale.className = 'cm-scale';
+  scale.innerHTML = `<span>−1</span><span class="cm-scale-bar"></span><span>+1</span>
+    <span style="margin-left:10px;">Click any cell to chart the pair. Values shown where |r| &ge; 0.45; hover any cell for the exact figure.</span>`;
+  wrap.appendChild(scale);
+
+  document.getElementById('cm-sub').textContent =
+    `Pearson correlation of monthly YoY growth between all ${n} segments that disclose monthly, over the selected window. Strongest right now: ${top.join('; ')}. Most negative: ${bot.join('; ')}.`;
+  setNote(document.getElementById('cm-note'),
+    `Correlation is computed at zero lag on the two segments' monthly YoY growth; select a cell to see the pair charted with its best lead/lag fit. "Group similar" reorders rows and columns by a greedy nearest-neighbour walk so related segments sit adjacent and block structure becomes visible — it is a readability aid, not a statistical clustering result. Only segments with at least 12 months of category-level YoY are included, and every series is built from the NT$-reporting monthly disclosers only, so a category's Japanese, Korean and Chinese members do not contribute here. Two warnings worth taking seriously: with roughly ${n * (n - 1) / 2} pairs on screen, some will look strong by chance alone, and over a short window nearly everything in this industry correlates because nearly everything rode the same AI cycle. Treat a cell as a prompt to go look for a mechanism, not as evidence of one. ${DATA.categories_note}`);
+}
+renderMatrix();
+
+// ---------- quarterly KPI explorer ----------
+// Flow is category -> metric -> timeframe. Picking the segment first is what makes the metric list
+// meaningful: "capacity utilization" only exists for foundries, "DRAM ASP" only for memory, and
+// offering every metric up front would mostly offer dead ends.
+//
+// Revenue YoY % is deliberately special-cased onto the MONTHLY axis, reusing the same mixed-cadence
+// logic as the drill-down modal: Taiwan's monthly disclosers get all 19 monthly points and everyone
+// else is plotted at their quarter-end. That is the only way a single metric covers all companies.
+const KPI_METRICS = [
+  { id: 'yoy_pct',                   label: 'Revenue YoY %',           monthly: true },
+  { id: 'gross_margin_pct',          label: 'Gross margin %' },
+  { id: 'operating_margin_pct',      label: 'Operating margin %' },
+  { id: 'utilization_pct',           label: 'Capacity utilization %' },
+  { id: 'dram_asp_qoq_pct',          label: 'DRAM ASP QoQ %' },
+  { id: 'dram_bit_shipment_qoq_pct', label: 'DRAM bit shipments QoQ %' }
+];
+const KPI_RANGES = [
+  { id: '12m', label: '1Y', months: 12, quarters: 4 },
+  { id: '24m', label: '2Y', months: 24, quarters: 8 },
+  { id: '36m', label: '3Y', months: 36, quarters: 12 },
+  { id: '60m', label: '5Y', months: 60, quarters: 20 },
+  { id: '96m', label: '8Y', months: 96, quarters: 32 },
+  { id: 'all', label: 'All', months: null, quarters: null }
+];
+
+const QUARTER_ORDER = (() => {
+  const seen = new Map();
+  const MN = { Jan:1, Feb:2, Mar:3, Apr:4, May:5, Jun:6, Jul:7, Aug:8, Sep:9, Oct:10, Nov:11, Dec:12 };
+  DATA.companies.forEach(c => (c.quarterly_history || []).forEach(q => {
+    if (!seen.has(q.period)) { const [m, y] = q.period.split(' '); seen.set(q.period, { y: +y, m: MN[m] }); }
+  }));
+  return [...seen.keys()].sort((a, b) => (seen.get(a).y - seen.get(b).y) || (seen.get(a).m - seen.get(b).m));
+})();
+
+function kpiMembers(categoryId) {
+  const cat = DATA.categories.find(c => c.id === categoryId);
+  return cat ? cat.members.map(id => companyById[id]).filter(Boolean) : [];
+}
+
+function kpiThinFor(metricId, categoryId) {
+  const metric = KPI_METRICS.find(m => m.id === metricId) || KPI_METRICS[0];
+  return kpiMembers(categoryId).map(c => {
+    const pts = metric.monthly
+      ? (yoySeriesForCompany(c) || [])
+      : (c.quarterly_history || []).filter(q => q[metricId] !== undefined && q[metricId] !== null);
+    return { name: c.name, n: pts.length };
+  }).filter(x => x.n > 0 && x.n < MIN_SERIES_POINTS);
+}
+
+function kpiSeriesFor(metricId, categoryId) {
+  const metric = KPI_METRICS.find(m => m.id === metricId) || KPI_METRICS[0];
+  return kpiMembers(categoryId).map(c => {
+    let points;
+    if (metric.monthly) {
+      points = yoySeriesForCompany(c) || [];
+    } else {
+      points = (c.quarterly_history || [])
+        .filter(q => q[metricId] !== undefined && q[metricId] !== null)
+        .map(q => ({ period: q.period, value: q[metricId], label: q.label || q.period }));
+    }
+    return { company: c, points, monthly: !!metric.monthly };
+  }).filter(s => s.points.length >= MIN_SERIES_POINTS);
+}
+
+const kpiMetricChips = document.getElementById('kpi-metric-chips');
+const kpiCatChips    = document.getElementById('kpi-cat-chips');
+const kpiRangeChips  = document.getElementById('kpi-range-chips');
+const kpiLegendEl    = document.getElementById('kpi-legend');
+const kpiChartEl     = document.getElementById('kpi-chart');
+
+// There is deliberately no "all categories" option: the palette carries 8 hues and plotting every
+// company at once would be an unreadable hairball. Comparison happens within a segment.
+const kpiCategories = DATA.categories.filter(cat => kpiSeriesFor('yoy_pct', cat.id).length);
+const kpiState = { category: (kpiCategories[0] || {}).id, metric: 'yoy_pct', range: 'all', showAll: false };
+// The categorical palette carries 8 hues. Past ~10 lines a chart stops being readable and
+// starts being a hairball, so large categories default to a subset.
+const KPI_SERIES_CAP = 10;
+
+function metricsForCategory(catId) {
+  return KPI_METRICS.filter(m => kpiSeriesFor(m.id, catId).length);
+}
+
+function chip(container, label, active, onClick) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'kpi-chip' + (active ? ' active' : '');
+  b.textContent = label;
+  b.addEventListener('click', onClick);
+  container.appendChild(b);
+  return b;
+}
+
+function renderKpiChips() {
+  kpiCatChips.innerHTML = '';
+  let lastStage = null;
+  kpiCategories.forEach(cat => {
+    // Group the category chips by supply-chain stage so the row reads in production order.
+    if (cat.stage && cat.stage !== lastStage) {
+      lastStage = cat.stage;
+      const tag = document.createElement('span');
+      tag.textContent = cat.stage;
+      tag.style.cssText = 'font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);align-self:center;margin-left:6px;';
+      if (kpiCatChips.childNodes.length) tag.style.marginLeft = '14px';
+      kpiCatChips.appendChild(tag);
+    }
+    chip(kpiCatChips, `${cat.label} (${kpiMembers(cat.id).length})`, kpiState.category === cat.id, () => {
+      kpiState.category = cat.id;
+      if (!metricsForCategory(cat.id).some(m => m.id === kpiState.metric)) kpiState.metric = 'yoy_pct';
+      renderKpiChips(); renderKpiChart();
+    });
+  });
+
+  kpiMetricChips.innerHTML = '';
+  metricsForCategory(kpiState.category).forEach(m => {
+    chip(kpiMetricChips, m.label, kpiState.metric === m.id, () => {
+      kpiState.metric = m.id; renderKpiChips(); renderKpiChart();
+    });
+  });
+
+  const capGroup = document.getElementById('kpi-cap-group');
+  const capChips = document.getElementById('kpi-cap-chips');
+  const total = kpiSeriesFor(kpiState.metric, kpiState.category).length;
+  if (total > KPI_SERIES_CAP) {
+    capGroup.style.display = '';
+    capChips.innerHTML = '';
+    chip(capChips, `Top ${KPI_SERIES_CAP}`, !kpiState.showAll, () => { kpiState.showAll = false; renderKpiChips(); renderKpiChart(); });
+    chip(capChips, `All ${total}`, kpiState.showAll, () => { kpiState.showAll = true; renderKpiChips(); renderKpiChart(); });
+  } else {
+    capGroup.style.display = 'none';
+  }
+
+  kpiRangeChips.innerHTML = '';
+  // Offer only windows the current selection can actually fill.
+  const curSeries = kpiSeriesFor(kpiState.metric, kpiState.category);
+  const span = curSeries.length
+    ? new Set(curSeries.flatMap(s2 => s2.points.map(p => p.period))).size : 0;
+  const isMonthly = curSeries.length ? curSeries[0].monthly : true;
+  KPI_RANGES.filter(r => {
+    const lim = isMonthly ? r.months : r.quarters;
+    return !lim || lim < span;
+  }).forEach(r => {
+    chip(kpiRangeChips, r.label, kpiState.range === r.id, () => {
+      kpiState.range = r.id; renderKpiChips(); renderKpiChart();
+    });
+  });
+}
+
+function renderKpiChart() {
+  const series = kpiSeriesFor(kpiState.metric, kpiState.category);
+  kpiChartEl.innerHTML = ''; kpiLegendEl.innerHTML = '';
+  if (!series.length) {
+    kpiChartEl.innerHTML = '<div class="kpi-empty">No company in this category reports that metric.</div>';
+    return;
+  }
+  const isMonthly = series[0].monthly;
+  const baseAxis = isMonthly ? AXIS_MONTHS : QUARTER_ORDER;
+  const covered = new Set(series.flatMap(s => s.points.map(p => p.period)));
+  let axis = baseAxis.filter(p => covered.has(p));
+  const range = KPI_RANGES.find(r => r.id === kpiState.range);
+  const limit = isMonthly ? range.months : range.quarters;
+  if (limit && axis.length > limit) axis = axis.slice(-limit);
+  const axisSet = new Set(axis);
+
+  // Rank by how much history each company actually has, so the capped default shows the
+  // companies whose lines carry the most information rather than an arbitrary first-N.
+  let ranked = series.slice().sort((a, b) => b.points.length - a.points.length);
+  const capped = !kpiState.showAll && ranked.length > KPI_SERIES_CAP;
+  if (capped) ranked = ranked.slice(0, KPI_SERIES_CAP);
+
+  const seriesList = ranked.map((s, i) => ({
+    label: s.company.name,
+    color: `var(${catColorSlots[i % catColorSlots.length]})`,
+    points: s.points.filter(p => axisSet.has(p.period))
+  })).filter(s => s.points.length);
+
+  if (!seriesList.length) {
+    kpiChartEl.innerHTML = '<div class="kpi-empty">No data in the selected timeframe — try a longer window.</div>';
+    return;
+  }
+
+  const svg = renderMultiSeriesChart(kpiChartEl, axis, seriesList, '%', {
+    width: 760, height: 280, zeroLine: true, isPercent: true, noArea: true, yAxis: true, showYear: true
+  });
+  svg.style.minHeight = '280px';
+
+  seriesList.forEach((s, i) => {
+    const item = document.createElement('div');
+    item.className = 'modal-legend-item';
+    item.innerHTML = `<span class="modal-legend-swatch" style="background:${s.color}"></span>${s.label}`;
+    item.addEventListener('click', () => {
+      item.classList.toggle('off');
+      const g = svg.querySelector(`g[data-series-idx="${i}"]`);
+      if (g) g.style.display = item.classList.contains('off') ? 'none' : '';
+    });
+    kpiLegendEl.appendChild(item);
+  });
+
+  const cat = DATA.categories.find(c => c.id === kpiState.category);
+  const cadence = isMonthly
+    ? 'Monthly disclosers show every month; quarterly-only reporters (dashed, fewer points) are plotted at their quarter-end.'
+    : 'Quarterly cadence. Taiwan monthly disclosers carry a derived quarterly series (calendar-quarter sums of their monthly revenue), so margin data for them covers only the quarter they published.';
+  const thin = kpiThinFor(kpiState.metric, kpiState.category);
+  const thinNote = thin.length
+    ? ` Excluded for having fewer than ${MIN_SERIES_POINTS} data points: ${thin.map(t => `${t.name} (${t.n})`).join(', ')}.`
+    : '';
+  const capNote = capped
+    ? ` Showing the ${KPI_SERIES_CAP} companies with the deepest history out of ${series.length} in this category — switch to "All" to see every one, though the palette only carries 8 distinct hues so colours repeat beyond that.`
+    : '';
+  setNote(document.getElementById('kpi-explorer-note'),
+    `${axis[0]} – ${axis[axis.length - 1]}.${capNote}${thinNote} ${cadence} Figures are as reported under each company's own accounting standard and are not restated for comparability. ${(cat && cat.mixed_currency_note) || ''}`);
+}
+
+document.getElementById('kpi-explorer-sub').textContent =
+  'Pick a supply-chain category, then a metric, then a timeframe. Click a legend entry to isolate a company. Every metric is a percentage, so companies reporting in NT$, JPY, KRW, RMB and US$ are directly comparable without any currency conversion.';
+renderKpiChips();
+renderKpiChart();
+
+// ---------- macro drill-downs (from the KPI tiles) ----------
+// Each of the three sales tiles opens the same modal on a different default view, so the underlying
+// SIA/WSTS series is explorable rather than frozen at a single headline number.
+function openMacroModal(which) {
+  const H = DATA.macro && DATA.macro.history;
+  if (!H) return;
+  modalCard.classList.add('wide');
+  modalLegend.innerHTML = '';
+  modalChart.innerHTML = '';
+
+  const views = [];
+  if (H.quarterly) views.push({ id: 'q', label: 'Quarterly sales' }, { id: 'qyoy', label: 'Quarterly YoY %' });
+  if (H.monthly) views.push({ id: 'm', label: 'Monthly sales (3MMA)' }, { id: 'myoy', label: 'Monthly YoY %' });
+  if (H.by_region) views.push({ id: 'region', label: 'By region' }, { id: 'regionyoy', label: 'Region YoY %' });
+  if (DATA.industry && DATA.industry.wsts_by_product) views.push({ id: 'product', label: 'By product (annual)' });
+  if (H.annual) views.push({ id: 'annual', label: 'Annual total' });
+
+  let mState = which === 'sales_m' ? 'm' : which === 'outlook' ? 'annual' : 'q';
+  if (!views.some(v => v.id === mState)) mState = (views[0] || {}).id;
+
+  modalTitle.textContent = 'Global semiconductor sales';
+  modalSub.textContent = `SIA Global Sales Report, compiled by WSTS. Monthly ${H.monthly ? H.monthly.history[0][1] : ''}–${H.monthly ? H.monthly.history[H.monthly.history.length-1][1] : ''}; quarterly ${H.quarterly ? H.quarterly.history[0][1] : ''}–${H.quarterly ? H.quarterly.history[H.quarterly.history.length-1][1] : ''}. Monthly figures are a three-month moving average and quarterly figures are actual billings, so the two do not reconcile.`;
+
+  const controls = document.createElement('div');
+  controls.className = 'kpi-chips';
+  controls.style.marginBottom = '12px';
+  modalChart.appendChild(controls);
+  const holder = document.createElement('div');
+  modalChart.appendChild(holder);
+  const foot = document.getElementById('modal-foot');
+
+  function draw() {
+    controls.innerHTML = '';
+    views.forEach(v => chip(controls, v.label, mState === v.id, () => { mState = v.id; draw(); }));
+    holder.innerHTML = '';
+    modalLegend.innerHTML = '';
+
+    const MNn = { Jan:1, Feb:2, Mar:3, Apr:4, May:5, Jun:6, Jul:7, Aug:8, Sep:9, Oct:10, Nov:11, Dec:12 };
+    const stp = p => { const [m, y] = p.split(' '); return (+y) * 12 + MNn[m]; };
+    let series, unit, isPct = false, dec = 0, note;
+
+    const simple = (block, yoy, label, color) => {
+      const pts = block.history
+        .map(([p, l, v, y]) => ({ period: p, label: l, value: yoy ? y : v }))
+        .filter(pt => pt.value !== null && pt.value !== undefined);
+      return [{ label, color, points: pts }];
+    };
+
+    if (mState === 'q' || mState === 'qyoy') {
+      const yoy = mState === 'qyoy';
+      series = simple(H.quarterly, yoy, 'Worldwide sales, quarterly', 'var(--series-1)');
+      unit = yoy ? '%' : 'US$bn'; isPct = yoy; note = H.note;
+    } else if (mState === 'm' || mState === 'myoy') {
+      const yoy = mState === 'myoy';
+      series = simple(H.monthly, yoy, 'Worldwide sales, monthly (3MMA)', 'var(--series-3)');
+      unit = yoy ? '%' : 'US$bn'; isPct = yoy; note = H.note;
+    } else if (mState === 'region' || mState === 'regionyoy') {
+      const yoy = mState === 'regionyoy';
+      series = H.by_region.regions.map((r, i) => ({
+        label: r.name, color: `var(${catColorSlots[i % catColorSlots.length]})`,
+        points: r.history.map(([p, l, v, y]) => ({ period: p, label: l, value: yoy ? y : v }))
+                         .filter(pt => pt.value !== null && pt.value !== undefined)
+      }));
+      unit = yoy ? '%' : 'US$bn'; isPct = yoy; note = H.by_region.note || H.note;
+    } else if (mState === 'product') {
+      const w = DATA.industry.wsts_by_product;
+      series = w.categories.filter(c => c.id !== 'total').map((c, i) => ({
+        label: c.name, color: `var(${catColorSlots[i % catColorSlots.length]})`,
+        points: c.history.map(([p, l, v]) => ({ period: p, label: l, value: v }))
+      }));
+      unit = 'US$bn'; note = w.note;
+    } else {
+      const pts = H.annual.history.map(([y, v, g]) => ({ period: `Dec ${y}`, label: String(y), value: v }));
+      series = [{ label: 'Worldwide sales, annual', color: 'var(--series-4)', points: pts }];
+      unit = 'US$bn'; note = H.note;
+    }
+
+    const axis = [...new Set(series.flatMap(s2 => s2.points.map(p => p.period)))].sort((a, b) => stp(a) - stp(b));
+    const svg = renderMultiSeriesChart(holder, axis, series, unit, {
+      width: 860, height: 300, yAxis: true, showYear: true, isPercent: isPct,
+      decimals: dec, zeroLine: isPct, noArea: series.length > 1
+    });
+    svg.style.minHeight = '300px';
+    series.forEach((s2, i) => {
+      const item = document.createElement('div');
+      item.className = 'modal-legend-item';
+      item.innerHTML = `<span class="modal-legend-swatch" style="background:${s2.color}"></span>${s2.label}`;
+      item.addEventListener('click', () => {
+        item.classList.toggle('off');
+        const g = svg.querySelector(`g[data-series-idx="${i}"]`);
+        if (g) g.style.display = item.classList.contains('off') ? 'none' : '';
+      });
+      modalLegend.appendChild(item);
+    });
+    setNote(foot, note);
+  }
+  draw();
+  modalBackdrop.classList.add('open');
+}
+
+// ---------- wafer shipments drill-down (from the KPI tile) ----------
+// The true MSI split by device segment is paywalled inside SEMI's Silicon Wafer Market Monitor, so this
+// modal shows what CAN be sourced: the long area series itself, and the adjacent segment decompositions
+// in their own units, each labelled with its basis rather than silently converted onto the MSI scale.
+function openWaferModal() {
+  const IND = DATA.industry;
+  if (!IND || !IND.wafer_area) return;
+  const wa = IND.wafer_area;
+  modalCard.classList.add('wide');
+  modalTitle.textContent = 'Silicon wafer shipments — area, and what the segment mix looks like';
+  modalSub.textContent = `Worldwide silicon wafer area shipped, ${wa.quarterly[0][1]}–${wa.quarterly[wa.quarterly.length-1][1]} quarterly and ${wa.annual[0][0]}–${wa.annual[wa.annual.length-1][0]} annual. Area is the cleanest measure of real industry activity because it removes pricing entirely.`;
+  modalLegend.innerHTML = '';
+  modalChart.innerHTML = '';
+
+  const views = [
+    { id: 'q', label: 'Quarterly MSI' },
+    { id: 'qyoy', label: 'Quarterly YoY %' },
+    { id: 'a', label: 'Annual MSI' },
+    { id: 'ayoy', label: 'Annual YoY %' }
+  ];
+  if (IND.capacity_by_segment) views.push({ id: 'seg', label: 'Capacity mix (snapshot)' });
+  if (IND.advanced_node_capacity) views.push({ id: 'adv', label: 'Leading-edge capacity trend' });
+  let wState = 'q';
+
+  const controls = document.createElement('div');
+  controls.className = 'kpi-chips';
+  controls.style.marginBottom = '12px';
+  modalChart.appendChild(controls);
+  const holder = document.createElement('div');
+  modalChart.appendChild(holder);
+  const foot = document.getElementById('modal-foot');
+
+  function draw() {
+    controls.innerHTML = '';
+    views.forEach(v => chip(controls, v.label, wState === v.id, () => { wState = v.id; draw(); }));
+    holder.innerHTML = '';
+    modalLegend.innerHTML = '';
+
+    let series, axis, unit, isPct = false, dec = 0, note;
+    const MNn = { Jan:1, Feb:2, Mar:3, Apr:4, May:5, Jun:6, Jul:7, Aug:8, Sep:9, Oct:10, Nov:11, Dec:12 };
+    const stp = p => { const [m, y] = p.split(' '); return (+y) * 12 + MNn[m]; };
+
+    if (wState === 'q' || wState === 'qyoy') {
+      const yoy = wState === 'qyoy';
+      const pts = wa.quarterly.map(([p, l, v, y]) => ({ period: p, label: l, value: yoy ? y : v }))
+                              .filter(pt => pt.value !== null && pt.value !== undefined);
+      series = [{ label: 'Worldwide wafer area', color: 'var(--series-1)', points: pts }];
+      axis = pts.map(p => p.period).sort((a, b) => stp(a) - stp(b));
+      unit = yoy ? '%' : 'MSI'; isPct = yoy;
+      note = wa.note;
+    } else if (wState === 'a' || wState === 'ayoy') {
+      const yoy = wState === 'ayoy';
+      const pts = wa.annual.map(([y, v, g]) => ({ period: `Dec ${y}`, label: String(y), value: yoy ? g : v }))
+                           .filter(pt => pt.value !== null && pt.value !== undefined);
+      series = [{ label: 'Worldwide wafer area, annual', color: 'var(--series-3)', points: pts }];
+      axis = pts.map(p => p.period);
+      unit = yoy ? '%' : 'MSI'; isPct = yoy;
+      note = wa.note;
+    } else if (wState === 'seg') {
+      const cs = IND.capacity_by_segment;
+      const groups = [];
+      if (cs.by_device_type) {
+        const bd = cs.by_device_type;
+        groups.push({
+          title: `By device type, ${bd.year}`,
+          sub: 'Advanced logic, memory and analog — SEMI\'s published segments recast into the taxonomy the industry actually uses, from a single vintage so no restatement artefacts. Indented rows are components of the line above.',
+          rows: bd.rows.map(r => ({
+            name: r.name, value: r.value, decimals: 1,
+            color: r.id.startsWith('logic') ? 'var(--series-1)'
+                 : r.id.startsWith('memory') ? 'var(--series-2)'
+                 : r.id === 'analog' ? 'var(--series-3)' : 'var(--series-4)',
+            dim: !!r.child, title: r.note || ''
+          }))
+        });
+      }
+      if (cs.node_bands_2025 && cs.node_bands_2025.length) {
+        groups.push({
+          title: 'By technology node, 2025',
+          sub: 'The same question cut a different way — by process node rather than device type.',
+          rows: cs.node_bands_2025.map((b2, i) => ({ name: b2.name, value: b2.value, decimals: 1,
+            color: i === 0 ? 'var(--series-1)' : i === 1 ? 'var(--series-3)' : 'var(--series-4)' }))
+        });
+      }
+      cs.editions.slice().reverse().forEach((ed, k) => {
+        const yr = ed.segments[0].history[ed.segments[0].history.length - 1][1];
+        groups.push({
+          title: `SEMI segments as published, ${yr} — ${ed.edition.split(' (')[0]}`,
+          sub: k === 0 ? 'The raw published lines, for reference.'
+             : 'An older vintage. Foundry reads 10.2 here against 11.3 in the newer edition for the same year — that gap is the restatement, and it exceeds the annual growth it would otherwise appear to show, which is why editions are never chained.',
+          rows: ed.segments.map((seg, i) => ({ name: seg.name.replace(' (restated)', ''),
+            value: seg.history[seg.history.length - 1][2], decimals: 1,
+            color: `var(${catColorSlots[i % catColorSlots.length]})` }))
+        });
+      });
+      const capNote = (cs.by_device_type ? cs.by_device_type.note + ' ' + cs.by_device_type.unaccounted_note + ' ' : '')
+        + (cs.msi_split_status ? 'ON THE MSI SPLIT: ' + cs.msi_split_status + ' ' : '') + cs.note;
+      holder.innerHTML = '';
+      renderSnapshotBars(holder, groups, 'M wpm');
+      setNote(foot, capNote);
+      return;
+    } else {
+      const an = IND.advanced_node_capacity;
+      // Only the series with enough points to show a shape; the 2-point memory line was dropped.
+      series = an.series.filter(s2 => s2.history.length >= MIN_SERIES_POINTS).map((s2, i) => ({
+        label: s2.name, color: `var(${catColorSlots[i % catColorSlots.length]})`,
+        points: s2.history.map(([p, l, v]) => ({ period: p, label: l, value: v }))
+      }));
+      axis = [...new Set(series.flatMap(s2 => s2.points.map(p => p.period)))].sort((a2, b2) => stp(a2) - stp(b2));
+      unit = 'k wpm';
+      const dropped = an.series.filter(s2 => s2.history.length < MIN_SERIES_POINTS).map(s2 => `${s2.name} (${s2.history.length} points)`);
+      note = 'DIFFERENT UNIT from the MSI views — thousand actual 300mm wafers per month. '
+        + (dropped.length ? `Not charted for having too few points: ${dropped.join(', ')} — the 2026 figure is ${an.series.find(x => x.history.length < MIN_SERIES_POINTS).history[0][2]}k wpm. ` : '')
+        + an.note;
+    }
+
+    const svg = renderMultiSeriesChart(holder, axis, series, unit, {
+      width: 860, height: 300, yAxis: true, showYear: true, isPercent: isPct,
+      decimals: dec, zeroLine: isPct, noArea: series.length > 1
+    });
+    svg.style.minHeight = '300px';
+    series.forEach((s2, i) => {
+      const item = document.createElement('div');
+      item.className = 'modal-legend-item';
+      item.innerHTML = `<span class="modal-legend-swatch" style="background:${s2.color}"></span>${s2.label}`;
+      item.addEventListener('click', () => {
+        item.classList.toggle('off');
+        const g = svg.querySelector(`g[data-series-idx="${i}"]`);
+        if (g) g.style.display = item.classList.contains('off') ? 'none' : '';
+      });
+      modalLegend.appendChild(item);
+    });
+    setNote(foot, note);
+  }
+  draw();
+  modalBackdrop.classList.add('open');
+}
+
+// ---------- industry volumes & product mix ----------
+// Physical volume rather than revenue: wafer AREA is the cleanest read on real industry activity
+// because it strips pricing out entirely, which matters in a window where memory ASPs nearly doubled.
+if (DATA.industry) {
+  const IND = DATA.industry;
+  const indViewChips = document.getElementById('ind-view-chips');
+  const indMeasChips = document.getElementById('ind-measure-chips');
+  const indLegend = document.getElementById('ind-legend');
+  const indChartEl = document.getElementById('ind-chart');
+
+  const IND_VIEWS = [
+    { id: 'wafer', label: 'Silicon wafer area (MSI)', measures: [{ id: 'level', label: 'MSI' }, { id: 'yoy', label: 'YoY %' }] },
+    { id: 'foundry', label: 'Foundry wafer shipments', measures: [{ id: 'level', label: 'Wafers' }] },
+    { id: 'wsts', label: 'Semis by product (WSTS)', measures: [{ id: 'level', label: 'US$bn' }, { id: 'yoy', label: 'YoY %' }] },
+    { id: 'memory', label: 'Memory revenue & pricing', measures: [{ id: 'level', label: 'QoQ %' }] },
+    { id: 'capseg', label: 'Capacity mix (snapshot)', measures: [{ id: 'level', label: 'M wpm (200mm eq.)' }] },
+    { id: 'advnode', label: 'Leading-edge capacity trend', measures: [{ id: 'level', label: 'k 300mm wpm' }] }
+  ].filter(v => (v.id === 'wafer' && IND.wafer_area) || (v.id === 'foundry' && IND.foundry_wafers)
+              || (v.id === 'wsts' && IND.wsts_by_product) || (v.id === 'memory' && IND.memory_pricing)
+              || (v.id === 'capseg' && IND.capacity_by_segment) || (v.id === 'advnode' && IND.advanced_node_capacity));
+  const indState = { view: (IND_VIEWS[0] || {}).id, measure: 'level' };
+
+  function indBuild() {
+    const v = IND_VIEWS.find(x => x.id === indState.view);
+    const yoy = indState.measure === 'yoy';
+    if (indState.view === 'wafer') {
+      const q = IND.wafer_area.quarterly;
+      return { series: [{ label: 'Worldwide silicon wafer area', color: 'var(--series-1)',
+                          points: q.map(([p, l, msi, y]) => ({ period: p, label: l, value: yoy ? y : msi }))
+                                   .filter(pt => pt.value !== null) }],
+               unit: yoy ? '%' : 'MSI', isPercent: yoy, decimals: 0,
+               note: IND.wafer_area.note, src: IND.wafer_area };
+    }
+    if (indState.view === 'foundry') {
+      return { series: IND.foundry_wafers.companies.filter(c => c.history.length >= MIN_SERIES_POINTS).map((c, i) => ({
+                 label: `${c.name} (${c.unit.replace('thousand ', '').replace(' equivalent wafers', '-in eq.')})`,
+                 color: `var(${catColorSlots[i % catColorSlots.length]})`,
+                 points: c.history.map(([p, l, w]) => ({ period: p, label: l, value: w })) })),
+               unit: 'k wafers', isPercent: false, decimals: 0,
+               note: IND.foundry_wafers.note + ' ' + IND.foundry_wafers.companies.map(c => `${c.name}: ${c.note}`).join(' '),
+               src: null };
+    }
+    if (indState.view === 'wsts') {
+      return { series: IND.wsts_by_product.categories.filter(c => c.id !== 'total').map((c, i) => ({
+                 label: c.name, color: `var(${catColorSlots[i % catColorSlots.length]})`,
+                 points: c.history.map(([p, l, val, y]) => ({ period: p, label: l, value: yoy ? y : val })) })),
+               unit: yoy ? '%' : 'US$bn', isPercent: yoy, decimals: 0,
+               note: IND.wsts_by_product.note, src: IND.wsts_by_product };
+    }
+    if (indState.view === 'capseg') {
+      const cs = IND.capacity_by_segment;
+      const groups = [];
+      if (cs.by_device_type) {
+        const bd = cs.by_device_type;
+        groups.push({
+          title: `By device type, ${bd.year}`,
+          sub: 'Advanced logic, memory and analog — SEMI\'s published segments recast into the taxonomy the industry actually uses, from a single vintage so no restatement artefacts. Indented rows are components of the line above.',
+          rows: bd.rows.map(r => ({
+            name: r.name, value: r.value, decimals: 1,
+            color: r.id.startsWith('logic') ? 'var(--series-1)'
+                 : r.id.startsWith('memory') ? 'var(--series-2)'
+                 : r.id === 'analog' ? 'var(--series-3)' : 'var(--series-4)',
+            dim: !!r.child, title: r.note || ''
+          }))
+        });
+      }
+      if (cs.node_bands_2025 && cs.node_bands_2025.length) {
+        groups.push({
+          title: 'By technology node, 2025',
+          sub: 'The same question cut a different way — by process node rather than device type.',
+          rows: cs.node_bands_2025.map((b2, i) => ({ name: b2.name, value: b2.value, decimals: 1,
+            color: i === 0 ? 'var(--series-1)' : i === 1 ? 'var(--series-3)' : 'var(--series-4)' }))
+        });
+      }
+      cs.editions.slice().reverse().forEach((ed, k) => {
+        const yr = ed.segments[0].history[ed.segments[0].history.length - 1][1];
+        groups.push({
+          title: `SEMI segments as published, ${yr} — ${ed.edition.split(' (')[0]}`,
+          sub: k === 0 ? 'The raw published lines, for reference.'
+             : 'An older vintage. Foundry reads 10.2 here against 11.3 in the newer edition for the same year — that gap is the restatement, and it exceeds the annual growth it would otherwise appear to show, which is why editions are never chained.',
+          rows: ed.segments.map((seg, i) => ({ name: seg.name.replace(' (restated)', ''),
+            value: seg.history[seg.history.length - 1][2], decimals: 1,
+            color: `var(${catColorSlots[i % catColorSlots.length]})` }))
+        });
+      });
+      const capNote = (cs.by_device_type ? cs.by_device_type.note + ' ' + cs.by_device_type.unaccounted_note + ' ' : '')
+        + (cs.msi_split_status ? 'ON THE MSI SPLIT: ' + cs.msi_split_status + ' ' : '') + cs.note;
+      return { snapshot: groups, unit: 'M wpm', note: capNote, src: cs };
+    }
+    if (indState.view === 'advnode') {
+      const an = IND.advanced_node_capacity;
+      const cagr = an.segment_cagr.map(c => `${c.name} ${c.pct}%`).join('; ');
+      const dropped = an.series.filter(s2 => s2.history.length < MIN_SERIES_POINTS);
+      return { series: an.series.filter(s2 => s2.history.length >= MIN_SERIES_POINTS).map((s2, i) => ({
+                 label: s2.name, color: `var(${catColorSlots[i % catColorSlots.length]})`,
+                 points: s2.history.map(([p, l, v]) => ({ period: p, label: l, value: v })) })),
+               unit: 'k wpm', isPercent: false, decimals: 0,
+               note: an.note
+                 + (dropped.length ? ` Not charted for having too few points: ${dropped.map(x => `${x.name} (${x.history.length})`).join(', ')} — the 2026 figure is ${dropped[0].history[0][2]}k wpm. ` : ' ')
+                 + `SEMI segment capacity CAGRs, ${an.segment_cagr[0].period}: ${cagr}.`, src: an };
+    }
+    return { series: IND.memory_pricing.series.map((s2, i) => ({
+               label: `${s2.name} (${s2.basis})`, color: `var(${catColorSlots[i % catColorSlots.length]})`,
+               points: s2.history.map(([p, l, val]) => ({ period: p, label: l, value: val })) })),
+             unit: '%', isPercent: true, decimals: 0,
+             note: IND.memory_pricing.note, src: IND.memory_pricing };
+  }
+
+  function renderInd() {
+    const v = IND_VIEWS.find(x => x.id === indState.view);
+    indViewChips.innerHTML = '';
+    IND_VIEWS.forEach(x => chip(indViewChips, x.label, indState.view === x.id, () => {
+      indState.view = x.id;
+      const mv = IND_VIEWS.find(y => y.id === x.id);
+      if (!mv.measures.some(m => m.id === indState.measure)) indState.measure = 'level';
+      renderInd();
+    }));
+    indMeasChips.innerHTML = '';
+    v.measures.forEach(m => chip(indMeasChips, m.label, indState.measure === m.id, () => {
+      indState.measure = m.id; renderInd();
+    }));
+
+    const built = indBuild();
+    indChartEl.innerHTML = ''; indLegend.innerHTML = '';
+    if (built.snapshot) {
+      renderSnapshotBars(indChartEl, built.snapshot, built.unit);
+      setNote(document.getElementById('ind-note'), built.note);
+      return;
+    }
+    const MN = { Jan:1, Feb:2, Mar:3, Apr:4, May:5, Jun:6, Jul:7, Aug:8, Sep:9, Oct:10, Nov:11, Dec:12 };
+    const st = p => { const [m, y] = p.split(' '); return (+y) * 12 + MN[m]; };
+    const axis = [...new Set(built.series.flatMap(s2 => s2.points.map(p => p.period)))].sort((a, b) => st(a) - st(b));
+
+    const svg = renderMultiSeriesChart(indChartEl, axis, built.series, built.unit, {
+      width: 760, height: 280, noArea: built.series.length > 1, yAxis: true, showYear: true,
+      isPercent: built.isPercent, decimals: built.decimals, zeroLine: built.isPercent
+    });
+    svg.style.minHeight = '280px';
+
+    built.series.forEach((s2, i) => {
+      const item = document.createElement('div');
+      item.className = 'modal-legend-item';
+      item.innerHTML = `<span class="modal-legend-swatch" style="background:${s2.color}"></span>${s2.label}`;
+      item.addEventListener('click', () => {
+        item.classList.toggle('off');
+        const g = svg.querySelector(`g[data-series-idx="${i}"]`);
+        if (g) g.style.display = item.classList.contains('off') ? 'none' : '';
+      });
+      indLegend.appendChild(item);
+    });
+
+    const src = built.src && built.src.source_url
+      ? ` Source: ${built.src.source_name}.` : '';
+    setNote(document.getElementById('ind-note'), built.note + src);
+  }
+
+  document.getElementById('ind-sub').textContent =
+    'Physical volume and industry-level product mix, separate from company revenue. Wafer area is the cleanest measure of real activity because it strips pricing out entirely — which matters in a window where memory contract prices nearly doubled in a single quarter.';
+  renderInd();
+}
+
+// ---------- PC shipments by vendor (IDC) ----------
+if (DATA.pc_shipments) {
+  const PCS = DATA.pc_shipments;
+  const pcsChips = document.getElementById('pcs-measure-chips');
+  const pcsLegend = document.getElementById('pcs-legend');
+  const pcsChartEl = document.getElementById('pcs-chart');
+  const pcsState = { measure: 'units' };
+
+  function renderPcs() {
+    pcsChips.innerHTML = '';
+    [{ id: 'units', label: 'Units (M)' }, { id: 'yoy', label: 'YoY %' }].forEach(m =>
+      chip(pcsChips, m.label, pcsState.measure === m.id, () => { pcsState.measure = m.id; renderPcs(); }));
+
+    const yoy = pcsState.measure === 'yoy';
+    const rows = PCS.vendors.concat([Object.assign({ id: 'total' }, PCS.worldwide_total)]);
+    const series = rows.map((v, i) => ({
+      label: v.name,
+      color: v.id === 'total' ? 'var(--text-primary)' : `var(${catColorSlots[i % catColorSlots.length]})`,
+      points: v.history.map(h => ({ period: h.period, label: h.label, value: yoy ? h.yoy_pct : h.units_million }))
+                       .filter(p => p.value !== null && p.value !== undefined)
+    })).filter(s2 => s2.points.length >= MIN_SERIES_POINTS);
+
+    pcsChartEl.innerHTML = ''; pcsLegend.innerHTML = '';
+    const MN = { Jan:1, Feb:2, Mar:3, Apr:4, May:5, Jun:6, Jul:7, Aug:8, Sep:9, Oct:10, Nov:11, Dec:12 };
+    const st = p => { const [m, y] = p.split(' '); return (+y) * 12 + MN[m]; };
+    const axis = [...new Set(series.flatMap(s2 => s2.points.map(p => p.period)))].sort((a, b) => st(a) - st(b));
+
+    const svg = renderMultiSeriesChart(pcsChartEl, axis, series, yoy ? '%' : 'M units', {
+      width: 760, height: 280, noArea: true, yAxis: true, showYear: true,
+      isPercent: yoy, decimals: 1, zeroLine: yoy
+    });
+    svg.style.minHeight = '280px';
+
+    series.forEach((s2, i) => {
+      const item = document.createElement('div');
+      item.className = 'modal-legend-item';
+      item.innerHTML = `<span class="modal-legend-swatch" style="background:${s2.color}"></span>${s2.label}`;
+      item.addEventListener('click', () => {
+        item.classList.toggle('off');
+        const g = svg.querySelector(`g[data-series-idx="${i}"]`);
+        if (g) g.style.display = item.classList.contains('off') ? 'none' : '';
+      });
+      pcsLegend.appendChild(item);
+    });
+    setNote(document.getElementById('pcs-note'), PCS.note + ' ' + PCS.odm_note);
+  }
+
+  document.getElementById('pcs-sub').textContent =
+    `Worldwide PC unit shipments by vendor, ${PCS.source_family} traditional-PC basis (desktops, notebooks, workstations; tablets excluded). This is far better sourced than the ODM unit data below — 18 quarters with YoY for every major brand — because IDC publishes it quarterly while ODM unit counts surface only irregularly through trade press.`;
+  renderPcs();
+}
+
+// ---------- company table ----------
+// Sony's quarterly object uses a different schema (segment revenue, not a flat
+// `revenue` field) since it's reported as one segment of a larger group — handle it explicitly.
+function quarterlyRevenueDisplay(c) {
+  const q = c.quarterly;
+  if (!q) return '—';
+  if (c.id === 'sony') {
+    return fmtNum(q.segment_revenue, 1) + ' ' + q.segment_revenue_unit + ' (I&SS segment)';
+  }
+  return fmtNum(q.revenue, q.revenue < 100 ? 2 : 0) + ' ' + (q.revenue_unit || '');
+}
+function quarterlyGrowth(c) {
+  const q = c.quarterly;
+  if (!q) return { value: null, label: '' };
+  if (c.id === 'sony') return { value: q.segment_revenue_yoy_pct, label: 'YoY' };
+  if (q.yoy_pct !== undefined && q.yoy_pct !== null) return { value: q.yoy_pct, label: 'YoY' };
+  if (q.qoq_pct !== undefined && q.qoq_pct !== null) return { value: q.qoq_pct, label: 'QoQ' };
+  return { value: null, label: '' };
+}
+
+const catLabelById = Object.fromEntries(DATA.categories.map(cat => [cat.id, cat.label]));
+const catOrderById = Object.fromEntries(DATA.categories.map((cat, i) => [cat.id, i]));
+const tableRows = DATA.companies.map(c => {
+  const growth = quarterlyGrowth(c);
+  const note = (c.quarterly && c.quarterly.note) || (c.monthly_revenue && c.monthly_revenue.note) || '';
+  return {
+    name: c.name,
+    hq: c.hq,
+    // Normalised bucket for the region filter — `hq` keeps the company's own precise wording
+    // (e.g. "China / Hong Kong") while `region` groups it for filtering.
+    region: c.hq.split('/')[0].trim(),
+    categoryLabel: catLabelById[c.category] || c.category || '—',
+    categoryOrder: catOrderById[c.category] ?? 99,
+    sector: c.sector,
+    monthly: c.monthly_revenue ? fmtMoney(c.monthly_revenue.value, c.monthly_revenue.unit) + ' (' + c.monthly_revenue.period + ')' : '—',
+    monthlyYoy: c.monthly_revenue ? c.monthly_revenue.yoy_pct : null,
+    quarterly: c.quarterly ? quarterlyRevenueDisplay(c) + ' (' + c.quarterly.period + ')' : '—',
+    quarterlyGrowth: growth.value,
+    quarterlyGrowthLabel: growth.label,
+    grossMargin: (c.quarterly && c.quarterly.gross_margin_pct != null) ? c.quarterly.gross_margin_pct : null,
+    opMargin: (c.quarterly && c.quarterly.operating_margin_pct != null) ? c.quarterly.operating_margin_pct : null,
+    note: note,
+    sourceUrl: (c.quarterly && c.quarterly.source_url) || (c.monthly_revenue && c.monthly_revenue.source_url) || '#',
+    sourceName: (c.quarterly && c.quarterly.source_name) || (c.monthly_revenue && c.monthly_revenue.source_name) || ''
+  };
+});
+
+let sortKey = 'categoryOrder', sortDir = 1;
+let regionFilter = 'All';
+const tbody = document.querySelector('#company-table tbody');
+
+const REGIONS = ['All'].concat(
+  [...new Set(tableRows.map(r => r.region))]
+    .sort((a, b) => tableRows.filter(r => r.region === b).length - tableRows.filter(r => r.region === a).length));
+const regionChipsEl = document.getElementById('region-chips');
+function renderRegionChips() {
+  regionChipsEl.innerHTML = '';
+  REGIONS.forEach(reg => {
+    const count = reg === 'All' ? tableRows.length : tableRows.filter(r => r.region === reg).length;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'kpi-chip' + (regionFilter === reg ? ' active' : '');
+    b.textContent = `${reg} (${count})`;
+    b.addEventListener('click', () => { regionFilter = reg; renderRegionChips(); renderTable(); });
+    regionChipsEl.appendChild(b);
+  });
+}
+renderRegionChips();
+
+function renderTable() {
+  let rows = tableRows.filter(r => regionFilter === 'All' || r.region === regionFilter);
+  if (sortKey) {
+    rows.sort((a, b) => {
+      let av = a[sortKey], bv = b[sortKey];
+      if (typeof av === 'string') av = av.toLowerCase();
+      if (typeof bv === 'string') bv = bv.toLowerCase();
+      if (av === null || av === undefined) return 1;
+      if (bv === null || bv === undefined) return -1;
+      if (av < bv) return -1 * sortDir;
+      if (av > bv) return 1 * sortDir;
+      return 0;
+    });
+  }
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="name-cell" title="${r.note ? r.note.replace(/"/g, '&quot;') : 'No additional notes'}"><strong>${r.name}</strong></td>
+      <td>${r.hq}</td>
+      <td>${r.categoryLabel}</td>
+      <td><span class="sector-tag">${r.sector}</span></td>
+      <td class="num">${r.monthly}</td>
+      <td class="num ${r.monthlyYoy > 0 ? 'up' : ''}">${fmtPct(r.monthlyYoy)}</td>
+      <td class="num">${r.quarterly}</td>
+      <td class="num ${r.quarterlyGrowth > 0 ? 'up' : ''}">${fmtPct(r.quarterlyGrowth)} ${r.quarterlyGrowthLabel}</td>
+      <td class="num">${r.grossMargin != null ? fmtPct(r.grossMargin, 1) : '—'}</td>
+      <td class="num">${r.opMargin != null ? fmtPct(r.opMargin, 1) : '—'}</td>
+      <td><a href="${r.sourceUrl}" target="_blank" rel="noopener">${r.sourceName || 'Source'} &#8599;</a></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+renderTable();
+document.querySelectorAll('#company-table th[data-key]').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.getAttribute('data-key');
+    if (sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = 1; }
+    renderTable();
+  });
+});
+
+// ---------- footer ----------
+const allSources = [];
+DATA.companies.forEach(c => {
+  [c.monthly_revenue, c.quarterly, c.geography].forEach(block => {
+    if (block && block.source_url) allSources.push({ name: (c.name) + ' — ' + block.source_name, url: block.source_url });
+  });
+});
+allSources.push({ name: macro.source_name + ' (chip sales)', url: macro.source_url });
+allSources.push({ name: wafers.source_name + ' (wafer shipments)', url: wafers.source_url });
+
+// Industry-level sources sit alongside the company ones so the list is complete.
+if (DATA.industry) {
+  Object.values(DATA.industry).forEach(block => {
+    if (block && block.source_url) allSources.push({ name: block.source_name, url: block.source_url });
+  });
+}
+if (DATA.pc_shipments && DATA.pc_shipments.source_url) {
+  allSources.push({ name: DATA.pc_shipments.source_name, url: DATA.pc_shipments.source_url });
+}
+
+// ~250 source links printed in full made the footer taller than most of the dashboard.
+// Keep every one of them, but behind a disclosure.
+document.getElementById('footer').innerHTML = `
+  <div><strong>Methodology.</strong> Figures come from each company's own monthly-revenue disclosures (mandatory for Taiwan-listed issuers), quarterly earnings releases and filings, and industry bodies (SIA/WSTS, SEMI, IDC). No currency conversion is applied &mdash; every figure is in the currency it was originally reported in, which is why cross-country comparison uses percentages. This dashboard refreshes on a ${DATA.meta.refresh_cadence} cadence.</div>
+  <div style="margin-top:12px;">
+    <button type="button" class="note-toggle" id="src-toggle" style="padding:0;">Show all ${allSources.length} sources</button>
+  </div>
+  <ol class="src-list" id="src-list" style="display:none;">
+    ${allSources.map(s => `<li><a href="${s.url}" target="_blank" rel="noopener">${s.name}</a></li>`).join('')}
+  </ol>
+`;
+document.getElementById('src-toggle').addEventListener('click', function () {
+  const list = document.getElementById('src-list');
+  const open = list.style.display === 'none';
+  list.style.display = open ? '' : 'none';
+  this.textContent = open ? 'Hide sources' : `Show all ${allSources.length} sources`;
+});
+
+// ================= fab construction timeline =================
+// Forward-looking counterpart to the rest of the dashboard: every other card
+// reports what already happened, this one reports what is being poured.
+const FAB = DATA.fab_construction;
+if (FAB && FAB.projects && FAB.projects.length) {
+  const FAB_MIN = FAB.axis.min, FAB_MAX = FAB.axis.max, FAB_NOW = FAB.axis.today;
+  const FAB_SPAN = FAB_MAX - FAB_MIN;
+  const fabPct = y => ((Math.max(FAB_MIN, Math.min(FAB_MAX, y)) - FAB_MIN) / FAB_SPAN) * 100;
+
+  const REGION_ORDER = (FAB.regions && FAB.regions.length)
+    ? FAB.regions.slice()
+    : Array.from(new Set(FAB.projects.map(p => p.region)));
+  const DEVICES = [];
+  FAB.projects.forEach(p => { if (!DEVICES.includes(p.device)) DEVICES.push(p.device); });
+  DEVICES.sort();
+
+  const STATUS_LABEL = {
+    producing: 'In production', ramping: 'Ramping', fitout: 'Cleanroom / tooling',
+    building: 'Under construction', planned: 'Planned', delayed: 'Delayed', cancelled: 'Cancelled'
+  };
+
+  let fabRegion = 'all', fabDevice = 'all', fabSort = 'output', fabAudit = 'all';
+
+  const fabChart  = document.getElementById('fab-chart');
+  const fabStats  = document.getElementById('fab-stats');
+  const fabLegend = document.getElementById('fab-legend');
+
+  document.getElementById('fab-sub').textContent =
+    FAB.projects.length + ' projects across ' + REGION_ORDER.length + ' regions, ' +
+    Math.round(FAB_MIN) + '\u2013' + Math.round(FAB_MAX) +
+    '. A production bar marks FIRST wafer output, not full capacity \u2014 ramps run one to three years behind it. ' +
+    'Audited ' + FAB.as_of + '.';
+
+  FAB.phase_legend.forEach(l => {
+    const it = document.createElement('div');
+    it.className = 'fab-legend-item';
+    it.innerHTML = '<span class="fab-key ' + l.k + '"></span>' + l.label;
+    fabLegend.appendChild(it);
+  });
+  const softKey = document.createElement('div');
+  softKey.className = 'fab-legend-item';
+  softKey.innerHTML = '<span class="fab-key" style="border:1px dashed var(--good);opacity:.5"></span>Date inferred, not disclosed';
+  fabLegend.appendChild(softKey);
+
+  function fabFirstOutput(p) {
+    const prod = p.phases.find(f => f.k === 'production');
+    return prod ? prod.a : 9999;
+  }
+
+  // The audit is a filter rather than an overlay. Dimming 41 unchanged rows to
+  // surface 14 changed ones just made the whole chart muddy; showing only the
+  // rows in question answers the question directly.
+  const fabMoved = p => p.revision.direction === 'later' || p.revision.direction === 'earlier';
+  const fabAdded = p => p.revision.direction === 'new' || p.revision.direction === 'cancelled';
+
+  function fabFiltered() {
+    return FAB.projects.filter(p =>
+      (fabRegion === 'all' || p.region === fabRegion) &&
+      (fabDevice === 'all' || p.device === fabDevice) &&
+      (fabAudit === 'all' || (fabAudit === 'moved' ? fabMoved(p) : fabAdded(p))));
+  }
+
+  function fabRowEl(p) {
+    const row = document.createElement('div');
+    row.className = 'fab-row';
+    row.tabIndex = 0;
+    if (p.confidence === 'low') row.classList.add('soft');
+    if (p.status === 'cancelled') row.classList.add('dead');
+    const moved = fabMoved(p);
+    if (moved) row.classList.add('moved');
+
+    const label = document.createElement('div');
+    label.className = 'fab-label';
+    let deltaHtml = '';
+    if (moved && p.revision.was_year) {
+      const prod0 = p.phases.find(f => f.k === 'production');
+      if (prod0) {
+        const d = prod0.a - p.revision.was_year;
+        deltaHtml = '<span class="fab-delta ' + p.revision.direction + '">' +
+                    (d > 0 ? '+' : '\u2212') + Math.abs(d).toFixed(1) + 'y</span>';
+      }
+    }
+    label.innerHTML = '<b>' + p.company + '</b> ' + p.fab + deltaHtml;
+    label.title = p.company + ' ' + p.fab + ' \u2014 ' + p.site;
+
+    const track = document.createElement('div');
+    track.className = 'fab-track';
+
+    p.phases.forEach(f => {
+      const bar = document.createElement('div');
+      bar.className = 'fab-bar ' + f.k;
+      bar.style.left = fabPct(f.a) + '%';
+      bar.style.width = Math.max(0.35, fabPct(f.b) - fabPct(f.a)) + '%';
+      track.appendChild(bar);
+    });
+
+    const prod = p.phases.find(f => f.k === 'production');
+    if (prod && p.status !== 'cancelled') {
+      const tick = document.createElement('div');
+      tick.className = 'fab-first';
+      tick.style.left = fabPct(prod.a) + '%';
+      track.appendChild(tick);
+    }
+    if (p.status === 'cancelled') {
+      const x = document.createElement('div');
+      x.className = 'fab-x';
+      x.textContent = '\u2715';
+      x.style.left = fabPct(p.phases[0].b) + '%';
+      track.appendChild(x);
+    }
+
+    // Revision overlay: hollow bar at the old date, connector to the new one.
+    if (moved && p.revision.was_year && prod) {
+      const from = p.revision.was_year, to = prod.a;
+      const ghost = document.createElement('div');
+      ghost.className = 'fab-ghost fab-rev';
+      ghost.style.left = fabPct(from) + '%';
+      ghost.style.width = Math.max(0.6, fabPct(Math.min(FAB_MAX, from + 0.75)) - fabPct(from)) + '%';
+      track.appendChild(ghost);
+      const arrow = document.createElement('div');
+      arrow.className = 'fab-arrow fab-rev ' + p.revision.direction;
+      const lo = Math.min(from, to), hi = Math.max(from, to);
+      arrow.style.left = fabPct(lo) + '%';
+      arrow.style.width = Math.max(0.5, fabPct(hi) - fabPct(lo)) + '%';
+      track.appendChild(arrow);
+    }
+
+    row.appendChild(label);
+    row.appendChild(track);
+
+    const tip =
+      '<strong>' + p.company + ' \u2014 ' + p.fab + '</strong><br>' +
+      p.site + '<br>' + p.device + (p.node && p.node !== 'Not disclosed' ? ' \u00b7 ' + p.node : '') + '<br>' +
+      '<span style="opacity:.75">Status</span> ' + (STATUS_LABEL[p.status] || p.status) + '<br>' +
+      '<span style="opacity:.75">First output</span> ' + p.first_output + '<br>' +
+      '<span style="opacity:.75">Confidence</span> ' + p.confidence +
+      (moved ? '<br><span style="opacity:.75">Moved</span> ' + p.revision.direction : '') +
+      (p.revision.direction === 'new' ? '<br><em>Added \u2014 not on the source tracker</em>' : '');
+    row.addEventListener('mouseenter', e => showTip(e, tip));
+    row.addEventListener('mousemove', moveTip);
+    row.addEventListener('mouseleave', hideTip);
+    row.addEventListener('click', () => openFabModal(p));
+    row.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFabModal(p); } });
+    return row;
+  }
+
+  function openFabModal(p) {
+    modalCard.classList.remove('wide');
+    modalTitle.textContent = p.company + ' \u2014 ' + p.fab;
+    modalSub.textContent = p.site + '  \u00b7  ' + p.device +
+      (p.node && p.node !== 'Not disclosed' ? '  \u00b7  ' + p.node : '');
+    modalLegend.innerHTML = '';
+    modalChart.innerHTML = '';
+
+    const revWord = { later: 'Schedule slipped', earlier: 'Pulled forward',
+                      unchanged: 'Confirmed unchanged', new: 'Added in this audit',
+                      cancelled: 'Cancelled' }[p.revision.direction] || p.revision.direction;
+
+    const dl = document.createElement('dl');
+    dl.className = 'fab-detail';
+    dl.innerHTML =
+      '<dt>Status</dt><dd>' + (STATUS_LABEL[p.status] || p.status) + '</dd>' +
+      '<dt>First output</dt><dd>' + p.first_output + '</dd>' +
+      '<dt>Audit result</dt><dd><span class="fab-flag">' + revWord + '</span>' +
+        '<span class="fab-flag">' + p.confidence + ' confidence</span></dd>' +
+      '<dt>Was</dt><dd>' + p.revision.was + '</dd>' +
+      '<dt>Now</dt><dd>' + p.revision.now + '</dd>' +
+      (p.note ? '<dt>Notes</dt><dd>' + p.note + '</dd>' : '');
+    modalChart.appendChild(dl);
+
+    modalFoot.innerHTML = p.source && p.source.url
+      ? 'Source: <a href="' + p.source.url + '" target="_blank" rel="noopener">' + p.source.name + '</a>'
+      : '';
+    modalBackdrop.classList.add('open');
+  }
+
+  function renderFabChart() {
+    fabChart.innerHTML = '';
+    fabChart.classList.toggle('revs', fabAudit === 'moved');
+
+    // axis
+    const axis = document.createElement('div');
+    axis.className = 'fab-axis';
+    for (let y = Math.ceil(FAB_MIN); y <= FAB_MAX; y++) {
+      const t = document.createElement('span');
+      t.className = 'fab-axis-tick';
+      t.style.left = fabPct(y) + '%';
+      t.textContent = y;
+      axis.appendChild(t);
+    }
+    fabChart.appendChild(axis);
+
+    const body = document.createElement('div');
+    body.className = 'fab-body';
+    const grid = document.createElement('div');
+    grid.className = 'fab-grid';
+    for (let y = Math.ceil(FAB_MIN); y <= FAB_MAX; y++) {
+      const g = document.createElement('div');
+      g.className = 'fab-gl';
+      g.style.left = fabPct(y) + '%';
+      grid.appendChild(g);
+    }
+    const now = document.createElement('div');
+    now.className = 'fab-now';
+    now.style.left = fabPct(FAB_NOW) + '%';
+    grid.appendChild(now);
+    body.appendChild(grid);
+
+    const rows = fabFiltered();
+    if (!rows.length) {
+      const e = document.createElement('div');
+      e.className = 'fab-empty';
+      e.textContent = 'No projects match this combination. Widen the region, segment or audit filter.';
+      body.appendChild(e);
+      fabChart.appendChild(body);
+      return;
+    }
+
+    const nowTag = document.createElement('span');
+    nowTag.className = 'fab-now-tag';
+    nowTag.style.left = fabPct(FAB_NOW) + '%';
+    nowTag.textContent = 'today';
+    axis.appendChild(nowTag);
+
+    if (fabSort === 'output') {
+      rows.sort((a, b) => fabFirstOutput(a) - fabFirstOutput(b) || a.company.localeCompare(b.company));
+    } else if (fabSort === 'company') {
+      rows.sort((a, b) => a.company.localeCompare(b.company) || fabFirstOutput(a) - fabFirstOutput(b));
+    } else {
+      rows.sort((a, b) => REGION_ORDER.indexOf(a.region) - REGION_ORDER.indexOf(b.region) ||
+                          a.company.localeCompare(b.company) || fabFirstOutput(a) - fabFirstOutput(b));
+    }
+
+    // Group headings only when grouping by region — under any other sort a
+    // heading would break the very ordering the reader just asked for.
+    if (fabSort === 'region') {
+      let last = null;
+      rows.forEach(p => {
+        if (p.region !== last) {
+          last = p.region;
+          const n = rows.filter(r => r.region === p.region).length;
+          const h = document.createElement('div');
+          h.className = 'fab-group';
+          h.innerHTML = '<span class="fab-group-name">' + p.region + '</span>' +
+                        '<span class="fab-group-meta">' + n + (n === 1 ? ' project' : ' projects') + '</span>' +
+                        '<span class="fab-group-rule"></span>';
+          body.appendChild(h);
+        }
+        body.appendChild(fabRowEl(p));
+      });
+    } else {
+      rows.forEach(p => body.appendChild(fabRowEl(p)));
+    }
+    fabChart.appendChild(body);
+
+    // stats
+    const producing = rows.filter(p => p.status === 'producing').length;
+    const by2028 = rows.filter(p => p.status !== 'cancelled' && fabFirstOutput(p) < 2029).length;
+    const later = rows.filter(p => p.revision.direction === 'later').length;
+    const added = rows.filter(p => p.revision.direction === 'new' || p.revision.direction === 'cancelled').length;
+    const packaging = rows.filter(p => p.device === 'Advanced packaging').length;
+    const stats = [
+      [rows.length, 'projects shown'],
+      [producing, 'already producing'],
+      [by2028, 'first output by end-2028'],
+      [packaging, 'advanced packaging'],
+      [later, 'schedules slipped in this audit'],
+      [added, 'added to the source tracker']
+    ];
+    fabStats.innerHTML = stats.map(s =>
+      '<div class="fab-stat"><b>' + s[0] + '</b>' + s[1] + '</div>').join('');
+  }
+
+  function renderFabChips() {
+    const rc = document.getElementById('fab-region-chips');
+    rc.innerHTML = '';
+    chip(rc, 'All', fabRegion === 'all', () => { fabRegion = 'all'; renderFabChips(); renderFabChart(); });
+    REGION_ORDER.forEach(r => chip(rc, r, fabRegion === r,
+      () => { fabRegion = r; renderFabChips(); renderFabChart(); }));
+
+    const dc = document.getElementById('fab-device-chips');
+    dc.innerHTML = '';
+    chip(dc, 'All', fabDevice === 'all', () => { fabDevice = 'all'; renderFabChips(); renderFabChart(); });
+    DEVICES.forEach(d => chip(dc, d, fabDevice === d,
+      () => { fabDevice = d; renderFabChips(); renderFabChart(); }));
+
+    const sc = document.getElementById('fab-sort-chips');
+    sc.innerHTML = '';
+    [['output', 'First output'], ['region', 'Region'], ['company', 'Company']].forEach(s =>
+      chip(sc, s[1], fabSort === s[0], () => { fabSort = s[0]; renderFabChips(); renderFabChart(); }));
+
+    const vc = document.getElementById('fab-rev-chips');
+    vc.innerHTML = '';
+    [['all', 'All rows'], ['moved', 'Schedules that moved'], ['added', 'Missing from the tracker']].forEach(a =>
+      chip(vc, a[1], fabAudit === a[0], () => { fabAudit = a[0]; renderFabChips(); renderFabChart(); }));
+  }
+
+  renderFabChips();
+  renderFabChart();
+
+  // Where the chart overflows (phones, mainly) the default scroll position of 0
+  // lands on 2021 — the least useful end. Bring "today" into view once.
+  (function scrollToToday() {
+    const box = document.querySelector('.fab-scroll');
+    if (!box) return;
+    requestAnimationFrame(() => {
+      const over = box.scrollWidth - box.clientWidth;
+      if (over <= 0) return;
+      const lw = parseFloat(getComputedStyle(document.querySelector('.fab-card')).getPropertyValue('--fab-lw')) || 0;
+      const plot = box.scrollWidth - lw;
+      const target = lw + (plot * fabPct(FAB_NOW) / 100) - (box.clientWidth * 0.45);
+      box.scrollLeft = Math.max(0, Math.min(over, target));
+    });
+  })();
+  setNote(document.getElementById('fab-note'),
+    FAB.audit_summary + ' ' + FAB.note, 260);
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+{
+  "_note": "Deviations that are known, documented in the refresh runbook, and deliberately tolerated. Anything NOT listed here fails the build. Remove an entry the moment it is fixed \u2014 the point of this file is that the list should shrink.",
+  "quarterly_gaps": {
+    "_why": "Seams where a backfill batch met an existing batch, not source gaps. The runbook flags all six as fillable in a normal refresh. Charts break the line across them so they read as missing rather than flat.",
+    "companies": {
+      "smic": [
+        "Jun 2024"
+      ],
+      "huahong": [
+        "Jun 2024"
+      ],
+      "amec": [
+        "Jun 2024"
+      ],
+      "cambricon": [
+        "Jun 2024"
+      ],
+      "lgdisplay": [
+        "Dec 2021"
+      ],
+      "lginnotek": [
+        "Dec 2021"
+      ]
+    }
+  },
+  "headline_unit_differs": {
+    "_why": "`quarterly` is the latest-quarter headline tile and reports US$ for these names, while `quarterly_history` carries the as-reported local currency. Deliberate, not a backfill error.",
+    "companies": [
+      "ase",
+      "honhai",
+      "mediatek",
+      "quanta",
+      "tsmc",
+      "umc",
+      "unimicron",
+      "wistron",
+      "wiwynn"
+    ]
+  },
+  "period_label_form": {
+    "_why": "`quarterly.period` carries the company's own fiscal wording for some names ('Q1 FY2027 (Apr-Jun 2026)') where `quarterly_history[].period` carries the calendar quarter-end month ('Jun 2026'). Validated against the tail's `label` instead.",
+    "accept_label_match": true
+  },
+  "stale_headline_quarter": {
+    "_why": "The `quarterly` headline tile reports an older or differently-aggregated period than the derived `quarterly_history` tail. For the Taiwan monthly disclosers the history is rolled up from monthly revenue and so already has Q2 2026, while the snapshot block was last written at Q1. Wistron's headline is a half-year, not a quarter. Real, cosmetic in effect, and due to be fixed on the next full data refresh \u2014 tracked here rather than silently tolerated.",
+    "companies": [
+      "wistron",
+      "asustek",
+      "acer",
+      "novatek",
+      "accton",
+      "bizlink",
+      "nuvoton"
+    ]
+  }
+}
