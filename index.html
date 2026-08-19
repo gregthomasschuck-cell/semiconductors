@@ -16,9 +16,6 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Asia Semiconductor &amp; Hardware Dashboard">
 <meta name="twitter:description" content="122 companies across Taiwan, Japan, China, Korea and the US — monthly revenue back to 2018, quarterly KPIs, wafer area, WSTS billings and category momentum, all in one page.">
-<meta property="og:url" content="https://gregthomasschuck-cell.github.io/semiconductors/">
-<meta property="og:image" content="https://gregthomasschuck-cell.github.io/semiconductors/preview.png">
-<meta name="twitter:image" content="https://gregthomasschuck-cell.github.io/semiconductors/preview.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='6'%20fill='%230b0b0b'/%3E%3Cg%20fill='none'%20stroke='%23e8e6e1'%20stroke-width='2'%20stroke-linecap='round'%3E%3Cpath%20d='M7%2023l5-7%205%204%208-11'/%3E%3C/g%3E%3C/svg%3E">
 <style>
   :root, .viz-root {
@@ -378,6 +375,132 @@
     .kpi-row { grid-template-columns: 1fr; }
     .bar-row { grid-template-columns: 90px 1fr 60px; }
   }
+
+  /* ---------- fab construction timeline ---------- */
+  .fab-card { --fab-lw: 218px; }
+  .fab-toolbar { display:flex; flex-wrap:wrap; gap:10px 22px; align-items:flex-end; margin:14px 0 4px; }
+  .fab-legend { display:flex; flex-wrap:wrap; gap:6px 16px; margin:14px 0 10px; align-items:center; }
+  .fab-legend-item { display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--text-secondary); }
+  .fab-key { width:22px; height:11px; border-radius:2px; flex:none; }
+  .fab-key.start     { background:var(--baseline); }
+  .fab-key.build     { background:var(--seq-100); border:1px solid var(--seq-400); }
+  .fab-key.fitout    { background:var(--seq-400); }
+  .fab-key.production{ background:var(--good); }
+  .fab-key.paused    { background:repeating-linear-gradient(45deg,var(--series-8),var(--series-8) 3px,transparent 3px,transparent 6px); border:1px solid var(--series-8); }
+
+  .fab-scroll { overflow-x:auto; overflow-y:hidden; margin:0 -4px; padding:0 4px; }
+  .fab-chart { min-width:820px; position:relative; padding-right:18px; }
+
+  .fab-axis { position:relative; height:34px; margin-left:var(--fab-lw); border-bottom:1px solid var(--baseline); }
+  .fab-axis-tick { position:absolute; top:0; font-size:10.5px; color:var(--text-muted); transform:translateX(-50%);
+                   font-variant-numeric:tabular-nums; letter-spacing:.02em; white-space:nowrap; }
+  .fab-body { position:relative; padding-top:4px; }
+  .fab-grid { position:absolute; left:var(--fab-lw); right:0; top:0; bottom:0; pointer-events:none; }
+  .fab-gl { position:absolute; top:0; bottom:0; width:1px; background:var(--gridline); }
+  .fab-now { position:absolute; top:0; bottom:0; width:0; border-left:2px dashed var(--text-secondary); opacity:.55; }
+  .fab-now-tag { position:absolute; bottom:2px; font-size:9.5px; letter-spacing:.06em; text-transform:uppercase;
+                 color:var(--text-secondary); padding:0 5px; transform:translateX(-50%); white-space:nowrap; }
+  .fab-now-tag::before { content:''; position:absolute; left:50%; bottom:-4px; width:0; height:0;
+                         border:3px solid transparent; border-top-color:var(--text-secondary);
+                         transform:translateX(-50%); opacity:.55; }
+
+  .fab-group { display:flex; align-items:baseline; gap:10px; margin:16px 0 5px; }
+  .fab-group:first-child { margin-top:2px; }
+  .fab-group-name { font-size:11px; font-weight:650; letter-spacing:.09em; text-transform:uppercase; color:var(--text-primary); }
+  .fab-group-meta { font-size:11px; color:var(--text-muted); }
+  .fab-group-rule { flex:1; height:1px; background:var(--border); }
+
+  .fab-row { display:grid; grid-template-columns:var(--fab-lw) 1fr; align-items:center; height:23px; cursor:pointer; }
+  .fab-row:hover { background:color-mix(in srgb, var(--text-primary) 5%, transparent); }
+  .fab-row:focus-visible { outline:2px solid var(--seq-400); outline-offset:-2px; }
+  .fab-label { padding-right:12px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+               font-size:11.5px; color:var(--text-secondary); }
+  .fab-label b { font-weight:600; color:var(--text-primary); }
+  .fab-track { position:relative; height:100%; }
+
+  .fab-bar { position:absolute; top:50%; transform:translateY(-50%); border-radius:2px; min-width:2px; }
+  .fab-bar.start      { height:5px;  background:var(--baseline); }
+  .fab-bar.build      { height:9px;  background:var(--seq-100); border:1px solid var(--seq-400); box-sizing:border-box; }
+  .fab-bar.fitout     { height:11px; background:var(--seq-400); }
+  .fab-bar.production { height:13px; background:var(--good); }
+  .fab-bar.paused     { height:9px;  border:1px solid var(--series-8); box-sizing:border-box;
+                        background:repeating-linear-gradient(45deg,var(--series-8),var(--series-8) 3px,transparent 3px,transparent 6px); }
+  .fab-row.soft .fab-bar.production { opacity:.42; border:1px dashed var(--good); box-sizing:border-box; }
+  .fab-row.soft .fab-bar.build,
+  .fab-row.soft .fab-bar.fitout { opacity:.5; }
+  .fab-row.dead .fab-bar { opacity:.4; }
+  .fab-first { position:absolute; top:50%; transform:translate(-50%,-50%); width:3px; height:19px;
+               background:var(--text-primary); border-radius:1px; }
+  .fab-row.dead .fab-x { position:absolute; top:50%; transform:translate(-50%,-50%); font-size:12px;
+                         color:var(--series-8); font-weight:700; }
+
+  /* revision overlay — hidden until the toggle is on */
+  .fab-rev { display:none; }
+  .fab-chart.revs .fab-rev { display:block; }
+  .fab-ghost { position:absolute; top:50%; transform:translateY(-50%); height:13px; box-sizing:border-box;
+               border:1.5px dashed var(--text-secondary); border-radius:2px; }
+  .fab-arrow { position:absolute; top:50%; transform:translateY(-50%); height:2px; }
+  .fab-arrow.later   { background:var(--series-8); }
+  .fab-arrow.earlier { background:var(--good); }
+  .fab-arrow::after { content:''; position:absolute; top:-4px; border:5px solid transparent; }
+  .fab-arrow.later::after   { right:-6px; border-left-color:var(--series-8); }
+  .fab-arrow.earlier::after { left:-6px; border-right-color:var(--good); }
+  .fab-delta { display:none; margin-left:6px; font-size:10.5px; font-weight:650; font-variant-numeric:tabular-nums; }
+  .fab-delta.later   { color:var(--series-8); }
+  .fab-delta.earlier { color:var(--good); }
+  .fab-chart.revs .fab-delta { display:inline; }
+
+  .fab-stats { display:flex; flex-wrap:wrap; gap:6px 26px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
+  .fab-stat { font-size:11.5px; color:var(--text-secondary); }
+  .fab-stat b { display:block; font-size:19px; font-weight:600; color:var(--text-primary);
+                font-variant-numeric:tabular-nums; letter-spacing:-.01em; line-height:1.25; }
+  .fab-empty { padding:26px 0; font-size:12.5px; color:var(--text-muted); }
+
+  .fab-detail dt { font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--text-muted); margin-top:12px; }
+  .fab-detail dd { margin:3px 0 0; font-size:13px; color:var(--text-primary); }
+  .fab-detail .fab-flag { display:inline-block; font-size:10.5px; padding:2px 7px; border-radius:3px;
+                          border:1px solid var(--border); color:var(--text-secondary); margin-right:6px; }
+
+  :root[data-theme="dark"] .fab-bar.build,
+  [data-theme="dark"] .fab-bar.build,
+  :root[data-theme="dark"] .fab-key.build,
+  [data-theme="dark"] .fab-key.build { background:color-mix(in srgb, var(--seq-400) 26%, transparent); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .fab-bar.build,
+    :root:not([data-theme="light"]) .fab-key.build { background:color-mix(in srgb, var(--seq-400) 26%, transparent); }
+  }
+
+  @media (max-width: 720px) {
+    .fab-card { --fab-lw: 148px; }
+    .fab-label { font-size:11px; }
+  }
+
+  /* ---------- collapsible card body ---------- */
+  .reveal > summary {
+    list-style:none; cursor:pointer; display:inline-flex; align-items:center; gap:7px;
+    font-size:11.5px; color:var(--text-secondary); border:1px solid var(--border);
+    border-radius:999px; padding:5px 13px; margin-top:4px; background:transparent;
+    transition:border-color .12s ease, color .12s ease;
+  }
+  .reveal > summary::-webkit-details-marker { display:none; }
+  .reveal > summary:hover { border-color:var(--text-muted); color:var(--text-primary); }
+  .reveal > summary:focus-visible { outline:2px solid var(--seq-400); outline-offset:2px; }
+  .reveal > summary::before {
+    content:''; width:0; height:0; border:4px solid transparent;
+    border-left-color:currentColor; margin-left:1px; transition:transform .15s ease;
+  }
+  .reveal[open] > summary::before { transform:rotate(90deg) translateX(-1px); }
+  .reveal > summary .reveal-open  { display:inline; }
+  .reveal > summary .reveal-close { display:none; }
+  .reveal[open] > summary .reveal-open  { display:none; }
+  .reveal[open] > summary .reveal-close { display:inline; }
+  .reveal .barchart { margin-top:14px; }
+  /* Grid items stretch to row height by default, so the collapsed monthly card
+     rendered as a tall empty box next to the taller regional chart. */
+  .two-col { align-items:start; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal > summary, .reveal > summary::before { transition:none; }
+  }
 </style>
 </head>
 <body>
@@ -396,18 +519,35 @@
 
   <div class="kpi-row" id="kpi-row"></div>
 
-  <div class="two-col">
-    <div class="card">
-      <h2>July 2026 monthly revenue &mdash; YoY growth</h2>
-      <p class="card-sub">Taiwan-listed companies disclose revenue monthly by regulation; sorted high to low.</p>
-      <div class="barchart" id="chart-monthly"></div>
+  <div class="card fab-card">
+    <h2>Fab construction &mdash; what is being built, and when it actually produces</h2>
+    <p class="card-sub" id="fab-sub"></p>
+    <div class="kpi-controls fab-toolbar">
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Region</span>
+        <div class="kpi-chips" id="fab-region-chips"></div>
+      </div>
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Segment</span>
+        <div class="kpi-chips" id="fab-device-chips"></div>
+      </div>
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Order</span>
+        <div class="kpi-chips" id="fab-sort-chips"></div>
+      </div>
+      <div class="kpi-control-group">
+        <span class="kpi-control-label">Audit</span>
+        <div class="kpi-chips" id="fab-rev-chips"></div>
+      </div>
     </div>
-    <div class="card">
-      <h2>Global chip sales &mdash; regional YoY growth</h2>
-      <p class="card-sub">June 2026, per SIA/WSTS (3-month moving average methodology).</p>
-      <div class="barchart" id="chart-regional"></div>
+    <div class="fab-legend" id="fab-legend"></div>
+    <div class="fab-scroll">
+      <div class="fab-chart" id="fab-chart"></div>
     </div>
+    <div class="fab-stats" id="fab-stats"></div>
+    <p class="card-sub note" id="fab-note" style="margin-top:16px;margin-bottom:0;"></p>
   </div>
+
 
   <div class="card">
     <h2>Category momentum &mdash; latest quarter vs. the one before</h2>
@@ -421,6 +561,26 @@
     <div id="mom-table"></div>
     <p class="card-sub note" id="mom-note" style="margin-top:14px;margin-bottom:0;"></p>
   </div>
+
+  <div class="two-col">
+    <div class="card">
+      <h2>July 2026 monthly revenue &mdash; YoY growth</h2>
+      <p class="card-sub">Taiwan-listed companies disclose revenue monthly by regulation; sorted high to low.</p>
+      <details class="reveal">
+        <summary>
+          <span class="reveal-open">Show all 49 companies</span>
+          <span class="reveal-close">Hide company list</span>
+        </summary>
+        <div class="barchart" id="chart-monthly"></div>
+      </details>
+    </div>
+    <div class="card">
+      <h2>Global chip sales &mdash; regional YoY growth</h2>
+      <p class="card-sub">June 2026, per SIA/WSTS (3-month moving average methodology).</p>
+      <div class="barchart" id="chart-regional"></div>
+    </div>
+  </div>
+
 
   <div class="card">
     <h2>Category trends &mdash; combined monthly revenue by supply-chain segment</h2>
@@ -602,11 +762,12 @@
 const DATA = {
   "meta": {
     "title": "Asia Semiconductor & Hardware Dashboard",
-    "subtitle": "Monthly revenue, quarterly KPIs, supply-chain category trends and industry volume data for 122 semiconductor and hardware companies across Taiwan, Japan, China, Korea and the US",
+    "subtitle": "Monthly revenue, quarterly KPIs, supply-chain category trends, industry volume data and an audited fab construction timeline for 122 semiconductor and hardware companies across Taiwan, Japan, China, Korea and the US",
     "last_updated": "2026-08-18",
-    "data_as_of": "Monthly revenue Jan 2018 – Jul 2026 (up to 103 months) for 49 Taiwan-listed monthly disclosers. Quarterly KPIs reach Q1 2018 for six companies and Q1 2022 for the rest. Industry data runs deepest: SIA/WSTS global sales monthly from Jan 2015 with regional levels, SEMI silicon wafer area annual from 2002 and quarterly from Q1 2015, WSTS billings by product category from 2003, IDC PC vendor units from Q1 2022.",
-    "refresh_cadence": "weekly",
-    "currency_note": "NT$ = New Taiwan Dollar (Taiwan-listed cos.); KRW = South Korean Won; JPY = Japanese Yen; figures as originally reported, not currency-converted unless noted"
+    "data_as_of": "Monthly revenue Jan 2018 \u2013 Jul 2026 (up to 103 months) for 49 Taiwan-listed monthly disclosers. Quarterly KPIs reach Q1 2018 for six companies and Q1 2022 for the rest. Industry data runs deepest: SIA/WSTS global sales monthly from Jan 2015 with regional levels, SEMI silicon wafer area annual from 2002 and quarterly from Q1 2015, WSTS billings by product category from 2003, IDC PC vendor units from Q1 2022.",
+    "refresh_cadence": "weekly rebuild; data refreshed on demand",
+    "currency_note": "NT$ = New Taiwan Dollar (Taiwan-listed cos.); KRW = South Korean Won; JPY = Japanese Yen; figures as originally reported, not currency-converted unless noted",
+    "built_at": "2026-08-19 03:35 UTC"
   },
   "companies": [
     {
@@ -2482,7 +2643,7 @@ const DATA = {
         "net_income": 59.97,
         "net_income_unit": "NT$ billion",
         "net_income_yoy_pct": 35,
-        "note": "Cloud & networking (incl. AI servers) revenue share rose from 48% to 51% of total — first time above half. Ninth consecutive quarter of YoY revenue growth.",
+        "note": "Cloud & networking (incl. AI servers) revenue share rose from 48% to 51% of total \u2014 first time above half. Ninth consecutive quarter of YoY revenue growth.",
         "source_url": "https://finance.biggo.com/news/3df5ecaf-57c3-442b-b745-773888d9b113",
         "source_name": "Hon Hai Q2 2026 results coverage"
       },
@@ -6879,7 +7040,7 @@ const DATA = {
     {
       "id": "samsung",
       "name": "Samsung Electronics (DS)",
-      "full_name": "Samsung Electronics Co., Ltd. — Device Solutions Division",
+      "full_name": "Samsung Electronics Co., Ltd. \u2014 Device Solutions Division",
       "ticker": "005930.KS",
       "hq": "South Korea",
       "sector": "Memory (DRAM/NAND/HBM), foundry, system LSI",
@@ -6891,9 +7052,9 @@ const DATA = {
         "yoy_pct": 357.0,
         "gross_margin_pct": null,
         "operating_margin_pct": 70.0,
-        "note": "All figures are the DS (Device Solutions / semiconductor) DIVISION, not consolidated Samsung. Q2 2026 DS revenue KRW 127.5tn and operating profit KRW 89.2tn (both records) out of consolidated revenue KRW 171.5tn — essentially all group profit came from chips. Samsung does not disclose divisional gross margin. Where the earnings call gave a qualitative band for DRAM bit/ASP, the band midpoint is used.",
+        "note": "All figures are the DS (Device Solutions / semiconductor) DIVISION, not consolidated Samsung. Q2 2026 DS revenue KRW 127.5tn and operating profit KRW 89.2tn (both records) out of consolidated revenue KRW 171.5tn \u2014 essentially all group profit came from chips. Samsung does not disclose divisional gross margin. Where the earnings call gave a qualitative band for DRAM bit/ASP, the band midpoint is used.",
         "source_url": "https://news.samsung.com/global/samsung-electronics-announces-second-quarter-2026-results",
-        "source_name": "Samsung Global Newsroom — Q2 2026 results"
+        "source_name": "Samsung Global Newsroom \u2014 Q2 2026 results"
       },
       "geography": null,
       "platform_mix": null,
@@ -7237,7 +7398,7 @@ const DATA = {
         "operating_margin_pct": 76.3,
         "note": "Record quarter: revenue KRW 79.32tn (+51% QoQ) and operating profit KRW 60.54tn at a 76% margin, driven by HBM4 mass shipments and severe conventional DRAM/NAND undersupply. DRAM ASP rose ~30% QoQ. Where the call gave a qualitative band for bit/ASP, the band midpoint is used.",
         "source_url": "https://news.skhynix.com/en/q2-2026-business-results/",
-        "source_name": "SK hynix Newsroom — 2Q26 financial results"
+        "source_name": "SK hynix Newsroom \u2014 2Q26 financial results"
       },
       "geography": null,
       "platform_mix": null,
@@ -7570,7 +7731,7 @@ const DATA = {
     {
       "id": "sony",
       "name": "Sony (Imaging & Sensing Solutions)",
-      "full_name": "Sony Group Corporation — I&SS Segment",
+      "full_name": "Sony Group Corporation \u2014 I&SS Segment",
       "ticker": "6758.T / SONY",
       "hq": "Japan",
       "sector": "Image Sensors / Semiconductors",
@@ -12573,7 +12734,7 @@ const DATA = {
         "revenue": 278.153,
         "revenue_unit": "NT$ billion",
         "yoy_pct": 26.0,
-        "note": "H1 2026 revenue NT$554.66B, +41.7% YoY. From April, memory procurement for certain customers shifted to an agency model, excluded from revenue — affects YoY comparability.",
+        "note": "H1 2026 revenue NT$554.66B, +41.7% YoY. From April, memory procurement for certain customers shifted to an agency model, excluded from revenue \u2014 affects YoY comparability.",
         "source_url": "https://www.wiwynn.com/news/wiwynn-reports-second-quarter-2026-financial-results",
         "source_name": "Wiwynn Q2 2026 results"
       },
@@ -14828,7 +14989,7 @@ const DATA = {
       ],
       "geography": null,
       "platform_mix": null,
-      "not_asia_note": "Included at the user's request to benchmark against Asia-based foundries. US-headquartered; reports in USD, quarterly only — not included in the Foundry category's summed NT$ monthly total."
+      "not_asia_note": "Included at the user's request to benchmark against Asia-based foundries. US-headquartered; reports in USD, quarterly only \u2014 not included in the Foundry category's summed NT$ monthly total."
     },
     {
       "id": "globalfoundries",
@@ -15011,7 +15172,7 @@ const DATA = {
       ],
       "geography": null,
       "platform_mix": null,
-      "not_asia_note": "Included at the user's request to benchmark against Asia-based foundries. US-headquartered (fabs in Singapore/Germany/US); reports in USD, quarterly only — not included in the Foundry category's summed NT$ monthly total."
+      "not_asia_note": "Included at the user's request to benchmark against Asia-based foundries. US-headquartered (fabs in Singapore/Germany/US); reports in USD, quarterly only \u2014 not included in the Foundry category's summed NT$ monthly total."
     },
     {
       "id": "ibiden",
@@ -15028,7 +15189,7 @@ const DATA = {
         "revenue": 123.22,
         "revenue_unit": "JPY billion",
         "yoy_pct": 26.4,
-        "note": "Electronics segment (incl. AI/HPC package substrates) revenue ¥75.5B. Full-year FY2026 guidance raised: revenue to ¥550B (from ¥500B), operating profit to ¥127B (from ¥90B), on GPU/high-end-CPU substrate demand outstripping supply.",
+        "note": "Electronics segment (incl. AI/HPC package substrates) revenue \u00a575.5B. Full-year FY2026 guidance raised: revenue to \u00a5550B (from \u00a5500B), operating profit to \u00a5127B (from \u00a590B), on GPU/high-end-CPU substrate demand outstripping supply.",
         "source_url": "https://www.investing.com/news/earnings/ibiden-q1-profit-surges-41-on-ai-chipmaking-boost-4832935",
         "source_name": "Ibiden Q1 FY2026 results coverage"
       },
@@ -18243,7 +18404,7 @@ const DATA = {
       "geography": null,
       "platform_mix": null,
       "status": "delisted",
-      "data_gap_note": "NO CURRENT DATA. Shinko Electric was taken private by a JIC (Japan Investment Corporation) Capital-led consortium — the tender offer completed 19 Mar 2025 and the shares were delisted from the Tokyo Stock Exchange on 6 Jun 2025. The last public disclosure is the full year ended 31 Mar 2025, so the most recent sourceable quarter is Jan-Mar 2025 — roughly 17 months stale as of Aug 2026. The pre-delisting history is retained for trend context only and is excluded from current-period aggregates.",
+      "data_gap_note": "NO CURRENT DATA. Shinko Electric was taken private by a JIC (Japan Investment Corporation) Capital-led consortium \u2014 the tender offer completed 19 Mar 2025 and the shares were delisted from the Tokyo Stock Exchange on 6 Jun 2025. The last public disclosure is the full year ended 31 Mar 2025, so the most recent sourceable quarter is Jan-Mar 2025 \u2014 roughly 17 months stale as of Aug 2026. The pre-delisting history is retained for trend context only and is excluded from current-period aggregates.",
       "sources": [
         {
           "name": "Shinko Electric IR - Financial Results (last release: FY ended Mar 2025)",
@@ -18272,7 +18433,7 @@ const DATA = {
         "yoy_pct": 2.9,
         "gross_margin_pct": 20.6,
         "operating_margin_pct": 7.2,
-        "note": "STALE — this is the most recent quarter Nidec has disclosed (released 14 Nov 2025). Nidec has since suspended timely reporting amid an accounting investigation.",
+        "note": "STALE \u2014 this is the most recent quarter Nidec has disclosed (released 14 Nov 2025). Nidec has since suspended timely reporting amid an accounting investigation.",
         "source_url": "https://www.nidec.com/en/ir/library/earnings/",
         "source_name": "Nidec IR - Quarterly Financial Results"
       },
@@ -19568,7 +19729,7 @@ const DATA = {
       ],
       "geography": null,
       "platform_mix": null,
-      "data_gap_note": "The 2025 YoY percentages above 1000% reflect an extremely small 2024 revenue base, not a data error — Cambricon's business scaled from near-zero commercial revenue.",
+      "data_gap_note": "The 2025 YoY percentages above 1000% reflect an extremely small 2024 revenue base, not a data error \u2014 Cambricon's business scaled from near-zero commercial revenue.",
       "sources": [
         {
           "name": "SCMP - Cambricon H1 2026 revenue",
@@ -22342,7 +22503,7 @@ const DATA = {
         }
       ],
       "quarterly_derived": true,
-      "data_gap_note": "Basis break at Jan 2019: ASUS excluded its discontinued smartphone segment from monthly revenue announcements starting 2019, and the company's own 2019 YoY is computed against a restated ~NT$354bn 2018 base. 2018 values here are as-originally-reported and include phones, so 2019 growth should NOT be computed against them — the apparent step down of roughly 10% is definitional."
+      "data_gap_note": "Basis break at Jan 2019: ASUS excluded its discontinued smartphone segment from monthly revenue announcements starting 2019, and the company's own 2019 YoY is computed against a restated ~NT$354bn 2018 base. 2018 values here are as-originally-reported and include phones, so 2019 growth should NOT be computed against them \u2014 the apparent step down of roughly 10% is definitional."
     },
     {
       "id": "acer",
@@ -26478,7 +26639,7 @@ const DATA = {
         "yoy_pct": 684.23,
         "gross_margin_pct": 79.49,
         "operating_margin_pct": 73.69,
-        "note": "Latest reported quarter — extraordinary margin expansion driven by DRAM contract pricing.",
+        "note": "Latest reported quarter \u2014 extraordinary margin expansion driven by DRAM contract pricing.",
         "source_url": "https://stockanalysis.com/quote/tpe/2408/financials/",
         "source_name": "Nanya Technology quarterly financials"
       },
@@ -32300,7 +32461,7 @@ const DATA = {
         "yoy_pct": -7.52,
         "gross_margin_pct": 13.07,
         "operating_margin_pct": 2.32,
-        "note": "Revenue declined 7.5% YoY with operating margin compressed to 2.3% — the clearest laggard among Taiwan power suppliers.",
+        "note": "Revenue declined 7.5% YoY with operating margin compressed to 2.3% \u2014 the clearest laggard among Taiwan power suppliers.",
         "source_url": "https://www.wantgoo.com/stock/6412/financial-statements/income-statement",
         "source_name": "Chicony Power quarterly income statement (wantgoo.com)",
         "revenue_unit": "NT$ million"
@@ -34345,7 +34506,7 @@ const DATA = {
         }
       ],
       "quarterly_derived": true,
-      "data_gap_note": "KYEC divested its China subsidiary (King Long) during Q1 2024: as-reported monthly revenue steps down about 28% in Apr 2024 while the source's YoY is computed against a restated base, so levels either side of that date are not like-for-like. Separately, Jun 2021 (NT$1,978m, -20.5% YoY) is a genuine one-month collapse from the COVID cluster that suspended the Zhunan plants — not a data gap."
+      "data_gap_note": "KYEC divested its China subsidiary (King Long) during Q1 2024: as-reported monthly revenue steps down about 28% in Apr 2024 while the source's YoY is computed against a restated base, so levels either side of that date are not like-for-like. Separately, Jun 2021 (NT$1,978m, -20.5% YoY) is a genuine one-month collapse from the COVID cluster that suspended the Zhunan plants \u2014 not a data gap."
     },
     {
       "id": "pti",
@@ -42518,7 +42679,7 @@ const DATA = {
         "operating_margin_pct": 51.9,
         "note": "Record quarterly revenue with a 51.9% operating margin, rebounding sharply from a Q1 trough as memory makers expanded HBM TC bonder orders.",
         "source_url": "https://biz.heraldcorp.com/article/10808118",
-        "source_name": "Herald Business — Hanmi Q2 2026"
+        "source_name": "Herald Business \u2014 Hanmi Q2 2026"
       },
       "quarterly_history": [
         {
@@ -42686,10 +42847,10 @@ const DATA = {
       ],
       "geography": null,
       "platform_mix": null,
-      "data_gap_note": "The Q1 2026 trough (KRW 50.9bn, -65% YoY) followed by a record Q2 is real, not a data error — HBM bonder orders are extremely lumpy.",
+      "data_gap_note": "The Q1 2026 trough (KRW 50.9bn, -65% YoY) followed by a record Q2 is real, not a data error \u2014 HBM bonder orders are extremely lumpy.",
       "sources": [
         {
-          "name": "Herald Business — Hanmi Q2 2026",
+          "name": "Herald Business \u2014 Hanmi Q2 2026",
           "url": "https://biz.heraldcorp.com/article/10808118"
         }
       ]
@@ -42713,7 +42874,7 @@ const DATA = {
         "operating_margin_pct": 2.38,
         "note": "Revenue fell 24% YoY though the company returned to an operating profit after two loss-making quarters.",
         "source_url": "https://www.digitaltoday.co.kr/news/articleView.html?idxno=688094",
-        "source_name": "DigitalToday — Jusung Q2 2026"
+        "source_name": "DigitalToday \u2014 Jusung Q2 2026"
       },
       "quarterly_history": [
         {
@@ -42883,7 +43044,7 @@ const DATA = {
       "platform_mix": null,
       "sources": [
         {
-          "name": "DigitalToday — Jusung Q2 2026",
+          "name": "DigitalToday \u2014 Jusung Q2 2026",
           "url": "https://www.digitaltoday.co.kr/news/articleView.html?idxno=688094"
         }
       ]
@@ -42907,7 +43068,7 @@ const DATA = {
         "operating_margin_pct": -1.92,
         "note": "Revenue roughly flat YoY with an operating loss driven by a one-off voluntary retirement charge, yet first-half results were profitable for the first time in five years on OLED strength.",
         "source_url": "https://www.oled-info.com/lg-display-reports-its-financial-results-q2-2026-return-profitability-thanks",
-        "source_name": "OLED-Info — LG Display Q2 2026"
+        "source_name": "OLED-Info \u2014 LG Display Q2 2026"
       },
       "quarterly_history": [
         {
@@ -43086,7 +43247,7 @@ const DATA = {
       "platform_mix": null,
       "sources": [
         {
-          "name": "OLED-Info — LG Display Q2 2026",
+          "name": "OLED-Info \u2014 LG Display Q2 2026",
           "url": "https://www.oled-info.com/lg-display-reports-its-financial-results-q2-2026-return-profitability-thanks"
         }
       ]
@@ -43110,7 +43271,7 @@ const DATA = {
         "operating_margin_pct": 12.74,
         "note": "Revenue rose 24% YoY and operating profit more than doubled on AI-server and automotive MLCC demand plus higher FC-BGA substrate supply.",
         "source_url": "https://m.samsungsem.com/global/newsroom/news/view.do?id=10462",
-        "source_name": "Samsung Electro-Mechanics Newsroom — Q2 2026"
+        "source_name": "Samsung Electro-Mechanics Newsroom \u2014 Q2 2026"
       },
       "quarterly_history": [
         {
@@ -43298,7 +43459,7 @@ const DATA = {
       "platform_mix": null,
       "sources": [
         {
-          "name": "Samsung Electro-Mechanics Newsroom — Q2 2026",
+          "name": "Samsung Electro-Mechanics Newsroom \u2014 Q2 2026",
           "url": "https://m.samsungsem.com/global/newsroom/news/view.do?id=10462"
         }
       ]
@@ -43322,7 +43483,7 @@ const DATA = {
         "operating_margin_pct": 4.45,
         "note": "Revenue jumped 41% YoY and operating profit surged more than twentyfold on mobile camera module demand and FC-BGA substrate supply.",
         "source_url": "https://en.sedaily.com/finance/2026/07/27/lg-innotek-q2-operating-profit-surges-22-fold-to-2458",
-        "source_name": "Seoul Economic Daily — LG Innotek Q2 2026"
+        "source_name": "Seoul Economic Daily \u2014 LG Innotek Q2 2026"
       },
       "quarterly_history": [
         {
@@ -43510,7 +43671,7 @@ const DATA = {
       "platform_mix": null,
       "sources": [
         {
-          "name": "Seoul Economic Daily — LG Innotek Q2 2026",
+          "name": "Seoul Economic Daily \u2014 LG Innotek Q2 2026",
           "url": "https://en.sedaily.com/finance/2026/07/27/lg-innotek-q2-operating-profit-surges-22-fold-to-2458"
         }
       ]
@@ -43534,7 +43695,7 @@ const DATA = {
         "operating_margin_pct": 25.38,
         "note": "Revenue rose 23% YoY with operating profit up 43% on automotive and industrial power semiconductors plus AI data-center and robotics demand.",
         "source_url": "https://www.hankyung.com/article/202608055428P",
-        "source_name": "Hankyung — DB HiTek Q2 2026"
+        "source_name": "Hankyung \u2014 DB HiTek Q2 2026"
       },
       "quarterly_history": [
         {
@@ -43731,7 +43892,7 @@ const DATA = {
       "platform_mix": null,
       "sources": [
         {
-          "name": "Hankyung — DB HiTek Q2 2026",
+          "name": "Hankyung \u2014 DB HiTek Q2 2026",
           "url": "https://www.hankyung.com/article/202608055428P"
         }
       ]
@@ -43755,7 +43916,7 @@ const DATA = {
         "operating_margin_pct": 5.5,
         "note": "Revenue grew 6.0% YoY and operating profit more than doubled, beating consensus.",
         "source_url": "https://www.sedaily.com/article/20071495",
-        "source_name": "Seoul Economic Daily — LX Semicon Q2 2026"
+        "source_name": "Seoul Economic Daily \u2014 LX Semicon Q2 2026"
       },
       "quarterly_history": [
         {
@@ -43925,7 +44086,7 @@ const DATA = {
       "platform_mix": null,
       "sources": [
         {
-          "name": "Seoul Economic Daily — LX Semicon Q2 2026",
+          "name": "Seoul Economic Daily \u2014 LX Semicon Q2 2026",
           "url": "https://www.sedaily.com/article/20071495"
         }
       ]
@@ -43989,7 +44150,7 @@ const DATA = {
           "url": "https://www.jsr.co.jp/news/assets/pdf/20240430_03.pdf"
         },
         {
-          "name": "JPX — Decision on Delisting: JSR CORPORATION",
+          "name": "JPX \u2014 Decision on Delisting: JSR CORPORATION",
           "url": "https://www.jpx.co.jp/english/news/1023/20240605-11.html"
         }
       ]
@@ -44013,7 +44174,7 @@ const DATA = {
         "operating_margin_pct": 18.98,
         "note": "Record quarterly net sales driven by AI-server demand and a roughly 65% surge in EUV resist sales. TOK runs a calendar fiscal year.",
         "source_url": "https://www.tok.co.jp/eng/ir/library",
-        "source_name": "TOK IR — financial results library"
+        "source_name": "TOK IR \u2014 financial results library"
       },
       "quarterly_history": [
         {
@@ -44183,7 +44344,7 @@ const DATA = {
       "platform_mix": null,
       "sources": [
         {
-          "name": "TOK IR — financial results library",
+          "name": "TOK IR \u2014 financial results library",
           "url": "https://www.tok.co.jp/eng/ir/library"
         }
       ]
@@ -44207,7 +44368,7 @@ const DATA = {
         "operating_margin_pct": 13.87,
         "note": "Record semiconductor-materials profit on AI packaging demand pushed group operating margin to a multi-year high and prompted a large full-year upgrade. Resonac runs a calendar fiscal year.",
         "source_url": "https://www.resonac.com/investors/library/financial-results",
-        "source_name": "Resonac IR — consolidated financial results"
+        "source_name": "Resonac IR \u2014 consolidated financial results"
       },
       "quarterly_history": [
         {
@@ -44377,7 +44538,7 @@ const DATA = {
       "platform_mix": null,
       "sources": [
         {
-          "name": "Resonac IR — consolidated financial results",
+          "name": "Resonac IR \u2014 consolidated financial results",
           "url": "https://www.resonac.com/investors/library/financial-results"
         }
       ]
@@ -44401,7 +44562,7 @@ const DATA = {
         "operating_margin_pct": 21.12,
         "note": "Record quarterly revenue on AI-memory and advanced-logic ALD/furnace demand, with full-year guidance raised roughly 21%.",
         "source_url": "https://www.kokusai-electric.com/en/latest_report",
-        "source_name": "Kokusai Electric IR — latest financial results"
+        "source_name": "Kokusai Electric IR \u2014 latest financial results"
       },
       "quarterly_history": [
         {
@@ -44562,7 +44723,7 @@ const DATA = {
       "platform_mix": null,
       "sources": [
         {
-          "name": "Kokusai Electric IR — latest financial results",
+          "name": "Kokusai Electric IR \u2014 latest financial results",
           "url": "https://www.kokusai-electric.com/en/latest_report"
         }
       ]
@@ -44939,7 +45100,7 @@ const DATA = {
       ],
       "geography": null,
       "platform_mix": null,
-      "data_gap_note": "Socionext's gross margin swings between roughly 41% and 58% quarter to quarter on turnkey/manufacturing mix shifts — real, but worth confirming against segment disclosure before using the margin series analytically.",
+      "data_gap_note": "Socionext's gross margin swings between roughly 41% and 58% quarter to quarter on turnkey/manufacturing mix shifts \u2014 real, but worth confirming against segment disclosure before using the margin series analytically.",
       "sources": [
         {
           "name": "Socionext 1Q FY2027/3 results",
@@ -45513,7 +45674,7 @@ const DATA = {
       ],
       "geography": null,
       "platform_mix": null,
-      "data_gap_note": "Piotech's margins are highly volatile quarter to quarter because revenue recognition depends on lumpy tool acceptances — Q1 2025 operating margin was -15.9%.",
+      "data_gap_note": "Piotech's margins are highly volatile quarter to quarter because revenue recognition depends on lumpy tool acceptances \u2014 Q1 2025 operating margin was -15.9%.",
       "sources": [
         {
           "name": "Piotech quarterly financials",
@@ -49684,7 +49845,7 @@ const DATA = {
         }
       ],
       "quarterly_derived": true,
-      "data_gap_note": "BizLink roughly doubled from Feb 2022 on the Leoni industrial-solutions acquisition — eleven straight months of +86% to +121% YoY. Real, but 2022 is not organically comparable to 2021."
+      "data_gap_note": "BizLink roughly doubled from Feb 2022 on the Leoni industrial-solutions acquisition \u2014 eleven straight months of +86% to +121% YoY. Real, but 2022 is not organically comparable to 2021."
     },
     {
       "id": "chroma",
@@ -53677,7 +53838,7 @@ const DATA = {
           "url": "https://stockanalysis.com/quote/tyo/6728/financials/?p=quarterly"
         }
       ],
-      "data_gap_note": "Fiscal year runs July-June, so fiscal-quarter numbering differs from most Japanese peers. ULVAC also sells into display, packaging and industrial markets, not semiconductors alone. The source's Jun 2026 quarter does not fully reconcile with its own FY2026 annual total — treat the latest quarter as approximate."
+      "data_gap_note": "Fiscal year runs July-June, so fiscal-quarter numbering differs from most Japanese peers. ULVAC also sells into display, packaging and industrial markets, not semiconductors alone. The source's Jun 2026 quarter does not fully reconcile with its own FY2026 annual total \u2014 treat the latest quarter as approximate."
     },
     {
       "id": "ebara",
@@ -54067,7 +54228,7 @@ const DATA = {
           "url": "https://stockanalysis.com/quote/tyo/7751/financials/?p=quarterly"
         }
       ],
-      "data_gap_note": "Large diversified group — semiconductor lithography sits inside the Industrial segment and is a modest slice of a business dominated by cameras, printers and office imaging. Consolidated revenue is NOT a clean read on semiconductor equipment demand. The Jun 2026 gross margin (52.3%) is well above Canon's 46-48% run-rate and may be a source classification quirk."
+      "data_gap_note": "Large diversified group \u2014 semiconductor lithography sits inside the Industrial segment and is a modest slice of a business dominated by cameras, printers and office imaging. Consolidated revenue is NOT a clean read on semiconductor equipment demand. The Jun 2026 gross margin (52.3%) is well above Canon's 46-48% run-rate and may be a source classification quirk."
     },
     {
       "id": "nikon",
@@ -54262,7 +54423,7 @@ const DATA = {
           "url": "https://stockanalysis.com/quote/tyo/7731/financials/?p=quarterly"
         }
       ],
-      "data_gap_note": "Diversified optics group — semiconductor and FPD lithography is one of several segments alongside imaging, healthcare and components."
+      "data_gap_note": "Diversified optics group \u2014 semiconductor and FPD lithography is one of several segments alongside imaging, healthcare and components."
     },
     {
       "id": "taiyoyuden",
@@ -54670,7 +54831,7 @@ const DATA = {
         "yoy_pct": 19.1,
         "gross_margin_pct": 47.4,
         "operating_margin_pct": 23.6,
-        "note": "Q1 FY2027 revenue was a series high, up 19.1% YoY, with a 47.4% gross margin — the best profitability since the 2022 CMP slurry upcycle.",
+        "note": "Q1 FY2027 revenue was a series high, up 19.1% YoY, with a 47.4% gross margin \u2014 the best profitability since the 2022 CMP slurry upcycle.",
         "source_url": "https://stockanalysis.com/quote/tyo/5384/financials/?p=quarterly",
         "source_name": "Fujimi quarterly financials"
       },
@@ -55586,7 +55747,7 @@ const DATA = {
           "url": "https://stockanalysis.com/quote/she/002185/financials/?p=quarterly"
         }
       ],
-      "data_gap_note": "Structurally the thinnest margins in the OSAT set — operating income was negative in 6 of 17 quarters across 2023-2024 write-down periods."
+      "data_gap_note": "Structurally the thinnest margins in the OSAT set \u2014 operating income was negative in 6 of 17 quarters across 2023-2024 write-down periods."
     },
     {
       "id": "sanan",
@@ -55772,7 +55933,7 @@ const DATA = {
           "url": "https://stockanalysis.com/quote/sha/600703/financials/?p=quarterly"
         }
       ],
-      "data_gap_note": "Operating income is highly volatile and frequently negative, especially in Q4 periods that absorb impairments — every Q4 from 2022 to 2025 carries a large operating loss."
+      "data_gap_note": "Operating income is highly volatile and frequently negative, especially in Q4 periods that absorb impairments \u2014 every Q4 from 2022 to 2025 carries a large operating loss."
     },
     {
       "id": "verisilicon",
@@ -55977,7 +56138,7 @@ const DATA = {
         "yoy_pct": 31.6,
         "gross_margin_pct": 42.3,
         "operating_margin_pct": 23.7,
-        "note": "Q1 2026 revenue grew 31.6% YoY with a 42.3% gross margin — the cleanest compounder in China's equipment set, 3.4x revenue growth and always operating-profitable. H1 2026 report due late August 2026.",
+        "note": "Q1 2026 revenue grew 31.6% YoY with a 42.3% gross margin \u2014 the cleanest compounder in China's equipment set, 3.4x revenue growth and always operating-profitable. H1 2026 report due late August 2026.",
         "source_url": "https://stockanalysis.com/quote/sha/688120/financials/?p=quarterly",
         "source_name": "Hwatsing quarterly financials"
       },
@@ -56329,7 +56490,7 @@ const DATA = {
           "url": "https://stockanalysis.com/quote/sha/688249/financials/?p=quarterly"
         }
       ],
-      "data_gap_note": "Nexchip IPO'd on the STAR Market in May 2023; the 2022 quarters shown are pre-IPO restated figures carried by the data provider and are less comparable — the 48% operating margin in Q1 2022 collapsing to -31% by Q4 2022 reflects the display-driver downcycle plus Fab N2 start-up costs."
+      "data_gap_note": "Nexchip IPO'd on the STAR Market in May 2023; the 2022 quarters shown are pre-IPO restated figures carried by the data provider and are less comparable \u2014 the 48% operating margin in Q1 2022 collapsing to -31% by Q4 2022 reflects the display-driver downcycle plus Fab N2 start-up costs."
     },
     {
       "id": "simmtech",
@@ -56700,7 +56861,7 @@ const DATA = {
           "url": "https://stockanalysis.com/quote/kosdaq/240810/financials/?p=quarterly"
         }
       ],
-      "data_gap_note": "Revenue is highly seasonal on equipment acceptance timing — Q1 is routinely the weakest quarter of the year."
+      "data_gap_note": "Revenue is highly seasonal on equipment acceptance timing \u2014 Q1 is routinely the weakest quarter of the year."
     },
     {
       "id": "psk",
@@ -63046,7 +63207,7 @@ const DATA = {
           ]
         ]
       },
-      "note": "SIA Global Sales Report, compiled by WSTS. Monthly figures are a THREE-MONTH MOVING AVERAGE — that is SIA's published basis, not a smoothing choice made here — while quarterly figures are actual unsmoothed billings, which is why the two do not reconcile (Q1 2026 actual was $298.5bn against $270.8bn for the three 3MMA months). Regional values are levels in US$ billion on the same 3MMA basis and sum to the world total each month. China sat inside a combined Asia Pacific line until Feb 2015 and was split out from Mar 2015, so the first two months of the China and Asia Pacific series come from a later release's prior-year column on the split basis. WSTS restates: expect 0.5-2% drift between vintages."
+      "note": "SIA Global Sales Report, compiled by WSTS. Monthly figures are a THREE-MONTH MOVING AVERAGE \u2014 that is SIA's published basis, not a smoothing choice made here \u2014 while quarterly figures are actual unsmoothed billings, which is why the two do not reconcile (Q1 2026 actual was $298.5bn against $270.8bn for the three 3MMA months). Regional values are levels in US$ billion on the same 3MMA basis and sum to the world total each month. China sat inside a combined Asia Pacific line until Feb 2015 and was split out from Mar 2015, so the first two months of the China and Asia Pacific series come from a later release's prior-year column on the split basis. WSTS restates: expect 0.5-2% drift between vintages."
     }
   },
   "categories": [
@@ -63105,7 +63266,7 @@ const DATA = {
         "psk",
         "eugenetech"
       ],
-      "mixed_currency_note": "Members span Japan (JPY), China (RMB) and Korea (KRW) and none disclose monthly revenue, so this category has no monthly line — compare it in the KPI explorer, where every metric is a percentage."
+      "mixed_currency_note": "Members span Japan (JPY), China (RMB) and Korea (KRW) and none disclose monthly revenue, so this category has no monthly line \u2014 compare it in the KPI explorer, where every metric is a percentage."
     },
     {
       "id": "materials",
@@ -63141,7 +63302,7 @@ const DATA = {
         "winsemi",
         "nexchip"
       ],
-      "mixed_currency_note": "The monthly total sums only the NT$ monthly disclosers (TSMC, UMC, Vanguard, PSMC). SMIC and Hua Hong report quarterly in US$, DB HiTek in KRW, Intel Foundry and GlobalFoundries in US$ — all appear in the YoY and KPI views instead."
+      "mixed_currency_note": "The monthly total sums only the NT$ monthly disclosers (TSMC, UMC, Vanguard, PSMC). SMIC and Hua Hong report quarterly in US$, DB HiTek in KRW, Intel Foundry and GlobalFoundries in US$ \u2014 all appear in the YoY and KPI views instead."
     },
     {
       "id": "memory",
@@ -63186,7 +63347,7 @@ const DATA = {
         "shinko",
         "simmtech"
       ],
-      "mixed_currency_note": "The monthly total sums the NT$ Taiwan members. Ibiden reports quarterly in JPY. Shinko was delisted in June 2025 after being taken private — its line ends at Q1 2025 and it is excluded from current-period aggregates."
+      "mixed_currency_note": "The monthly total sums the NT$ Taiwan members. Ibiden reports quarterly in JPY. Shinko was delisted in June 2025 after being taken private \u2014 its line ends at Q1 2025 and it is excluded from current-period aggregates."
     },
     {
       "id": "pcb",
@@ -63211,7 +63372,7 @@ const DATA = {
         "delta",
         "bizlink"
       ],
-      "mixed_currency_note": "Thermal, power and interconnect suppliers levered to AI server build-outs — the fastest-growing part of the Taiwan hardware chain. Delta sits here rather than in its own Power Electronics category since its growth driver is now data-centre infrastructure. Chicony Power is the clear laggard, still tied to legacy PC and appliance power."
+      "mixed_currency_note": "Thermal, power and interconnect suppliers levered to AI server build-outs \u2014 the fastest-growing part of the Taiwan hardware chain. Delta sits here rather than in its own Power Electronics category since its growth driver is now data-centre infrastructure. Chicony Power is the clear laggard, still tied to legacy PC and appliance power."
     },
     {
       "id": "components",
@@ -63228,7 +63389,7 @@ const DATA = {
         "taiyoyuden",
         "kyocera"
       ],
-      "mixed_currency_note": "The monthly total sums Yageo alone; Murata, TDK, Samsung Electro-Mechanics, LG Innotek, Goertek and Nidec report quarterly in JPY/KRW/RMB. Nidec's figures stop at Q3 2025 — it suspended timely reporting amid an accounting investigation."
+      "mixed_currency_note": "The monthly total sums Yageo alone; Murata, TDK, Samsung Electro-Mechanics, LG Innotek, Goertek and Nidec report quarterly in JPY/KRW/RMB. Nidec's figures stop at Q3 2025 \u2014 it suspended timely reporting amid an accounting investigation."
     },
     {
       "id": "analog_power",
@@ -63241,7 +63402,7 @@ const DATA = {
         "nuvoton",
         "sanan"
       ],
-      "mixed_currency_note": "No member discloses monthly revenue — Renesas and Rohm report quarterly in JPY, SG Micro in RMB."
+      "mixed_currency_note": "No member discloses monthly revenue \u2014 Renesas and Rohm report quarterly in JPY, SG Micro in RMB."
     },
     {
       "id": "storage_controllers",
@@ -63284,7 +63445,7 @@ const DATA = {
         "innolight",
         "eoptolink"
       ],
-      "mixed_currency_note": "The AI-interconnect layer — switches and optical transceivers, the fastest-growing segment in the whole dataset. The monthly total is Accton alone (NT$); Innolight and Eoptolink report quarterly in RMB and appear in the YoY and KPI views. Both Chinese names grew revenue roughly 9-11x across this window, which is real, not a data error."
+      "mixed_currency_note": "The AI-interconnect layer \u2014 switches and optical transceivers, the fastest-growing segment in the whole dataset. The monthly total is Accton alone (NT$); Innolight and Eoptolink report quarterly in RMB and appear in the YoY and KPI views. Both Chinese names grew revenue roughly 9-11x across this window, which is real, not a data error."
     },
     {
       "id": "ai_servers",
@@ -63330,7 +63491,7 @@ const DATA = {
       "mixed_currency_note": "The monthly total is Hon Hai alone; Luxshare reports quarterly in RMB."
     }
   ],
-  "categories_note": "Category assignment reflects each company's dominant revenue driver, not a strict product-line split — most ODMs do not break out monthly revenue by product. Quanta and Inventec sit under AI/Servers because AI servers now exceed half their revenue, though both retain notebook businesses; Compal, Wistron and Pegatron remain PC/Notebook ODMs. Hon Hai is kept in its own EMS category rather than folded into AI/Servers, since AI servers are only part of one segment of a far larger, diversified conglomerate. PC brands (Asustek, Acer, Lenovo) are split from the contract ODMs because their margin structure and demand drivers differ. No currency conversion is applied anywhere: NT$, JPY, KRW, RMB and US$ figures are shown as originally reported, which is why category monthly totals sum only the NT$ members and why the drill-down and KPI views use YoY %/margins — those are currency-agnostic. Two companies carry data caveats: Shinko Electric was taken private and delisted in June 2025 (history ends Q1 2025), and Nidec suspended timely reporting in late 2025 amid an accounting investigation (history ends Q3 2025), with prior periods subject to restatement.",
+  "categories_note": "Category assignment reflects each company's dominant revenue driver, not a strict product-line split \u2014 most ODMs do not break out monthly revenue by product. Quanta and Inventec sit under AI/Servers because AI servers now exceed half their revenue, though both retain notebook businesses; Compal, Wistron and Pegatron remain PC/Notebook ODMs. Hon Hai is kept in its own EMS category rather than folded into AI/Servers, since AI servers are only part of one segment of a far larger, diversified conglomerate. PC brands (Asustek, Acer, Lenovo) are split from the contract ODMs because their margin structure and demand drivers differ. No currency conversion is applied anywhere: NT$, JPY, KRW, RMB and US$ figures are shown as originally reported, which is why category monthly totals sum only the NT$ members and why the drill-down and KPI views use YoY %/margins \u2014 those are currency-agnostic. Two companies carry data caveats: Shinko Electric was taken private and delisted in June 2025 (history ends Q1 2025), and Nidec suspended timely reporting in late 2025 amid an accounting investigation (history ends Q3 2025), with prior periods subject to restatement.",
   "stages": [
     "Design & IP",
     "Equipment & Materials",
@@ -63343,7 +63504,7 @@ const DATA = {
     "unit": "million units",
     "source_family": "IDC",
     "note": "IDC Worldwide Quarterly Personal Computing Device Tracker preliminary results for TRADITIONAL PCs (desktops, notebooks, workstations; tablets and detachables excluded), taken from each quarter's own IDC press release as first published. No Canalys or Gartner figures are mixed in. IDC publishes only a Top-5-plus-Others table and the No.5 slot alternates between Asus and Acer, so Acer appears in 6 of 18 quarters and Asus in 16; in any quarter a vendor is not listed it sits inside 'Others', which is why named vendors plus Others still foot to the worldwide total every quarter. That also means the standalone 'Others' line has step changes that are artifacts of IDC's table format, not real market moves. These are as-first-published figures: IDC restates history between releases (Q2 2025 was first published at 68.4M and later restated to 71.7M), so the YoY percentages are IDC's own as-published growth rates and will not always reconcile against the prior figure in this series.",
-    "odm_note": "None of Foxconn/Hon Hai, Luxshare, BYD Electronics or Hongfujin discloses notebook UNIT shipments — all report revenue only. Foxconn is widely estimated as the No.6 notebook ODM at roughly 5-8% share but publishes a four-category revenue split, never units. Two genuinely large notebook ODMs are absent on a volume basis — LCFC (the Lenovo-Compal JV in Hefei) and Huaqin Technology — but neither discloses units either. Quanta, Compal, Wistron, Inventec and Pegatron are therefore the complete set of notebook ODMs reporting at unit granularity, and everyone else could only be added as an analyst share estimate rather than a disclosed figure.",
+    "odm_note": "None of Foxconn/Hon Hai, Luxshare, BYD Electronics or Hongfujin discloses notebook UNIT shipments \u2014 all report revenue only. Foxconn is widely estimated as the No.6 notebook ODM at roughly 5-8% share but publishes a four-category revenue split, never units. Two genuinely large notebook ODMs are absent on a volume basis \u2014 LCFC (the Lenovo-Compal JV in Hefei) and Huaqin Technology \u2014 but neither discloses units either. Quanta, Compal, Wistron, Inventec and Pegatron are therefore the complete set of notebook ODMs reporting at unit granularity, and everyone else could only be added as an analyst share estimate rather than a disclosed figure.",
     "source_url": "https://www.idc.com/promo/pcdforecast",
     "source_name": "IDC Worldwide Quarterly Personal Computing Device Tracker (per-quarter press releases)",
     "vendors": [
@@ -64179,9 +64340,9 @@ const DATA = {
   "industry": {
     "wafer_area": {
       "unit": "million square inches (MSI)",
-      "note": "SEMI / Silicon Manufacturers Group worldwide silicon wafer AREA shipments — polished, epitaxial and non-polished wafers shipped to end users, semiconductor applications only (solar excluded). This is the cleanest single volume measure of industry activity, because it strips out pricing entirely. The 300mm / 200mm / ≤150mm split you would want alongside it is collected by SEMI but sold only inside the paid Silicon Wafer Market Monitor subscription — it appears in no free release, not even as a percentage, so it is deliberately absent here rather than estimated. SEMI's free commentary characterises it qualitatively (Q3 2025 growth was 'driven by 300mm shipments for advanced logic, cloud infrastructure, and memory demand'). HISTORY: the quarterly series now runs from Q1 2015 (Q2 and Q3 2015 are missing — not free-sourceable) and the annual series from 2002. Provenance differs by era: 2004-2025 are SEMI's own annual releases, chained through year-end press releases each of which states the current and prior year; 2002-2003 come from the USGS Minerals Yearbook citing Roskill rather than SEMI directly, so their basis may differ slightly and they are the least comparable points in the series. 2017 and 2019 are both 11,810 MSI — a genuine coincidence in SEMI's data, verified against two independent releases, not a transcription error. SEMI sells quarterly history for 1995-2020 as a paid report, which is the binding limit on going back further than Q1 2015 quarterly.",
+      "note": "SEMI / Silicon Manufacturers Group worldwide silicon wafer AREA shipments \u2014 polished, epitaxial and non-polished wafers shipped to end users, semiconductor applications only (solar excluded). This is the cleanest single volume measure of industry activity, because it strips out pricing entirely. The 300mm / 200mm / \u2264150mm split you would want alongside it is collected by SEMI but sold only inside the paid Silicon Wafer Market Monitor subscription \u2014 it appears in no free release, not even as a percentage, so it is deliberately absent here rather than estimated. SEMI's free commentary characterises it qualitatively (Q3 2025 growth was 'driven by 300mm shipments for advanced logic, cloud infrastructure, and memory demand'). HISTORY: the quarterly series now runs from Q1 2015 (Q2 and Q3 2015 are missing \u2014 not free-sourceable) and the annual series from 2002. Provenance differs by era: 2004-2025 are SEMI's own annual releases, chained through year-end press releases each of which states the current and prior year; 2002-2003 come from the USGS Minerals Yearbook citing Roskill rather than SEMI directly, so their basis may differ slightly and they are the least comparable points in the series. 2017 and 2019 are both 11,810 MSI \u2014 a genuine coincidence in SEMI's data, verified against two independent releases, not a transcription error. SEMI sells quarterly history for 1995-2020 as a paid report, which is the binding limit on going back further than Q1 2015 quarterly.",
       "source_url": "https://www.semi.org/en/products-services/market-data/materials/si-shipment-statistics",
-      "source_name": "SEMI Silicon Manufacturers Group — Silicon Shipment Statistics",
+      "source_name": "SEMI Silicon Manufacturers Group \u2014 Silicon Shipment Statistics",
       "quarterly": [
         [
           "Mar 2015",
@@ -64572,7 +64733,7 @@ const DATA = {
       ]
     },
     "foundry_wafers": {
-      "note": "UNIT BASES DIFFER BY COMPANY AND ARE NOT COMPARABLE WITHOUT CONVERSION — each series is labelled with its own basis and they are deliberately not summed. TSMC and UMC report 12-inch equivalents; SMIC and Hua Hong report 8-inch equivalents. UMC switched from 8-inch to 12-inch equivalents in 2025, so its pre-2025 figures are excluded rather than spliced onto a different basis (that would create a fake ~2.2x discontinuity). Vanguard is absent because it discloses only percentage sequential changes, never absolute volumes.",
+      "note": "UNIT BASES DIFFER BY COMPANY AND ARE NOT COMPARABLE WITHOUT CONVERSION \u2014 each series is labelled with its own basis and they are deliberately not summed. TSMC and UMC report 12-inch equivalents; SMIC and Hua Hong report 8-inch equivalents. UMC switched from 8-inch to 12-inch equivalents in 2025, so its pre-2025 figures are excluded rather than spliced onto a different basis (that would create a fake ~2.2x discontinuity). Vanguard is absent because it discloses only percentage sequential changes, never absolute volumes.",
       "companies": [
         {
           "id": "tsmc",
@@ -64788,7 +64949,7 @@ const DATA = {
     },
     "wsts_by_product": {
       "unit": "US$ billion",
-      "note": "WSTS semiconductor billings by product category — the industry's own product taxonomy, which is why it sits alongside the company categories rather than inside them. 'Micro' is MPU + MCU + DSP. Actuals for 2022, 2024 and 2025 plus the 2026 forecast come from free WSTS release PDFs; the 2023 row is BACK-CALCULATED from 2024 actuals and their stated growth rates because WSTS's 2023 by-category actuals were not in any free release — treat 2023 as accurate to roughly ±0.5% rather than as a published figure. The 2026 forecast embeds an extraordinary memory expansion (+249.5%) which is what drives the ~$1.51tn total; that is WSTS's number, not an extrapolation. HISTORY: category actuals now run from 2003 and the total from 2000, giving a full view across the 2008-09 crash, the 2017-18 memory supercycle, the 2019 memory bust and the AI expansion. Figures are taken from the most recent WSTS release in which each year appears as an actual (via the JEITA archive of WSTS semi-annual releases); cross-vintage overlaps were checked and agree. Two caveats: 2003 uses a slightly different taxonomy ('Sensors and Actuators', plus a separate Bipolar line that later vintages drop), so it is not perfectly comparable to 2004+; and WSTS restated the Memory/Logic boundary around 2017, so part of the 2016-17 Memory step is definitional even though most of it is the real memory supercycle. DRAM and NAND are never split in any free WSTS or SIA release — Memory is the finest granularity available.",
+      "note": "WSTS semiconductor billings by product category \u2014 the industry's own product taxonomy, which is why it sits alongside the company categories rather than inside them. 'Micro' is MPU + MCU + DSP. Actuals for 2022, 2024 and 2025 plus the 2026 forecast come from free WSTS release PDFs; the 2023 row is BACK-CALCULATED from 2024 actuals and their stated growth rates because WSTS's 2023 by-category actuals were not in any free release \u2014 treat 2023 as accurate to roughly \u00b10.5% rather than as a published figure. The 2026 forecast embeds an extraordinary memory expansion (+249.5%) which is what drives the ~$1.51tn total; that is WSTS's number, not an extrapolation. HISTORY: category actuals now run from 2003 and the total from 2000, giving a full view across the 2008-09 crash, the 2017-18 memory supercycle, the 2019 memory bust and the AI expansion. Figures are taken from the most recent WSTS release in which each year appears as an actual (via the JEITA archive of WSTS semi-annual releases); cross-vintage overlaps were checked and agree. Two caveats: 2003 uses a slightly different taxonomy ('Sensors and Actuators', plus a separate Bipolar line that later vintages drop), so it is not perfectly comparable to 2004+; and WSTS restated the Memory/Logic boundary around 2017, so part of the 2016-17 Memory step is definitional even though most of it is the real memory supercycle. DRAM and NAND are never split in any free WSTS or SIA release \u2014 Memory is the finest granularity available.",
       "source_url": "https://www.wsts.org/",
       "source_name": "WSTS Semiconductor Market Forecast releases (Fall 2023, Autumn 2025, Spring 2026)",
       "categories": [
@@ -66007,7 +66168,7 @@ const DATA = {
       ]
     },
     "memory_pricing": {
-      "note": "IMPORTANT — these are NOT bit shipments. Industry-level DRAM and NAND bit-shipment percentages are not published in any free source for this window: TrendForce's free releases now give revenue and contract price only, with the bit numbers inside their paid reports, and Omdia is subscription-only. Rather than estimate them, these are the three adjacent series that could be sourced cleanly, labelled for what they actually are. All values are QoQ percent. Contract-price values are midpoints of TrendForce's published ranges (Q3 2024 +8~13%; Q4 2025 +45~50%; Q1 2026 +93~98%), and the Q2 2026 price figure is a FORECAST published during Q1 2026, not an actual.",
+      "note": "IMPORTANT \u2014 these are NOT bit shipments. Industry-level DRAM and NAND bit-shipment percentages are not published in any free source for this window: TrendForce's free releases now give revenue and contract price only, with the bit numbers inside their paid reports, and Omdia is subscription-only. Rather than estimate them, these are the three adjacent series that could be sourced cleanly, labelled for what they actually are. All values are QoQ percent. Contract-price values are midpoints of TrendForce's published ranges (Q3 2024 +8~13%; Q4 2025 +45~50%; Q1 2026 +93~98%), and the Q2 2026 price figure is a FORECAST published during Q1 2026, not an actual.",
       "source_url": "https://www.trendforce.com/presscenter/",
       "source_name": "TrendForce quarterly DRAM and NAND Flash industry releases",
       "series": [
@@ -66110,7 +66271,7 @@ const DATA = {
       ]
     },
     "capacity_by_segment": {
-      "note": "SEMI World Fab Forecast installed fab capacity by device segment, in MILLION WAFERS PER MONTH on a 200mm-equivalent basis — a different unit and basis from the MSI wafer-area series, so the two must not be compared directly. THE CRITICAL CAVEAT: SEMI restates between editions and the restatements are larger than the year-over-year changes. Foundry 2024 is 10.2M wpm in the January 2024 edition but 11.3M wpm in the January 2025 edition — an 11% revision against roughly 10% annual growth. The two editions are therefore plotted as SEPARATE series and must never be chained into one line. This is also why there is no continuous 2022-2026 segment panel here: building one from free data would show revision noise as if it were industry movement. A full mutually exclusive segment decomposition summing to the world total does not exist free for any single year — no free source gives absolute logic/MPU capacity, and none splits leading-edge from mature logic in absolute terms.",
+      "note": "SEMI World Fab Forecast installed fab capacity by device segment, in MILLION WAFERS PER MONTH on a 200mm-equivalent basis \u2014 a different unit and basis from the MSI wafer-area series, so the two must not be compared directly. THE CRITICAL CAVEAT: SEMI restates between editions and the restatements are larger than the year-over-year changes. Foundry 2024 is 10.2M wpm in the January 2024 edition but 11.3M wpm in the January 2025 edition \u2014 an 11% revision against roughly 10% annual growth. The two editions are therefore plotted as SEPARATE series and must never be chained into one line. This is also why there is no continuous 2022-2026 segment panel here: building one from free data would show revision noise as if it were industry movement. A full mutually exclusive segment decomposition summing to the world total does not exist free for any single year \u2014 no free source gives absolute logic/MPU capacity, and none splits leading-edge from mature logic in absolute terms.",
       "unit": "million wafers per month (200mm equivalent)",
       "source_url": "https://www.semi.org/en/news-media-press-releases/semi-press-releases/global-semiconductor-capacity-projected-to-reach-record-high-30-million-wafers-per-month-in-2024-semi-reports",
       "source_name": "SEMI World Fab Forecast press releases (Jan 2024 and Jan 2025 editions)",
@@ -66201,7 +66362,7 @@ const DATA = {
           ]
         },
         {
-          "edition": "SEMI WFF, Jan 2025 edition (RESTATED — do not chain with the above)",
+          "edition": "SEMI WFF, Jan 2025 edition (RESTATED \u2014 do not chain with the above)",
           "segments": [
             {
               "id": "foundry_r",
@@ -66260,7 +66421,7 @@ const DATA = {
       ],
       "by_device_type": {
         "unit": "million wafers per month (200mm equivalent)",
-        "note": "SEMI's published segments recast into the advanced-logic / memory / analog taxonomy the industry actually uses. Memory is DRAM plus 3D NAND summed; logic is the foundry line, inside which leading-edge (7nm and below) is called out separately from SEMI's 300mm Fab Outlook, converted to a 200mm-equivalent basis at the 2.25x area ratio so it sits on the same scale. Everything here is one vintage — the Jan 2024 World Fab Forecast, 2024 forecast year — because mixing editions produces restatement artefacts larger than the annual change. IMPORTANT: this is installed CAPACITY in wafers per month, not wafer AREA shipped in MSI. They are different measures and are not interchangeable.",
+        "note": "SEMI's published segments recast into the advanced-logic / memory / analog taxonomy the industry actually uses. Memory is DRAM plus 3D NAND summed; logic is the foundry line, inside which leading-edge (7nm and below) is called out separately from SEMI's 300mm Fab Outlook, converted to a 200mm-equivalent basis at the 2.25x area ratio so it sits on the same scale. Everything here is one vintage \u2014 the Jan 2024 World Fab Forecast, 2024 forecast year \u2014 because mixing editions produces restatement artefacts larger than the annual change. IMPORTANT: this is installed CAPACITY in wafers per month, not wafer AREA shipped in MSI. They are different measures and are not interchangeable.",
         "year": "2024F",
         "source_name": "SEMI World Fab Forecast (Jan 2024 edition) and 300mm Fab Outlook (Jun 2025)",
         "rows": [
@@ -66272,7 +66433,7 @@ const DATA = {
           },
           {
             "id": "logic_adv",
-            "name": "— of which leading edge (≤7nm)",
+            "name": "\u2014 of which leading edge (\u22647nm)",
             "value": 1.91,
             "child": true,
             "note": "850k actual 300mm wafers/month in 2024, converted at the 2.25x area ratio to sit on the 200mm-equivalent scale used by the other rows."
@@ -66285,13 +66446,13 @@ const DATA = {
           },
           {
             "id": "memory_dram",
-            "name": "— DRAM",
+            "name": "\u2014 DRAM",
             "value": 4.0,
             "child": true
           },
           {
             "id": "memory_nand",
-            "name": "— 3D NAND",
+            "name": "\u2014 3D NAND",
             "value": 3.7,
             "child": true
           },
@@ -66308,12 +66469,12 @@ const DATA = {
             "emphasis": true
           }
         ],
-        "unaccounted_note": "SEMI's published segments do not sum to its world total — MPU, logic-IDM, optoelectronics and sensors are not broken out in the free release. The rows above cover roughly 83% of the 29.6M wpm world total for 2023, so read them as the major segments rather than an exhaustive split."
+        "unaccounted_note": "SEMI's published segments do not sum to its world total \u2014 MPU, logic-IDM, optoelectronics and sensors are not broken out in the free release. The rows above cover roughly 83% of the 29.6M wpm world total for 2023, so read them as the major segments rather than an exhaustive split."
       },
-      "msi_split_status": "The true MSI (wafer AREA shipped) split by application is NOT available as numbers in any free source. SUMCO does publish exactly this breakdown — its quarterly decks carry slides on 300mm wafer demand by logic/memory and on leading-edge epi — but those charts are plotted without printed data labels, and SUMCO prints only CAGRs and ratios alongside them (e.g. leading-edge epi 'CAGR 2022-2026: 27%'). Reading values off those charts would be estimation, not data, so it is not done here. Shin-Etsu and GlobalWafers were checked and publish no application volumes at all; GlobalWafers' Q2 2026 deck says so explicitly. SEMI's own free releases give MSI totals with no split. If you have a SEMI Silicon Wafer Market Monitor or TECHCET Critical Materials subscription, that is where the numeric series lives and it can be dropped straight in."
+      "msi_split_status": "The true MSI (wafer AREA shipped) split by application is NOT available as numbers in any free source. SUMCO does publish exactly this breakdown \u2014 its quarterly decks carry slides on 300mm wafer demand by logic/memory and on leading-edge epi \u2014 but those charts are plotted without printed data labels, and SUMCO prints only CAGRs and ratios alongside them (e.g. leading-edge epi 'CAGR 2022-2026: 27%'). Reading values off those charts would be estimation, not data, so it is not done here. Shin-Etsu and GlobalWafers were checked and publish no application volumes at all; GlobalWafers' Q2 2026 deck says so explicitly. SEMI's own free releases give MSI totals with no split. If you have a SEMI Silicon Wafer Market Monitor or TECHCET Critical Materials subscription, that is where the numeric series lives and it can be dropped straight in."
     },
     "advanced_node_capacity": {
-      "note": "SEMI 300mm Fab Outlook leading-edge capacity — the closest free proxy to the 'advanced logic' cut, and the one genuine multi-year segment TREND available without a subscription. Unit is THOUSAND ACTUAL 300mm wafers per month, NOT 200mm-equivalent and NOT MSI. 2024 is actual; 2025 onward are forecasts, and 2027 is absent from the source so the line jumps 2026 to 2028. Cross-check: 982k 300mm wpm for 2025 equals the 2.2M wpm 200mm-equivalent advanced-node figure in the capacity-by-segment view (x2.25 area ratio), which is a useful consistency check but also a trap — the two are the same quantity in different units, not two independent observations.",
+      "note": "SEMI 300mm Fab Outlook leading-edge capacity \u2014 the closest free proxy to the 'advanced logic' cut, and the one genuine multi-year segment TREND available without a subscription. Unit is THOUSAND ACTUAL 300mm wafers per month, NOT 200mm-equivalent and NOT MSI. 2024 is actual; 2025 onward are forecasts, and 2027 is absent from the source so the line jumps 2026 to 2028. Cross-check: 982k 300mm wpm for 2025 equals the 2.2M wpm 200mm-equivalent advanced-node figure in the capacity-by-segment view (x2.25 area ratio), which is a useful consistency check but also a trap \u2014 the two are the same quantity in different units, not two independent observations.",
       "unit": "thousand 300mm wafers per month",
       "source_url": "https://www.semi.org/en/semi-press-release/semi-forecasts-69-percent-growth-in-advanced-chipmaking-capacity-through-2028-due-to-ai",
       "source_name": "SEMI 300mm Fab Outlook (Jun 2025); memory line from the Jun 2026 edition",
@@ -66386,7 +66547,7 @@ const DATA = {
     },
     "semi_units": {
       "unit": "billion units",
-      "note": "Total semiconductor units shipped. Only three datapoints exist in free SIA/WSTS material — the full unit series sits in the subscription-only WSTS Blue Book, and ASP is likewise unpublished. Intervening years are deliberately omitted rather than interpolated, so read this as three anchors two decades apart, not a trend line: the industry shipped 257bn units in 1998, crossed 1 trillion for the first time in 2018, and reached 1.15 trillion in 2021.",
+      "note": "Total semiconductor units shipped. Only three datapoints exist in free SIA/WSTS material \u2014 the full unit series sits in the subscription-only WSTS Blue Book, and ASP is likewise unpublished. Intervening years are deliberately omitted rather than interpolated, so read this as three anchors two decades apart, not a trend line: the industry shipped 257bn units in 1998, crossed 1 trillion for the first time in 2018, and reached 1.15 trillion in 2021.",
       "source_url": "https://www.semiconductors.org/more-than-1-trillion-semiconductors-sold-annually-for-the-first-time-ever-in-2018/",
       "source_name": "SIA press releases (WSTS data)",
       "history": [
@@ -66410,7 +66571,7 @@ const DATA = {
   },
   "retired_odm_shipments": {
     "unit": "million units",
-    "note": "Taiwan ODMs publish monthly REVENUE by regulation but NOT unit shipments — unit counts surface irregularly through trade press, and DIGITIMES, which publishes the complete monthly series, is subscription-only. Quarterly is therefore the only cadence that reliably supports year-over-year comparison. Quanta's quarterly series is cross-validated across four independent sources (its reported QoQ and YoY percentages reproduce the reported absolutes to within 0.1M). Compal's quarters are arithmetic reconstructions from its audited FY2025 total, its reported H1 2026 total and two disclosed percentage changes — directionally sound but approximate. Wistron, Inventec and Pegatron have no usable 2025 unit baseline at all in public sources, so no YoY is computable for them and they are shown on the monthly detail view only. Hollow markers are derived from a reported percentage change.",
+    "note": "Taiwan ODMs publish monthly REVENUE by regulation but NOT unit shipments \u2014 unit counts surface irregularly through trade press, and DIGITIMES, which publishes the complete monthly series, is subscription-only. Quarterly is therefore the only cadence that reliably supports year-over-year comparison. Quanta's quarterly series is cross-validated across four independent sources (its reported QoQ and YoY percentages reproduce the reported absolutes to within 0.1M). Compal's quarters are arithmetic reconstructions from its audited FY2025 total, its reported H1 2026 total and two disclosed percentage changes \u2014 directionally sound but approximate. Wistron, Inventec and Pegatron have no usable 2025 unit baseline at all in public sources, so no YoY is computable for them and they are shown on the monthly detail view only. Hollow markers are derived from a reported percentage change.",
     "companies": [
       {
         "id": "quanta",
@@ -66604,7 +66765,7 @@ const DATA = {
       }
     ],
     "industry_total": {
-      "note": "Annual benchmarks only — no free monthly or quarterly industry totals are published. FY2026 values are FORECASTS. Plotted at each year's December purely as a date anchor; these are full-year figures, not December months.",
+      "note": "Annual benchmarks only \u2014 no free monthly or quarterly industry totals are published. FY2026 values are FORECASTS. Plotted at each year's December purely as a date anchor; these are full-year figures, not December months.",
       "history": [
         {
           "period": "Dec 2025",
@@ -66633,6 +66794,3020 @@ const DATA = {
       "source_name": "TrendForce, DIGITIMES Research, Wistron 2025 annual report"
     },
     "retired_note": "Retired from the dashboard on 18 Aug 2026. Only Quanta and Compal had a usable unit series and only Quanta's was independently cross-validated; Wistron, Inventec and Pegatron have no 2025 unit baseline in any free source, so the card rendered as mostly empty space. DIGITIMES publishes the complete monthly ODM unit series but it is subscription-only. The IDC PC-vendor block (pc_shipments) answers the same question with 7 vendors and 18 quarters and is the better view. Data retained here so the sourcing work is not lost if a subscription later makes the full series available."
+  },
+  "fab_construction": {
+    "as_of": "2026-08-18",
+    "axis": {
+      "min": 2021.0,
+      "max": 2034.0,
+      "today": 2026.63
+    },
+    "source_name": "Company disclosures, SEC filings and trade press, audited Aug 2026",
+    "source_url": "https://www.tsmc.com/static/abouttsmcaz/index.htm",
+    "note": "Fab shell and advanced-packaging construction timelines for the projects that actually change supply, audited against public disclosure as of 18 Aug 2026. The starting point was a user-supplied Excel tracker of roughly Dec 2025 vintage covering the US, South Korea and Japan; every row on it was re-checked, and the projects it omitted were added. Dates resolve to a quarter and no finer. THREE THINGS TO READ CAREFULLY. (1) A production bar is FIRST OUTPUT, not full capacity; ramps run one to three years behind the bar's left edge, and Intel Fab 52 is the clearest case \u2014 operational since Oct 2025 but capped until 18A yields normalise in early 2027. (2) `confidence` is not decoration. Rows marked low carry inferred dates, not disclosed ones, and should not be planned against. (3) The `revision` field records the audit result against the source sheet, and the direction skews heavily to `later` \u2014 which is itself the finding. Of the dated projects that moved, the large majority slipped; only Samsung's P5 and TSMC Arizona Phase 1 moved earlier.",
+    "audit_summary": "Of the 26 projects the source sheet carried, 12 schedules moved later, 2 moved earlier and 12 were confirmed unchanged. A further 42 projects were missing entirely. The single largest error was Micron Clay Fab 2 at roughly five years. The largest structural gap was advanced packaging, which the source sheet did not cover at all despite it being the binding constraint on AI accelerator supply \u2014 21 packaging and substrate projects are now on the chart, more than any other segment. Filter to Advanced packaging and the shape of the problem is visible in one read: the US has essentially nothing running until Intel New Mexico's existing line is joined by Amkor Peoria and SK hynix Indiana in 2028, while Taiwan and Southeast Asia are adding capacity every year between now and then. The second structural gap was foundational analog: TI's Sherman site has been producing since Dec 2025 and was absent from a chart tracking only logic and DRAM. Taiwan and Southeast Asia were both absent as regions, which removes the baseline everything else is being built to catch.",
+    "phase_legend": [
+      {
+        "k": "start",
+        "label": "Site prep / groundbreaking"
+      },
+      {
+        "k": "build",
+        "label": "Shell construction"
+      },
+      {
+        "k": "fitout",
+        "label": "Cleanroom + tool install"
+      },
+      {
+        "k": "paused",
+        "label": "Construction suspended"
+      },
+      {
+        "k": "production",
+        "label": "Wafer output"
+      }
+    ],
+    "projects": [
+      {
+        "id": "tsmc_az_p1",
+        "company": "TSMC",
+        "site": "North Phoenix, AZ",
+        "region": "United States",
+        "fab": "Fab 21 Phase 1",
+        "device": "Logic",
+        "node": "N4 / N5",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2021.25,
+            "b": 2021.5
+          },
+          {
+            "k": "build",
+            "a": 2021.5,
+            "b": 2023.5
+          },
+          {
+            "k": "fitout",
+            "a": 2023.5,
+            "b": 2024.75
+          },
+          {
+            "k": "production",
+            "a": 2024.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Q4 2024",
+        "confidence": "high",
+        "revision": {
+          "direction": "earlier",
+          "was": "Sheet shows production starting 2025",
+          "now": "Volume production began Q4 2024",
+          "was_year": 2025.0
+        },
+        "note": "Roughly 90,000-100,000 wpm. TSMC reports N4 yield at the Arizona fab is on par with its Taiwan fabs (~92% cited publicly). Arizona operations turned a NT$16.1bn profit in 2025, their first full production year, and Arizona revenue is guided from ~2% of TSMC total in 2025 to 4-5% by 2027. Apple bought over 100 million Arizona-made chips in 2026.",
+        "source": {
+          "name": "TSMC Arizona site + Q2 2026 results coverage",
+          "url": "https://www.tsmc.com/static/abouttsmcaz/index.htm"
+        }
+      },
+      {
+        "id": "tsmc_az_p2",
+        "company": "TSMC",
+        "site": "North Phoenix, AZ",
+        "region": "United States",
+        "fab": "Fab 21 Phase 2",
+        "device": "Logic",
+        "node": "N3",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.5,
+            "b": 2022.75
+          },
+          {
+            "k": "build",
+            "a": 2022.75,
+            "b": 2026.25
+          },
+          {
+            "k": "fitout",
+            "a": 2026.5,
+            "b": 2027.25
+          },
+          {
+            "k": "production",
+            "a": 2027.25,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2027",
+        "confidence": "high",
+        "revision": {
+          "direction": "later",
+          "was": "Sheet shows production 2026",
+          "now": "Shell completed Apr 2026; tool move-in Q3 2026; volume production 2027",
+          "was_year": 2026.0
+        },
+        "note": "Two things are true at once and the sheet captured neither. Against TSMC's ORIGINAL plan this fab is a year EARLY \u2014 the 2028 target was pulled forward to 2027 on AI demand. Against the sheet's 2026 line it is a year LATE. Equipment installation began Q3 2026; qualifying a line after tool move-in typically runs two to four quarters, which is what puts first output in 2027 rather than late 2026.",
+        "source": {
+          "name": "Nikkei Asia via Tom's Hardware \u2014 Arizona P2 equipment installation",
+          "url": "https://www.tomshardware.com/tech-industry/semiconductors/tsmc-brings-its-most-advanced-chipmaking-node-to-the-us-yet-to-begin-equipment-installation-for-3mn-months-ahead-of-schedule-arizona-fab-slated-for-production-in-2027"
+        }
+      },
+      {
+        "id": "tsmc_az_p3",
+        "company": "TSMC",
+        "site": "North Phoenix, AZ",
+        "region": "United States",
+        "fab": "Fab 21 Phase 3",
+        "device": "Logic",
+        "node": "N2 / A16",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2025.25,
+            "b": 2025.5
+          },
+          {
+            "k": "build",
+            "a": 2025.5,
+            "b": 2028.0
+          },
+          {
+            "k": "fitout",
+            "a": 2028.0,
+            "b": 2029.0
+          },
+          {
+            "k": "production",
+            "a": 2029.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2029",
+        "confidence": "medium",
+        "revision": {
+          "direction": "later",
+          "was": "Sheet shows production 2028",
+          "now": "Targeted 2029",
+          "was_year": 2028.0
+        },
+        "note": "Broke ground April 2025. TSMC has said it wants this one as fast as possible, so 2029 could pull left \u2014 but P1 took 3.5 years from groundbreaking to output and P2 is taking 4.5, which makes a 2028 start implausible on the same site.",
+        "source": {
+          "name": "Arizona Technology Council \u2014 TSMC accelerates Arizona timeline",
+          "url": "https://www.aztechcouncil.org/tsmc-moves-up-production-second-fab-html/"
+        }
+      },
+      {
+        "id": "tsmc_az_p4",
+        "company": "TSMC",
+        "site": "North Phoenix, AZ",
+        "region": "United States",
+        "fab": "Fab 21 Phase 4",
+        "device": "Logic",
+        "node": "N2 / A16",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2026.0,
+            "b": 2026.25
+          },
+          {
+            "k": "build",
+            "a": 2026.25,
+            "b": 2029.0
+          },
+          {
+            "k": "fitout",
+            "a": 2029.0,
+            "b": 2030.0
+          },
+          {
+            "k": "production",
+            "a": 2030.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2030 (est.)",
+        "confidence": "low",
+        "revision": {
+          "direction": "later",
+          "was": "Sheet shows start 2Q26, clean room 2029",
+          "now": "Initial construction began early 2026; no production date disclosed",
+          "was_year": 2029.0
+        },
+        "note": "TSMC confirms initial construction stages began in early 2026 but has not published a production date. 2030 is inferred from the P1-P3 cadence, not stated.",
+        "source": {
+          "name": "TSMC Arizona site",
+          "url": "https://www.tsmc.com/static/abouttsmcaz/index.htm"
+        }
+      },
+      {
+        "id": "tsmc_az_ap1",
+        "company": "TSMC",
+        "site": "North Phoenix, AZ",
+        "region": "United States",
+        "fab": "Advanced Packaging Fab 1",
+        "device": "Advanced packaging",
+        "node": "CoWoS / SoIC",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2026.0,
+            "b": 2026.25
+          },
+          {
+            "k": "build",
+            "a": 2026.25,
+            "b": 2028.25
+          },
+          {
+            "k": "fitout",
+            "a": 2028.25,
+            "b": 2029.0
+          },
+          {
+            "k": "production",
+            "a": 2029.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2029 (est.)",
+        "confidence": "low",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Initial construction began early 2026 alongside Phase 4"
+        },
+        "note": "The most consequential omission in the US section of the source sheet. Advanced packaging \u2014 not wafer fabrication \u2014 is the binding constraint on AI accelerator supply, and until this fab and Amkor Peoria run, every Arizona wafer still flies to Taiwan for CoWoS. Permits were in process in early 2026; no production date has been published.",
+        "source": {
+          "name": "TSMC Arizona site",
+          "url": "https://www.tsmc.com/static/abouttsmcaz/index.htm"
+        }
+      },
+      {
+        "id": "tsmc_az_p5",
+        "company": "TSMC",
+        "site": "North Phoenix, AZ",
+        "region": "United States",
+        "fab": "Fab 21 Phase 5",
+        "device": "Logic",
+        "node": "Not disclosed",
+        "status": "planned",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2027.5,
+            "b": 2027.75
+          },
+          {
+            "k": "build",
+            "a": 2027.75,
+            "b": 2030.5
+          },
+          {
+            "k": "production",
+            "a": 2031.5,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2031 (est.)",
+        "confidence": "low",
+        "revision": {
+          "direction": "unchanged",
+          "was": "Sheet shows start 2H27",
+          "now": "Consistent; no TSMC date published"
+        },
+        "note": "C.C. Wei said in July 2026 that fabs five and six would use 'far more advanced technologies' than N2/A16, without naming a node or a date. Everything on this row is a placeholder.",
+        "source": {
+          "name": "Arizona Technology Council",
+          "url": "https://www.aztechcouncil.org/tsmc-moves-up-production-second-fab-html/"
+        }
+      },
+      {
+        "id": "samsung_taylor_f1",
+        "company": "Samsung",
+        "site": "Taylor, TX",
+        "region": "United States",
+        "fab": "Taylor Fab 1",
+        "device": "Logic",
+        "node": "SF4 / SF2",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.25,
+            "b": 2022.5
+          },
+          {
+            "k": "build",
+            "a": 2022.5,
+            "b": 2025.5
+          },
+          {
+            "k": "fitout",
+            "a": 2025.5,
+            "b": 2026.75
+          },
+          {
+            "k": "production",
+            "a": 2026.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Operations late 2026; mass production 2027",
+        "confidence": "high",
+        "revision": {
+          "direction": "later",
+          "was": "Sheet shows production 2026",
+          "now": "Operations start late 2026 / early 2027; mass production 2027",
+          "was_year": 2026.0
+        },
+        "note": "Originally targeted 2H 2024, so this fab is roughly 2.5 years behind its own announcement. Samsung confirmed on the Q2 2026 call that Fab 1 remains on track to begin operations in 2026 with a gradual 2nm capacity ramp after; a foundry VP separately put production at 2027. Backed by Tesla's $16.5bn order and a Broadcom agreement.",
+        "source": {
+          "name": "Samsung Q2 2026 earnings call via TrendForce",
+          "url": "https://www.trendforce.com/news/2026/07/31/news-samsung-to-start-taylor-fab-2-build-by-end-2026-targets-2030-mass-production-eyes-1-4nm-expansion/"
+        }
+      },
+      {
+        "id": "samsung_taylor_f2",
+        "company": "Samsung",
+        "site": "Taylor, TX",
+        "region": "United States",
+        "fab": "Taylor Fab 2",
+        "device": "Logic",
+        "node": "SF2 / SF1.4",
+        "status": "planned",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2026.75,
+            "b": 2027.0
+          },
+          {
+            "k": "build",
+            "a": 2027.0,
+            "b": 2029.5
+          },
+          {
+            "k": "fitout",
+            "a": 2029.5,
+            "b": 2030.0
+          },
+          {
+            "k": "production",
+            "a": 2030.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2030",
+        "confidence": "high",
+        "revision": {
+          "direction": "later",
+          "was": "Sheet shows start 1H26, production 2029",
+          "now": "Groundbreaking end-2026, mass production 2030",
+          "was_year": 2029.0
+        },
+        "note": "Confirmed on the Q2 2026 call: construction starts by end-2026, mass production 2030. Roughly 2.7m sq ft, the same footprint as Fab 1. Samsung owns 1,268 acres in Taylor, enough for up to ten fabs, and said 1.4nm customer inquiries are rising.",
+        "source": {
+          "name": "Korea Times \u2014 Samsung to begin construction of 2nd Texas fab",
+          "url": "https://www.koreatimes.co.kr/amp/business/companies/20260730/samsung-to-begin-construction-of-2nd-chip-fab-in-texas-at-end-of-2026"
+        }
+      },
+      {
+        "id": "intel_az_f52",
+        "company": "Intel",
+        "site": "Ocotillo \u2014 Chandler, AZ",
+        "region": "United States",
+        "fab": "Fab 52",
+        "device": "Logic",
+        "node": "Intel 18A",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2021.5,
+            "b": 2021.75
+          },
+          {
+            "k": "build",
+            "a": 2021.75,
+            "b": 2023.75
+          },
+          {
+            "k": "fitout",
+            "a": 2023.75,
+            "b": 2025.75
+          },
+          {
+            "k": "production",
+            "a": 2025.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Fully operational Oct 2025",
+        "confidence": "high",
+        "revision": {
+          "direction": "unchanged",
+          "was": "Sheet shows production 2025",
+          "now": "Confirmed \u2014 operational Oct 2025"
+        },
+        "note": "The sheet got this one right. Named capacity is over 10,000 18A wafer starts per week (~40,000 wpm), larger than Arizona Fab 21 phases 1 and 2 combined. But named capacity is not output: Intel is capping CPU volume on 18A until yields reach industry-standard levels in early 2027, so part of Fab 52 sits idle. Built as a JV with Brookfield \u2014 Intel takes 51% of capital and profits.",
+        "source": {
+          "name": "Tom's Hardware \u2014 Intel's fab roadmap examined",
+          "url": "https://www.tomshardware.com/tech-industry/semiconductors/intels-fab-roadmap-examined"
+        }
+      },
+      {
+        "id": "intel_az_f62",
+        "company": "Intel",
+        "site": "Ocotillo \u2014 Chandler, AZ",
+        "region": "United States",
+        "fab": "Fab 62",
+        "device": "Logic",
+        "node": "Intel 18A",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2021.5,
+            "b": 2021.75
+          },
+          {
+            "k": "build",
+            "a": 2021.75,
+            "b": 2024.25
+          },
+          {
+            "k": "fitout",
+            "a": 2024.25,
+            "b": 2026.75
+          },
+          {
+            "k": "production",
+            "a": 2026.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Not separately disclosed",
+        "confidence": "low",
+        "revision": {
+          "direction": "later",
+          "was": "Sheet shows production 2025",
+          "now": "No separate production date disclosed; Fab 52 is the one that went operational in 2025",
+          "was_year": 2025.0
+        },
+        "note": "Fab 52 and Fab 62 were originally 52.1 and 52.2 \u2014 one building with two modules, 685,000 sq ft of cleanroom between them, construction started 2021. Intel has publicised Fab 52's ramp and said nothing specific about Fab 62's, and Fab 52 is not yet fully tooled. The sheet's 2025 production line for Fab 62 appears to be Fab 52's milestone applied twice. Low confidence by design.",
+        "source": {
+          "name": "Intel FY2026 annual report",
+          "url": "https://www.sec.gov/Archives/edgar/data/50863/000005086326000060/intc014890-arsa.pdf"
+        }
+      },
+      {
+        "id": "intel_oh_m1",
+        "company": "Intel",
+        "site": "New Albany \u2014 Licking County, OH",
+        "region": "United States",
+        "fab": "Ohio One Mod 1",
+        "device": "Logic",
+        "node": "Intel 14A-class",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.5,
+            "b": 2022.75
+          },
+          {
+            "k": "build",
+            "a": 2022.75,
+            "b": 2030.0
+          },
+          {
+            "k": "fitout",
+            "a": 2030.0,
+            "b": 2031.75
+          },
+          {
+            "k": "production",
+            "a": 2031.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "End of 2031",
+        "confidence": "high",
+        "revision": {
+          "direction": "later",
+          "was": "Sheet shows 'Delayed 4 Years', start 2026, clean room 2029",
+          "now": "Construction completes 2030; operations begin end-2031",
+          "was_year": 2030.0
+        },
+        "note": "The sheet's four-year delay understates it. Original production was 2025; Intel's own confirmed schedule is construction complete 2030, operations end-2031 \u2014 a six-year slip. Intel is building deliberately slowly and has said it will accelerate only if customer demand warrants. The strategic problem is self-inflicted: 14A launches in 2027, so a 2031 fab is four years behind its own node.",
+        "source": {
+          "name": "Intel via Columbus Dispatch / DCD",
+          "url": "https://www.datacenterdynamics.com/en/news/intel-further-delays-28bn-ohio-chip-fabs-by-half-a-decade/"
+        }
+      },
+      {
+        "id": "intel_oh_m2",
+        "company": "Intel",
+        "site": "New Albany \u2014 Licking County, OH",
+        "region": "United States",
+        "fab": "Ohio One Mod 2",
+        "device": "Logic",
+        "node": "Intel 14A-class",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2023.0,
+            "b": 2023.25
+          },
+          {
+            "k": "build",
+            "a": 2023.25,
+            "b": 2031.0
+          },
+          {
+            "k": "fitout",
+            "a": 2031.0,
+            "b": 2032.0
+          },
+          {
+            "k": "production",
+            "a": 2032.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2032",
+        "confidence": "high",
+        "revision": {
+          "direction": "later",
+          "was": "Sheet shows 'Delayed 5 Years', start 2027",
+          "now": "Construction completes 2031; operational 2032",
+          "was_year": 2030.0
+        },
+        "note": "The Ohio One site can hold up to eight fabs. Two are funded. Intel has taken $2.2bn of its $7.865bn CHIPS award; in Aug 2025 the remaining $5.7bn plus $3.2bn of Secure Enclave money was converted into a 9.9% US government equity stake rather than paid as grants.",
+        "source": {
+          "name": "Intel via DCD",
+          "url": "https://www.datacenterdynamics.com/en/news/intel-further-delays-28bn-ohio-chip-fabs-by-half-a-decade/"
+        }
+      },
+      {
+        "id": "intel_nm_ap",
+        "company": "Intel",
+        "site": "Rio Rancho, NM",
+        "region": "United States",
+        "fab": "Fab 9 / 11x \u2014 advanced packaging",
+        "device": "Advanced packaging",
+        "node": "Foveros",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2021.0,
+            "b": 2021.25
+          },
+          {
+            "k": "build",
+            "a": 2021.25,
+            "b": 2023.0
+          },
+          {
+            "k": "fitout",
+            "a": 2023.0,
+            "b": 2024.0
+          },
+          {
+            "k": "production",
+            "a": 2024.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2024",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Producing \u2014 Intel's key US advanced packaging site"
+        },
+        "note": "Included because it is currently the largest operating advanced-packaging capacity on US soil, and the sheet's omission of packaging entirely is its biggest structural gap. Intel's EMIB/Foveros is a genuine alternative to CoWoS and Intel Foundry reports rising external interest.",
+        "source": {
+          "name": "Intel FY2026 annual report",
+          "url": "https://www.sec.gov/Archives/edgar/data/50863/000005086326000060/intc014890-arsa.pdf"
+        }
+      },
+      {
+        "id": "micron_id1",
+        "company": "Micron",
+        "site": "Boise, ID",
+        "region": "United States",
+        "fab": "ID1",
+        "device": "DRAM",
+        "node": "1-gamma",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.75,
+            "b": 2023.0
+          },
+          {
+            "k": "build",
+            "a": 2023.0,
+            "b": 2025.5
+          },
+          {
+            "k": "fitout",
+            "a": 2025.5,
+            "b": 2027.25
+          },
+          {
+            "k": "production",
+            "a": 2027.25,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Mid-to-2H calendar 2027",
+        "confidence": "high",
+        "revision": {
+          "direction": "later",
+          "was": "Sheet shows production 2026",
+          "now": "First DRAM wafer output 2027",
+          "was_year": 2026.0
+        },
+        "note": "Micron has been consistent on this for over a year: first wafer output in 2027, customer qualification after. This is the single most load-bearing date in the whole US memory picture, because it is the first new US DRAM supply of the current shortage \u2014 and it lands a full year later than the sheet implies.",
+        "source": {
+          "name": "Micron via Tom's Hardware",
+          "url": "https://www.tomshardware.com/pc-components/dram/micron-details-new-u-s-fab-projects-idaho-fab-1-comes-online-in-2h-2027-new-york-fabs-come-later-hbm-assembly-in-the-u-s"
+        }
+      },
+      {
+        "id": "micron_id2",
+        "company": "Micron",
+        "site": "Boise, ID",
+        "region": "United States",
+        "fab": "ID2",
+        "device": "DRAM",
+        "node": "Leading-edge DRAM",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2026.0,
+            "b": 2026.25
+          },
+          {
+            "k": "build",
+            "a": 2026.25,
+            "b": 2028.0
+          },
+          {
+            "k": "fitout",
+            "a": 2028.0,
+            "b": 2028.75
+          },
+          {
+            "k": "production",
+            "a": 2028.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Late calendar 2028",
+        "confidence": "high",
+        "revision": {
+          "direction": "later",
+          "was": "Sheet shows start 1Q26, production 2027",
+          "now": "Production late 2028",
+          "was_year": 2027.0
+        },
+        "note": "Micron amended its CHIPS agreement to redirect about $1.2bn from the New York project to ID2, cutting Clay's share from $4.6bn to $3.4bn. ID2 is explicitly scheduled to produce before the first New York fab. Shares infrastructure and R&D co-location with ID1.",
+        "source": {
+          "name": "Futurum \u2014 Micron $250B US investment",
+          "url": "https://futurumgroup.com/insights/microns-250b-us-investment-finds-its-edge-on-koreas-memory-juggernaut/"
+        }
+      },
+      {
+        "id": "micron_ny_f1",
+        "company": "Micron",
+        "site": "Clay, NY",
+        "region": "United States",
+        "fab": "Clay Fab 1",
+        "device": "DRAM",
+        "node": "Leading-edge DRAM",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2025.75,
+            "b": 2026.0
+          },
+          {
+            "k": "build",
+            "a": 2026.0,
+            "b": 2028.75
+          },
+          {
+            "k": "fitout",
+            "a": 2028.75,
+            "b": 2030.0
+          },
+          {
+            "k": "production",
+            "a": 2030.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2030",
+        "confidence": "high",
+        "revision": {
+          "direction": "later",
+          "was": "Sheet shows start 4Q25, production 2029",
+          "now": "Groundbreaking Jan 2026; DRAM supply 2030 or later",
+          "was_year": 2029.0
+        },
+        "note": "Groundbreaking January 2026; first concrete poured July 2026, which Micron says is more than a quarter ahead of the revised schedule. But the revised schedule is itself two to three years later than the original \u2014 the final Environmental Impact Statement moved Fab 1 from 2028 to 2030. Being ahead of a slipped schedule is not the same as being on the old one.",
+        "source": {
+          "name": "Micron final EIS via Construction Dive",
+          "url": "https://www.constructiondive.com/news/micron-delay-construction-new-york-megafab/805622/"
+        }
+      },
+      {
+        "id": "micron_ny_f2",
+        "company": "Micron",
+        "site": "Clay, NY",
+        "region": "United States",
+        "fab": "Clay Fab 2",
+        "device": "DRAM",
+        "node": "Leading-edge DRAM",
+        "status": "planned",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2030.75,
+            "b": 2031.0
+          },
+          {
+            "k": "build",
+            "a": 2031.0,
+            "b": 2033.75
+          },
+          {
+            "k": "production",
+            "a": 2034.0,
+            "b": 2034.5
+          }
+        ],
+        "first_output": "~2034",
+        "confidence": "medium",
+        "revision": {
+          "direction": "later",
+          "was": "Sheet shows production 2029",
+          "now": "Construction Q4 2030 - Q4 2033; operational ~2034",
+          "was_year": 2029.0
+        },
+        "note": "The largest single error in the source sheet \u2014 five years. The EIS puts Fab 2 construction at Q4 2030 to Q4 2033, against an original 2028-2030. Fabs 3 and 4 follow around 2035 and 2041, with the full campus operational in 2045; both are past this chart's horizon and are omitted rather than drawn as stubs.",
+        "source": {
+          "name": "Micron final EIS via Construction Dive",
+          "url": "https://www.constructiondive.com/news/micron-delay-construction-new-york-megafab/805622/"
+        }
+      },
+      {
+        "id": "micron_va",
+        "company": "Micron",
+        "site": "Manassas, VA",
+        "region": "United States",
+        "fab": "Manassas expansion",
+        "device": "DRAM",
+        "node": "1-alpha",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2024.25,
+            "b": 2024.5
+          },
+          {
+            "k": "build",
+            "a": 2024.5,
+            "b": 2025.5
+          },
+          {
+            "k": "fitout",
+            "a": 2025.5,
+            "b": 2026.25
+          },
+          {
+            "k": "production",
+            "a": 2026.25,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "May 2026",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "1-alpha DRAM in production since May 2026"
+        },
+        "note": "Quietly the most immediately useful new US memory capacity, because it is the only one already shipping. Onshoring 1-alpha creates a dedicated domestic DDR4/LP4 line for automotive, industrial and defence that does not compete for wafer starts with leading-edge AI product \u2014 relevant when automotive DRAM contract prices are forecast up 70-100% in 2026. HBM advanced packaging is planned for the same site.",
+        "source": {
+          "name": "Tom's Hardware \u2014 Micron Virginia fab",
+          "url": "https://www.tomshardware.com/tech-industry/micron-begins-producing-americas-most-advanced-dram-at-its-virginia-fab"
+        }
+      },
+      {
+        "id": "ti_sm1",
+        "company": "Texas Instruments",
+        "site": "Sherman, TX",
+        "region": "United States",
+        "fab": "SM1",
+        "device": "Analog / embedded",
+        "node": "300mm analog",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.25,
+            "b": 2022.5
+          },
+          {
+            "k": "build",
+            "a": 2022.5,
+            "b": 2025.0
+          },
+          {
+            "k": "fitout",
+            "a": 2025.0,
+            "b": 2025.9
+          },
+          {
+            "k": "production",
+            "a": 2025.9,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "17 Dec 2025",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "In production since Dec 2025"
+        },
+        "note": "The largest omission in the source sheet by capacity. Sherman is a potential $40-60bn, four-fab site targeting over 100 million chips a day, and SM1 went from groundbreaking to production in three years \u2014 faster than any leading-edge project on this chart. A tracker built only around leading-edge logic and DRAM misses that most of the actual new US wafer volume is foundational analog.",
+        "source": {
+          "name": "Texas Instruments \u2014 Sherman site",
+          "url": "https://www.ti.com/about-ti/company/ti-at-a-glance/manufacturing/sherman.html"
+        }
+      },
+      {
+        "id": "ti_sm2",
+        "company": "Texas Instruments",
+        "site": "Sherman, TX",
+        "region": "United States",
+        "fab": "SM2",
+        "device": "Analog / embedded",
+        "node": "300mm analog",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.5,
+            "b": 2022.75
+          },
+          {
+            "k": "build",
+            "a": 2022.75,
+            "b": 2025.75
+          },
+          {
+            "k": "fitout",
+            "a": 2026.5,
+            "b": 2028.0
+          },
+          {
+            "k": "production",
+            "a": 2028.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "~2028",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Shell complete; cleanroom and tooling from late 2026"
+        },
+        "note": "Exterior shell already complete and directly connected to SM1, so TI can expand into it on demand rather than on a fixed schedule. Cleanroom installation and tool positioning were slated to begin later in 2026. TI has not published a production date; 2028 is inferred from SM1's fitout duration.",
+        "source": {
+          "name": "EE Times \u2014 inside TI's Sherman fab",
+          "url": "https://www.eetimes.com/inside-texas-instruments-new-300mm-fab-in-sherman-texas/"
+        }
+      },
+      {
+        "id": "ti_sm3",
+        "company": "Texas Instruments",
+        "site": "Sherman, TX",
+        "region": "United States",
+        "fab": "SM3 / SM4",
+        "device": "Analog / embedded",
+        "node": "300mm analog",
+        "status": "planned",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2028.0,
+            "b": 2028.5
+          },
+          {
+            "k": "build",
+            "a": 2028.5,
+            "b": 2031.0
+          },
+          {
+            "k": "production",
+            "a": 2032.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Not disclosed",
+        "confidence": "low",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Planned, undated"
+        },
+        "note": "Early planning only. Drawn as one row rather than two because TI has published nothing that would distinguish them.",
+        "source": {
+          "name": "Texas Instruments \u2014 Sherman site",
+          "url": "https://www.ti.com/about-ti/company/ti-at-a-glance/manufacturing/sherman.html"
+        }
+      },
+      {
+        "id": "ti_lfab2",
+        "company": "Texas Instruments",
+        "site": "Lehi, UT",
+        "region": "United States",
+        "fab": "LFAB2",
+        "device": "Analog / embedded",
+        "node": "300mm analog",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2023.0,
+            "b": 2023.25
+          },
+          {
+            "k": "build",
+            "a": 2023.25,
+            "b": 2025.5
+          },
+          {
+            "k": "fitout",
+            "a": 2025.5,
+            "b": 2026.5
+          },
+          {
+            "k": "production",
+            "a": 2026.5,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "As early as 2026",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "First production guided as early as 2026"
+        },
+        "note": "Sits beside LFAB1, the 300mm fab TI bought from Micron in 2021 for $900m. Part of the same CHIPS package as Sherman ($1.6bn direct funding across three projects). TI is targeting over 95% internal manufacturing by 2030, which is what all of this is for.",
+        "source": {
+          "name": "ENR \u2014 CHIPS funding for TI",
+          "url": "https://www.enr.com/articles/59148-feds-offer-texas-instruments-16b-to-support-construction-of-three-fab-plants"
+        }
+      },
+      {
+        "id": "skhynix_indiana",
+        "company": "SK hynix",
+        "site": "West Lafayette, IN",
+        "region": "United States",
+        "fab": "Indiana advanced packaging",
+        "device": "Advanced packaging",
+        "node": "HBM 2.5D",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2026.0,
+            "b": 2026.5
+          },
+          {
+            "k": "build",
+            "a": 2026.5,
+            "b": 2028.0
+          },
+          {
+            "k": "fitout",
+            "a": 2028.0,
+            "b": 2028.5
+          },
+          {
+            "k": "production",
+            "a": 2028.5,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2H 2028",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Piling from Feb 2026; groundbreaking 27 Aug 2026; production 2H 2028"
+        },
+        "note": "$3.87bn on the Purdue University campus \u2014 SK hynix's first US production base, and the first HBM packaging on US soil. Confirmed in SK hynix's own F-1 filing, so this is a high-confidence date rather than press speculation. Up to $458m CHIPS funding plus $570m in loans.",
+        "source": {
+          "name": "SK hynix Form F-1 (SEC)",
+          "url": "https://www.sec.gov/Archives/edgar/data/0002120882/000119312526280172/d32785df1.htm"
+        }
+      },
+      {
+        "id": "amkor_peoria",
+        "company": "Amkor",
+        "site": "Peoria, AZ",
+        "region": "United States",
+        "fab": "Peoria advanced packaging",
+        "device": "Advanced packaging",
+        "node": "CoWoS",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2025.75,
+            "b": 2026.0
+          },
+          {
+            "k": "build",
+            "a": 2026.0,
+            "b": 2027.5
+          },
+          {
+            "k": "fitout",
+            "a": 2027.5,
+            "b": 2028.0
+          },
+          {
+            "k": "production",
+            "a": 2028.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Early 2028",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Groundbreaking Oct 2025; production early 2028"
+        },
+        "note": "$7bn, 750,000 sq ft, built with TSMC to bring CoWoS to the US. This is the fab that decides whether Arizona-made wafers can become finished AI accelerators without a round trip to Taiwan, and it lands in 2028 \u2014 one to two years after the leading-edge wafer capacity it is meant to serve.",
+        "source": {
+          "name": "The Register \u2014 SK hynix Indiana / Amkor Peoria",
+          "url": "https://www.theregister.com/2026/04/22/sk_hynix_indiana/"
+        }
+      },
+      {
+        "id": "gf_malta",
+        "company": "GlobalFoundries",
+        "site": "Malta, NY",
+        "region": "United States",
+        "fab": "New 300mm fab + packaging",
+        "device": "Logic",
+        "node": "Essential / feature-rich",
+        "status": "planned",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2026.0,
+            "b": 2026.75
+          },
+          {
+            "k": "build",
+            "a": 2026.75,
+            "b": 2029.5
+          },
+          {
+            "k": "production",
+            "a": 2030.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Not disclosed",
+        "confidence": "low",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "CHIPS-funded, no public construction milestones"
+        },
+        "note": "$1.5bn CHIPS grant plus $1.6bn in loans against a potential $12.5bn programme across Malta and Burlington VT, aiming to triple Malta capacity over a decade. GF announced a further $16bn US investment in 2025. But no dated construction milestones have been published for the new fab, so every bar on this row is a placeholder \u2014 it is here to mark that the project exists, not to assert a schedule.",
+        "source": {
+          "name": "NIST CHIPS \u2014 GlobalFoundries New York",
+          "url": "https://www.nist.gov/chips/globalfoundries-new-york-malta"
+        }
+      },
+      {
+        "id": "sandisk_flint",
+        "company": "SanDisk",
+        "site": "Flint, MI",
+        "region": "United States",
+        "fab": "Michigan megafab",
+        "device": "NAND",
+        "node": "3D NAND",
+        "status": "cancelled",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2025.0,
+            "b": 2025.5
+          }
+        ],
+        "first_output": "Cancelled",
+        "confidence": "high",
+        "revision": {
+          "direction": "cancelled",
+          "was": "Absent from sheet",
+          "now": "Proposed $55bn fab cancelled"
+        },
+        "note": "Included deliberately. A construction tracker that only shows projects still alive overstates the capacity pipeline, and this was a $55bn proposal. Also cancelled or stalled in the same window: NXP's Chandler AZ GaN facility (shutting 2027), the GF/STMicro Crolles fab (stalled), Wolfspeed's Saarland fab.",
+        "source": {
+          "name": "Semiconductor Engineering \u2014 annual fabs and facilities report",
+          "url": "https://semiengineering.com/annual-global-ic-fabs-and-facilities-report/"
+        }
+      },
+      {
+        "id": "samsung_p4_1",
+        "company": "Samsung",
+        "site": "Pyeongtaek",
+        "region": "South Korea",
+        "fab": "P4 Phase 1",
+        "device": "DRAM",
+        "node": "1c DRAM",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.5,
+            "b": 2022.75
+          },
+          {
+            "k": "build",
+            "a": 2022.75,
+            "b": 2024.0
+          },
+          {
+            "k": "fitout",
+            "a": 2024.0,
+            "b": 2025.0
+          },
+          {
+            "k": "production",
+            "a": 2025.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "1H 2025",
+        "confidence": "high",
+        "revision": {
+          "direction": "unchanged",
+          "was": "Sheet shows production 1H25",
+          "now": "Confirmed"
+        },
+        "note": "P4 is being run as the core HBM4 base for NVIDIA's Vera Rubin generation, and Samsung used temporary-use permits to start cleanroom installation before building completion \u2014 six months early.",
+        "source": {
+          "name": "TrendForce \u2014 memory cleanroom race",
+          "url": "https://www.trendforce.com/news/2026/02/26/news-memory-giants-hbm-cleanroom-race-samsung-sk-hynix-fast-track-micron-acquires/"
+        }
+      },
+      {
+        "id": "samsung_p4_2",
+        "company": "Samsung",
+        "site": "Pyeongtaek",
+        "region": "South Korea",
+        "fab": "P4 Phase 2",
+        "device": "DRAM",
+        "node": "1c DRAM",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2023.0,
+            "b": 2023.25
+          },
+          {
+            "k": "build",
+            "a": 2023.25,
+            "b": 2024.25
+          },
+          {
+            "k": "paused",
+            "a": 2024.25,
+            "b": 2025.0
+          },
+          {
+            "k": "build",
+            "a": 2025.0,
+            "b": 2026.75
+          },
+          {
+            "k": "fitout",
+            "a": 2026.75,
+            "b": 2027.0
+          },
+          {
+            "k": "production",
+            "a": 2027.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "1H 2027",
+        "confidence": "medium",
+        "revision": {
+          "direction": "unchanged",
+          "was": "Sheet shows pause/resume, clean room Nov 26, production 1H27",
+          "now": "Consistent"
+        },
+        "note": "The source sheet deserves credit here \u2014 it recorded the 2024 pause and 2025 resumption, which most public trackers do not. This build adds an explicit `paused` phase so the suspension renders as a gap rather than as continuous construction.",
+        "source": {
+          "name": "TrendForce / The Elec",
+          "url": "https://www.trendforce.com/news/2026/02/26/news-memory-giants-hbm-cleanroom-race-samsung-sk-hynix-fast-track-micron-acquires/"
+        }
+      },
+      {
+        "id": "samsung_p4_3",
+        "company": "Samsung",
+        "site": "Pyeongtaek",
+        "region": "South Korea",
+        "fab": "P4 Phase 3",
+        "device": "DRAM",
+        "node": "1c DRAM",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.5,
+            "b": 2022.75
+          },
+          {
+            "k": "build",
+            "a": 2022.75,
+            "b": 2025.25
+          },
+          {
+            "k": "fitout",
+            "a": 2025.25,
+            "b": 2026.0
+          },
+          {
+            "k": "production",
+            "a": 2026.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "1H 2026",
+        "confidence": "medium",
+        "revision": {
+          "direction": "unchanged",
+          "was": "Sheet shows clean room mid-25, production 1H26",
+          "now": "Consistent"
+        },
+        "note": "",
+        "source": {
+          "name": "TrendForce",
+          "url": "https://www.trendforce.com/news/2026/02/26/news-memory-giants-hbm-cleanroom-race-samsung-sk-hynix-fast-track-micron-acquires/"
+        }
+      },
+      {
+        "id": "samsung_p4_4",
+        "company": "Samsung",
+        "site": "Pyeongtaek",
+        "region": "South Korea",
+        "fab": "P4 Phase 4",
+        "device": "DRAM",
+        "node": "1c DRAM",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.5,
+            "b": 2022.75
+          },
+          {
+            "k": "build",
+            "a": 2022.75,
+            "b": 2024.25
+          },
+          {
+            "k": "paused",
+            "a": 2024.25,
+            "b": 2025.0
+          },
+          {
+            "k": "build",
+            "a": 2025.0,
+            "b": 2026.5
+          },
+          {
+            "k": "fitout",
+            "a": 2026.5,
+            "b": 2027.0
+          },
+          {
+            "k": "production",
+            "a": 2027.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "1H 2027",
+        "confidence": "medium",
+        "revision": {
+          "direction": "unchanged",
+          "was": "Sheet shows pause/resume, clean room Jul 26, production 1H27",
+          "now": "Consistent"
+        },
+        "note": "",
+        "source": {
+          "name": "TrendForce",
+          "url": "https://www.trendforce.com/news/2026/02/26/news-memory-giants-hbm-cleanroom-race-samsung-sk-hynix-fast-track-micron-acquires/"
+        }
+      },
+      {
+        "id": "samsung_p5_1",
+        "company": "Samsung",
+        "site": "Pyeongtaek",
+        "region": "South Korea",
+        "fab": "P5 Phase 1",
+        "device": "DRAM",
+        "node": "1c DRAM / HBM",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2023.5,
+            "b": 2023.75
+          },
+          {
+            "k": "build",
+            "a": 2023.75,
+            "b": 2024.25
+          },
+          {
+            "k": "paused",
+            "a": 2024.25,
+            "b": 2026.0
+          },
+          {
+            "k": "build",
+            "a": 2026.0,
+            "b": 2027.25
+          },
+          {
+            "k": "fitout",
+            "a": 2027.25,
+            "b": 2027.75
+          },
+          {
+            "k": "production",
+            "a": 2027.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Late 2027 (was early 2028)",
+        "confidence": "medium",
+        "revision": {
+          "direction": "earlier",
+          "was": "Sheet shows production 2028",
+          "now": "Cleanroom pulled forward to Q3 2026; operational target moved up to late 2027",
+          "was_year": 2028.0
+        },
+        "note": "One of only two schedules on this chart that moved LEFT. Samsung brought the P5 cleanroom forward by more than six months and is fast-tracking \u2014 building structures and gas/chemical utilities simultaneously, with night shifts added. Sources still disagree: some say late 2027, others hold 2028, so treat the half-year as soft. P5 is a triple-storey fab, roughly the size of P3 and P4 combined.",
+        "source": {
+          "name": "Financial News / TrendForce; The Elec",
+          "url": "https://www.trendforce.com/news/2026/02/26/news-memory-giants-hbm-cleanroom-race-samsung-sk-hynix-fast-track-micron-acquires/"
+        }
+      },
+      {
+        "id": "samsung_p5_2",
+        "company": "Samsung",
+        "site": "Pyeongtaek",
+        "region": "South Korea",
+        "fab": "P5 Phase 2",
+        "device": "DRAM",
+        "node": "Undecided",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2025.5,
+            "b": 2025.75
+          },
+          {
+            "k": "build",
+            "a": 2025.75,
+            "b": 2027.5
+          },
+          {
+            "k": "fitout",
+            "a": 2027.5,
+            "b": 2028.5
+          },
+          {
+            "k": "production",
+            "a": 2028.5,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2028-29",
+        "confidence": "low",
+        "revision": {
+          "direction": "unchanged",
+          "was": "Sheet shows start 2H25, production 2028",
+          "now": "Broadly consistent"
+        },
+        "note": "Whether P5 makes memory, HBM or foundry wafers for external customers is still undecided per The Elec.",
+        "source": {
+          "name": "The Elec \u2014 Samsung to resume P5 construction",
+          "url": "https://www.thelec.net/news/articleView.html?idxno=5537"
+        }
+      },
+      {
+        "id": "samsung_p6",
+        "company": "Samsung",
+        "site": "Pyeongtaek",
+        "region": "South Korea",
+        "fab": "P6",
+        "device": "DRAM",
+        "node": "Not disclosed",
+        "status": "planned",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2028.5,
+            "b": 2028.75
+          },
+          {
+            "k": "build",
+            "a": 2028.75,
+            "b": 2031.0
+          },
+          {
+            "k": "production",
+            "a": 2031.5,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Not disclosed",
+        "confidence": "low",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Construction start guided to Q3 2028"
+        },
+        "note": "The last planned Pyeongtaek fab. Only the construction start is guided; production is inferred.",
+        "source": {
+          "name": "SemiWiki / JoongAng",
+          "url": "https://semiwiki.com/forum/threads/samsung-and-sk-are-expanding-fast-but-why-is-memory-still-in-short-supply.24881/"
+        }
+      },
+      {
+        "id": "skh_yongin_f1",
+        "company": "SK hynix",
+        "site": "Yongin",
+        "region": "South Korea",
+        "fab": "Yongin Fab 1",
+        "device": "DRAM",
+        "node": "1c DRAM",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2025.0,
+            "b": 2025.25
+          },
+          {
+            "k": "build",
+            "a": 2025.25,
+            "b": 2027.0
+          },
+          {
+            "k": "fitout",
+            "a": 2027.0,
+            "b": 2027.5
+          },
+          {
+            "k": "production",
+            "a": 2027.5,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2027",
+        "confidence": "high",
+        "revision": {
+          "direction": "unchanged",
+          "was": "Sheet shows start Feb 25, production Feb 27",
+          "now": "Fab completion Q1-Q2 2027, operations 2027 \u2014 sheet essentially right"
+        },
+        "note": "SK hynix's F-1 filing puts Phase 1 completion at Q1 2027 against a KRW 9,412bn budget; the board resolution and later reporting say May 2027, and the central chemical supply system is already going in. Phases 2-6 of Fab 1 run to end-2030 at a further KRW 21,608bn. The Yongin cluster is 4.15m sq m and will hold four fabs.",
+        "source": {
+          "name": "SK hynix Form F-1 (SEC)",
+          "url": "https://www.sec.gov/Archives/edgar/data/0002120882/000119312526280172/d32785df1.htm"
+        }
+      },
+      {
+        "id": "skh_yongin_f2",
+        "company": "SK hynix",
+        "site": "Yongin",
+        "region": "South Korea",
+        "fab": "Yongin Fab 2",
+        "device": "DRAM",
+        "node": "1c / 3D DRAM",
+        "status": "planned",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2027.5,
+            "b": 2028.0
+          },
+          {
+            "k": "build",
+            "a": 2028.0,
+            "b": 2029.75
+          },
+          {
+            "k": "production",
+            "a": 2030.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "~2030 if HBM demand holds",
+        "confidence": "low",
+        "revision": {
+          "direction": "unchanged",
+          "was": "Sheet shows TBD, possibly 2030",
+          "now": "Still undated"
+        },
+        "note": "The source sheet's own note \u2014 schedule TBD, possibly 2030 if HBM demand remains high \u2014 is still the correct characterisation eight months later. Carried as-is.",
+        "source": {
+          "name": "SK hynix Form F-1 (SEC)",
+          "url": "https://www.sec.gov/Archives/edgar/data/0002120882/000119312526280172/d32785df1.htm"
+        }
+      },
+      {
+        "id": "skh_m15x",
+        "company": "SK hynix",
+        "site": "Cheongju",
+        "region": "South Korea",
+        "fab": "M15X",
+        "device": "DRAM",
+        "node": "1b / 1c, HBM4",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2024.25,
+            "b": 2024.5
+          },
+          {
+            "k": "build",
+            "a": 2024.5,
+            "b": 2025.75
+          },
+          {
+            "k": "fitout",
+            "a": 2025.75,
+            "b": 2026.0
+          },
+          {
+            "k": "production",
+            "a": 2026.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "1H 2026",
+        "confidence": "high",
+        "revision": {
+          "direction": "unchanged",
+          "was": "Sheet shows start Apr 24, production 1H26",
+          "now": "Confirmed, and pulled slightly forward"
+        },
+        "note": "Both cleanroom phases were accelerated \u2014 phase 3 to February 2026, phase 4 from April to March. The site is about 60,000 sq m, roughly M11 and M12 combined, and is SK hynix's near-term capacity lever: from 10,000 wpm in 2025 toward as much as 70,000 wpm. HBM4 is the target product.",
+        "source": {
+          "name": "Financial News via TrendForce",
+          "url": "https://www.trendforce.com/news/2026/02/26/news-memory-giants-hbm-cleanroom-race-samsung-sk-hynix-fast-track-micron-acquires/"
+        }
+      },
+      {
+        "id": "skh_m17",
+        "company": "SK hynix",
+        "site": "Cheongju",
+        "region": "South Korea",
+        "fab": "M17",
+        "device": "NAND",
+        "node": "321L / 4xx",
+        "status": "delayed",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2027.0,
+            "b": 2027.5
+          }
+        ],
+        "first_output": "Delayed, undated",
+        "confidence": "low",
+        "revision": {
+          "direction": "unchanged",
+          "was": "Sheet shows 'Delayed TBD'",
+          "now": "Still delayed and undated"
+        },
+        "note": "Capital is going to DRAM and HBM, not NAND. The sheet's read is still right.",
+        "source": {
+          "name": "The Register \u2014 SK hynix M15X announcement",
+          "url": "https://www.theregister.com/2022/09/06/sk_hynix_11b_fab/"
+        }
+      },
+      {
+        "id": "skh_pt7",
+        "company": "SK hynix",
+        "site": "Cheongju",
+        "region": "South Korea",
+        "fab": "P&T7 advanced packaging",
+        "device": "Advanced packaging",
+        "node": "HBM",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2025.5,
+            "b": 2025.75
+          },
+          {
+            "k": "build",
+            "a": 2025.75,
+            "b": 2027.9
+          },
+          {
+            "k": "fitout",
+            "a": 2027.9,
+            "b": 2028.5
+          },
+          {
+            "k": "production",
+            "a": 2028.5,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2028",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "KRW 19tn; construction completes end-2027"
+        },
+        "note": "Roughly KRW 19 trillion \u2014 more than double the KRW 9.4tn budget for Yongin Fab 1, and larger than the Indiana packaging plant by a wide margin. That ratio is the story: SK hynix is spending more on stacking HBM than on the DRAM fab that feeds it. Confirmed in the F-1 filing.",
+        "source": {
+          "name": "SK hynix Form F-1 (SEC)",
+          "url": "https://www.sec.gov/Archives/edgar/data/0002120882/000119312526280172/d32785df1.htm"
+        }
+      },
+      {
+        "id": "jasm_f1",
+        "company": "TSMC / JASM",
+        "site": "Kikuyo, Kumamoto",
+        "region": "Japan",
+        "fab": "JASM Fab 1",
+        "device": "Logic",
+        "node": "12 / 16 / 22 / 28nm",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.25,
+            "b": 2022.5
+          },
+          {
+            "k": "build",
+            "a": 2022.5,
+            "b": 2023.75
+          },
+          {
+            "k": "fitout",
+            "a": 2023.75,
+            "b": 2024.9
+          },
+          {
+            "k": "production",
+            "a": 2024.9,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Dec 2024",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "In mass production since Dec 2024"
+        },
+        "note": "Backed by Sony, Denso and Toyota, aimed at automotive and industrial. Went from groundbreaking to mass production in under three years \u2014 the fastest leading-node-adjacent build on this chart, and a useful counterexample to the assumption that fabs necessarily take five years.",
+        "source": {
+          "name": "Tom's Hardware \u2014 Rapidus fab roadmap examined",
+          "url": "https://www.tomshardware.com/tech-industry/semiconductors/rapidus-fab-roadmap-examined"
+        }
+      },
+      {
+        "id": "jasm_f2",
+        "company": "TSMC / JASM",
+        "site": "Kikuyo, Kumamoto",
+        "region": "Japan",
+        "fab": "JASM Fab 2",
+        "device": "Logic",
+        "node": "3nm (upgraded from 6nm)",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2025.5,
+            "b": 2025.75
+          },
+          {
+            "k": "build",
+            "a": 2025.75,
+            "b": 2026.75
+          },
+          {
+            "k": "fitout",
+            "a": 2026.75,
+            "b": 2028.0
+          },
+          {
+            "k": "production",
+            "a": 2028.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "~2027-2028",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Broke ground 2025; node upgraded twice; production ~2028"
+        },
+        "note": "The planned node was upgraded twice \u2014 6nm to 4nm to 3nm \u2014 which is unusual and reflects how much stronger Japanese demand turned out to be than the original plan assumed. Sources split on timing: some say equipment move-in in 2026 with mass production late 2027, others around 2028. Drawn at 2028.",
+        "source": {
+          "name": "Tom's Hardware \u2014 Rapidus fab roadmap examined",
+          "url": "https://www.tomshardware.com/tech-industry/semiconductors/rapidus-fab-roadmap-examined"
+        }
+      },
+      {
+        "id": "rapidus_iim1",
+        "company": "Rapidus",
+        "site": "Chitose, Hokkaido",
+        "region": "Japan",
+        "fab": "IIM-1",
+        "device": "Logic",
+        "node": "2nm GAA",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2023.5,
+            "b": 2023.75
+          },
+          {
+            "k": "build",
+            "a": 2023.75,
+            "b": 2024.75
+          },
+          {
+            "k": "fitout",
+            "a": 2024.75,
+            "b": 2027.5
+          },
+          {
+            "k": "production",
+            "a": 2027.5,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2027 (2H FY2027)",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Pilot line running since Apr 2025; mass production targeted 2027"
+        },
+        "note": "Japan's entire return to leading-edge logic rests on this one fab. The pilot line has run wafers through Japan's first production-grade EUV scanner and produced a 2nm gate-all-around prototype hitting expected electrical characteristics. The gap is commercial, not technical: over 60 companies are in talks and not one has signed a volume agreement. A February 2026 round of Y267.6bn made the Japanese government the largest shareholder.",
+        "source": {
+          "name": "Tom's Hardware \u2014 Rapidus fab roadmap examined",
+          "url": "https://www.tomshardware.com/tech-industry/semiconductors/rapidus-fab-roadmap-examined"
+        }
+      },
+      {
+        "id": "rapidus_iim2",
+        "company": "Rapidus",
+        "site": "Chitose, Hokkaido",
+        "region": "Japan",
+        "fab": "IIM-2 advanced packaging",
+        "device": "Advanced packaging",
+        "node": "Chiplet / 2nm-gen",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2024.5,
+            "b": 2024.75
+          },
+          {
+            "k": "build",
+            "a": 2024.75,
+            "b": 2025.75
+          },
+          {
+            "k": "fitout",
+            "a": 2025.75,
+            "b": 2026.25
+          },
+          {
+            "k": "production",
+            "a": 2026.25,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Trial production Apr 2026",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Trial production from Apr 2026"
+        },
+        "note": "Runs on a parallel NEDO project covering chiplet and package design. Trial production, not volume.",
+        "source": {
+          "name": "FinancialContent \u2014 Japan's silicon renaissance",
+          "url": "https://www.financialcontent.com/article/tokenring-2026-2-5-japans-silicon-renaissance-tsmcs-3nm-commitment-and-rapiduss-2nm-surge-redefine-global-chip-landscape"
+        }
+      },
+      {
+        "id": "kioxia_k2",
+        "company": "Kioxia / Sandisk",
+        "site": "Kitakami, Iwate",
+        "region": "Japan",
+        "fab": "Kitakami Fab 2 (K2)",
+        "device": "NAND",
+        "node": "BiCS 8 / BiCS 10 (332L)",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2021.25,
+            "b": 2022.25
+          },
+          {
+            "k": "build",
+            "a": 2022.25,
+            "b": 2023.9
+          },
+          {
+            "k": "fitout",
+            "a": 2023.9,
+            "b": 2025.75
+          },
+          {
+            "k": "production",
+            "a": 2025.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Opened Sep 2025; 10th-gen production Jul 2026",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Producing since Sep 2025"
+        },
+        "note": "The sheet carries no NAND outside SK hynix's delayed M17, which leaves out the segment's actual swing capacity. K2 opened Sep 2025 on 218-layer BiCS 8 and began 332-layer BiCS 10 production in July 2026. Utilisation was still only around 50% in mid-2026 \u2014 Kioxia is filling existing shells before pouring new ones, which is why a third Kitakami building is under consideration rather than under construction. At full capacity K2 roughly doubles Kitakami output.",
+        "source": {
+          "name": "Kioxia \u2014 10th-generation 3D flash at K2",
+          "url": "https://www.kioxia.com/en-jp/about/news/2026/20260703-2.html"
+        }
+      },
+      {
+        "id": "kioxia_k3",
+        "company": "Kioxia / Sandisk",
+        "site": "Kitakami, Iwate",
+        "region": "Japan",
+        "fab": "Kitakami Fab 3 (K3)",
+        "device": "NAND",
+        "node": "Not disclosed",
+        "status": "planned",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2027.0,
+            "b": 2027.5
+          },
+          {
+            "k": "build",
+            "a": 2027.5,
+            "b": 2029.5
+          },
+          {
+            "k": "production",
+            "a": 2030.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Under consideration",
+        "confidence": "low",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Under consideration only"
+        },
+        "note": "Kioxia guided to Y470bn annual capex for FY26-28, up 66%, and says a third Kitakami building is being weighed against market growth. Not committed. The dates here are placeholders.",
+        "source": {
+          "name": "EE Times Japan via TrendForce",
+          "url": "https://www.trendforce.com/news/2026/06/03/news-kioxia-targets-%C2%A5470b-yearly-capex-in-fy26-28-up-66-from-fy25-reportedly-weighing-third-kitakami-fab-and-ma/"
+        }
+      },
+      {
+        "id": "micron_hiroshima",
+        "company": "Micron",
+        "site": "Hiroshima",
+        "region": "Japan",
+        "fab": "Hiroshima expansion",
+        "device": "DRAM",
+        "node": "1-gamma / EUV, HBM",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2026.4,
+            "b": 2026.6
+          },
+          {
+            "k": "build",
+            "a": 2026.6,
+            "b": 2027.75
+          },
+          {
+            "k": "fitout",
+            "a": 2027.75,
+            "b": 2028.25
+          },
+          {
+            "k": "production",
+            "a": 2028.25,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "~2028",
+        "confidence": "medium",
+        "revision": {
+          "direction": "unchanged",
+          "was": "Sheet shows start May 26, production 2028",
+          "now": "Consistent"
+        },
+        "note": "Construction on the expansion has started. Adds advanced DRAM and HBM capacity, supported by Japanese government subsidy. The sheet's read holds.",
+        "source": {
+          "name": "Cleanroom Technology industry brief",
+          "url": "https://www.cleanroomtechnology.com/news/article_page/Kioxia_announces_expansion_for_future_creation_of_K2_facility/173091"
+        }
+      },
+      {
+        "id": "tsmc_f20_p1",
+        "company": "TSMC",
+        "site": "Baoshan, Hsinchu",
+        "region": "Taiwan",
+        "fab": "Fab 20 Phase 1",
+        "device": "Logic",
+        "node": "N2",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.0,
+            "b": 2022.25
+          },
+          {
+            "k": "build",
+            "a": 2022.25,
+            "b": 2024.5
+          },
+          {
+            "k": "fitout",
+            "a": 2024.5,
+            "b": 2025.75
+          },
+          {
+            "k": "production",
+            "a": 2025.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Q4 2025",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "N2 volume production since Q4 2025"
+        },
+        "note": "Adjacent to TSMC's global R&D centre, where N2 was developed. Roughly 20,000-25,000 wpm.",
+        "source": {
+          "name": "TrendForce \u2014 TSMC speeds up Taiwan expansion",
+          "url": "https://www.trendforce.com/news/2026/02/23/news-tsmc-speeds-up-expansion-in-taiwan-up-to-10-fabs-reportedly-under-construction-or-starting-in-2026/"
+        }
+      },
+      {
+        "id": "tsmc_f20_p2",
+        "company": "TSMC",
+        "site": "Baoshan, Hsinchu",
+        "region": "Taiwan",
+        "fab": "Fab 20 Phase 2",
+        "device": "Logic",
+        "node": "N2 / N2P",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.75,
+            "b": 2023.0
+          },
+          {
+            "k": "build",
+            "a": 2023.0,
+            "b": 2025.0
+          },
+          {
+            "k": "fitout",
+            "a": 2025.0,
+            "b": 2026.0
+          },
+          {
+            "k": "production",
+            "a": 2026.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2026",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Fully equipped, entering production 2026"
+        },
+        "note": "",
+        "source": {
+          "name": "Tom's Hardware \u2014 TSMC fab expansion roadmap",
+          "url": "https://www.tomshardware.com/tech-industry/semiconductors/analyzing-tsmcs-fab-expansion-roadmap-multi-fab-n2-ramp-cowos-soic-and-uncorking-bottlenecks"
+        }
+      },
+      {
+        "id": "tsmc_f20_p34",
+        "company": "TSMC",
+        "site": "Baoshan, Hsinchu",
+        "region": "Taiwan",
+        "fab": "Fab 20 Phase 3 / 4",
+        "device": "Logic",
+        "node": "A14 / sub-2nm",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2025.75,
+            "b": 2026.25
+          },
+          {
+            "k": "build",
+            "a": 2026.25,
+            "b": 2028.5
+          },
+          {
+            "k": "fitout",
+            "a": 2028.5,
+            "b": 2029.5
+          },
+          {
+            "k": "production",
+            "a": 2029.5,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Not disclosed",
+        "confidence": "low",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Civil engineering underway for sub-2nm"
+        },
+        "note": "Drawn as one row \u2014 civil engineering is reported for both phases together and no production date exists.",
+        "source": {
+          "name": "Liberty Times via TrendForce",
+          "url": "https://www.trendforce.com/news/2026/02/23/news-tsmc-speeds-up-expansion-in-taiwan-up-to-10-fabs-reportedly-under-construction-or-starting-in-2026/"
+        }
+      },
+      {
+        "id": "tsmc_f22_p1",
+        "company": "TSMC",
+        "site": "Kaohsiung",
+        "region": "Taiwan",
+        "fab": "Fab 22 Phase 1",
+        "device": "Logic",
+        "node": "N2",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.0,
+            "b": 2022.5
+          },
+          {
+            "k": "build",
+            "a": 2022.5,
+            "b": 2024.5
+          },
+          {
+            "k": "fitout",
+            "a": 2024.5,
+            "b": 2025.75
+          },
+          {
+            "k": "production",
+            "a": 2025.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Q4 2025",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "First site to reach N2 volume production"
+        },
+        "note": "TSMC ramped N2 at Fab 20 and Fab 22 simultaneously \u2014 five fab phases in year one, which is effectively unprecedented for a foundry. First-year N2 output is targeted about 45% above where N3 started, putting year-end capacity near 90,000 wpm on conservative estimates and as high as 140,000 on aggressive ones. Both fabs are sold out for the year.",
+        "source": {
+          "name": "TSMC 2026 Technology Symposium coverage",
+          "url": "https://www.tomshardware.com/tech-industry/semiconductors/analyzing-tsmcs-fab-expansion-roadmap-multi-fab-n2-ramp-cowos-soic-and-uncorking-bottlenecks"
+        }
+      },
+      {
+        "id": "tsmc_f22_p2",
+        "company": "TSMC",
+        "site": "Kaohsiung",
+        "region": "Taiwan",
+        "fab": "Fab 22 Phase 2",
+        "device": "Logic",
+        "node": "N2",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.75,
+            "b": 2023.25
+          },
+          {
+            "k": "build",
+            "a": 2023.25,
+            "b": 2025.25
+          },
+          {
+            "k": "fitout",
+            "a": 2025.25,
+            "b": 2026.25
+          },
+          {
+            "k": "production",
+            "a": 2026.25,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Q2 2026",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Equipment installed, trial then volume production Q2 2026"
+        },
+        "note": "",
+        "source": {
+          "name": "Liberty Times via TrendForce",
+          "url": "https://www.trendforce.com/news/2026/02/23/news-tsmc-speeds-up-expansion-in-taiwan-up-to-10-fabs-reportedly-under-construction-or-starting-in-2026/"
+        }
+      },
+      {
+        "id": "tsmc_f22_p345",
+        "company": "TSMC",
+        "site": "Kaohsiung",
+        "region": "Taiwan",
+        "fab": "Fab 22 Phase 3 / 4 / 5",
+        "device": "Logic",
+        "node": "N2 / A16",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2024.0,
+            "b": 2024.75
+          },
+          {
+            "k": "build",
+            "a": 2024.75,
+            "b": 2026.75
+          },
+          {
+            "k": "fitout",
+            "a": 2026.75,
+            "b": 2027.75
+          },
+          {
+            "k": "production",
+            "a": 2027.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "All five phases operational by Q4 2027",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "P3 structure largely complete; P4/P5 underway"
+        },
+        "note": "Five 2nm fabs in Kaohsiung against total investment reported above NT$1.5tn. A16, which adds backside power delivery, slipped from late 2026 to 2027.",
+        "source": {
+          "name": "Liberty Times via TrendForce",
+          "url": "https://www.trendforce.com/news/2026/02/23/news-tsmc-speeds-up-expansion-in-taiwan-up-to-10-fabs-reportedly-under-construction-or-starting-in-2026/"
+        }
+      },
+      {
+        "id": "tsmc_f25",
+        "company": "TSMC",
+        "site": "Central Taiwan Science Park",
+        "region": "Taiwan",
+        "fab": "Fab 25 (4 fabs)",
+        "device": "Logic",
+        "node": "A14 / 1.4nm",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2025.75,
+            "b": 2026.25
+          },
+          {
+            "k": "build",
+            "a": 2026.25,
+            "b": 2027.5
+          },
+          {
+            "k": "fitout",
+            "a": 2027.5,
+            "b": 2028.5
+          },
+          {
+            "k": "production",
+            "a": 2028.5,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Risk production late 2027; volume 2H 2028",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Piling began late 2025; volume production 2H 2028"
+        },
+        "note": "TSMC's 1.4nm hub, four fabs planned. Worth watching against Intel Ohio: TSMC expects to be in volume on A14 in 2028, three years before Intel's Ohio fabs open on a node launched in 2027.",
+        "source": {
+          "name": "Liberty Times via TrendForce",
+          "url": "https://www.trendforce.com/news/2026/02/23/news-tsmc-speeds-up-expansion-in-taiwan-up-to-10-fabs-reportedly-under-construction-or-starting-in-2026/"
+        }
+      },
+      {
+        "id": "tsmc_ap7",
+        "company": "TSMC",
+        "site": "Chiayi",
+        "region": "Taiwan",
+        "fab": "AP7 (P1)",
+        "device": "Advanced packaging",
+        "node": "SoIC",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2024.0,
+            "b": 2024.5
+          },
+          {
+            "k": "build",
+            "a": 2024.5,
+            "b": 2026.0
+          },
+          {
+            "k": "fitout",
+            "a": 2026.0,
+            "b": 2026.75
+          },
+          {
+            "k": "production",
+            "a": 2026.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "P1 completion 2026",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "P1 completing 2026"
+        },
+        "note": "Being built out as TSMC's largest advanced-packaging campus, using SoIC and aimed at NVIDIA's Feynman generation. SoIC capacity is on a roughly 90% CAGR through 2027, CoWoS about 80%.",
+        "source": {
+          "name": "DigiTimes via Tom's Hardware",
+          "url": "https://www.tomshardware.com/tech-industry/semiconductors/analyzing-tsmcs-fab-expansion-roadmap-multi-fab-n2-ramp-cowos-soic-and-uncorking-bottlenecks"
+        }
+      },
+      {
+        "id": "tsmc_ap8",
+        "company": "TSMC",
+        "site": "Tainan",
+        "region": "Taiwan",
+        "fab": "AP8 (converted Innolux fab)",
+        "device": "Advanced packaging",
+        "node": "CoWoS",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2024.25,
+            "b": 2024.5
+          },
+          {
+            "k": "build",
+            "a": 2024.5,
+            "b": 2025.25
+          },
+          {
+            "k": "fitout",
+            "a": 2025.25,
+            "b": 2025.75
+          },
+          {
+            "k": "production",
+            "a": 2025.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Ramping to 40k+ wpm by late 2026",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Converted LCD fab, ramping CoWoS"
+        },
+        "note": "Converted from an Innolux LCD fab rather than built new \u2014 the fastest route to CoWoS capacity anyone has found, and expected to exceed 40,000 wpm by late 2026. A tracker that only counts greenfield shells misses conversions like this entirely, and conversions are where a lot of near-term capacity comes from.",
+        "source": {
+          "name": "DigiTimes via Tom's Hardware",
+          "url": "https://www.tomshardware.com/tech-industry/semiconductors/analyzing-tsmcs-fab-expansion-roadmap-multi-fab-n2-ramp-cowos-soic-and-uncorking-bottlenecks"
+        }
+      },
+      {
+        "id": "tsmc_ap5b",
+        "company": "TSMC",
+        "site": "Taichung",
+        "region": "Taiwan",
+        "fab": "AP5B",
+        "device": "Advanced packaging",
+        "node": "CoWoS / SoIC",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2024.0,
+            "b": 2024.5
+          },
+          {
+            "k": "build",
+            "a": 2024.5,
+            "b": 2026.0
+          },
+          {
+            "k": "fitout",
+            "a": 2026.0,
+            "b": 2026.75
+          },
+          {
+            "k": "production",
+            "a": 2026.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Completion 2026",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "On track for completion in 2026"
+        },
+        "note": "",
+        "source": {
+          "name": "Commercial Times via TrendForce",
+          "url": "https://www.trendforce.com/news/2026/02/23/news-tsmc-speeds-up-expansion-in-taiwan-up-to-10-fabs-reportedly-under-construction-or-starting-in-2026/"
+        }
+      },
+      {
+        "id": "absolics_ga",
+        "company": "Absolics (SKC)",
+        "site": "Covington, GA",
+        "region": "United States",
+        "fab": "Glass substrate plant",
+        "device": "Advanced packaging",
+        "node": "Glass substrate",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2023.75,
+            "b": 2024.0
+          },
+          {
+            "k": "build",
+            "a": 2024.0,
+            "b": 2025.25
+          },
+          {
+            "k": "fitout",
+            "a": 2025.25,
+            "b": 2026.0
+          },
+          {
+            "k": "production",
+            "a": 2026.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Mass-production samples to AMD, Jan 2026",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "World's first dedicated glass substrate plant; customer qualification underway"
+        },
+        "note": "The wildcard on this chart. Every AI package today sits on an organic ABF substrate, and ABF supply is a large part of why CoWoS output is capped. Glass could raise power efficiency by a claimed 40%+ and cut package thickness by 25%+. Absolics completed equipment installation and began supplying mass-production samples to AMD in Jan 2026. Capacity is small \u2014 around 12,000 sq m of panels a year, enough for perhaps 2-3 million H100-sized packages \u2014 so read this as a bridgehead, not volume. $600m plant plus $175m of CHIPS grants; SKC is putting roughly KRW 590bn more in.",
+        "source": {
+          "name": "MIT Technology Review \u2014 future AI chips could be built on glass",
+          "url": "https://www.technologyreview.com/2026/03/13/1134230/future-ai-chips-could-be-built-on-glass/"
+        }
+      },
+      {
+        "id": "ase_renwu",
+        "company": "ASE",
+        "site": "Renwu, Kaohsiung",
+        "region": "Taiwan",
+        "fab": "Renwu test complex",
+        "device": "Advanced packaging",
+        "node": "AI / HPC test",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2026.25,
+            "b": 2026.5
+          },
+          {
+            "k": "build",
+            "a": 2026.5,
+            "b": 2027.25
+          },
+          {
+            "k": "fitout",
+            "a": 2027.25,
+            "b": 2027.75
+          },
+          {
+            "k": "production",
+            "a": 2027.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Phase 1 Apr 2027, phase 2 Oct 2027",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Groundbreaking 10 Apr 2026; NT$108.3bn, ASE's largest single investment ever"
+        },
+        "note": "ASE's largest single capital commitment in its history \u2014 over NT$108.3bn against expected annual output of NT$177.3bn. Test, not assembly, which matters: AI package test times are long and testers have become their own bottleneck alongside bonders. Both phases land in 2027.",
+        "source": {
+          "name": "TrendForce \u2014 OSAT capacity race",
+          "url": "https://www.trendforce.com/news/2026/04/20/news-semiconductor-packaging-and-testing-capacity-race-intensifies-as-ase-samsung-and-amkor-announced-new-moves/"
+        }
+      },
+      {
+        "id": "ase_nanzih3",
+        "company": "ASE",
+        "site": "Nanzih, Kaohsiung",
+        "region": "Taiwan",
+        "fab": "Nanzih Park III (2 buildings)",
+        "device": "Advanced packaging",
+        "node": "FOCoS / advanced",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2026.0,
+            "b": 2026.25
+          },
+          {
+            "k": "build",
+            "a": 2026.25,
+            "b": 2028.25
+          },
+          {
+            "k": "fitout",
+            "a": 2028.25,
+            "b": 2028.75
+          },
+          {
+            "k": "production",
+            "a": 2028.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Buildings complete Q2 2028",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Groundbreaking 11 Mar 2026; NT$17.8bn, complete Q2 2028"
+        },
+        "note": "Two buildings, about 1,470 jobs. ASE's FOCoS-Bridge line connects GPU chiplets to HBM using silicon bridges instead of a full silicon interposer \u2014 the same logic as Intel's EMIB, and a genuine route around the interposer capacity that gates CoWoS.",
+        "source": {
+          "name": "ASE \u2014 Nanzih groundbreaking",
+          "url": "https://www.aseglobal.com/press-room/ase-breaks-ground-on-new-high-tech-facility-in-kaohsiung/"
+        }
+      },
+      {
+        "id": "ase_plp",
+        "company": "ASE",
+        "site": "Kaohsiung",
+        "region": "Taiwan",
+        "fab": "Panel-level packaging line",
+        "device": "Advanced packaging",
+        "node": "Large-panel PLP",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2025.5,
+            "b": 2025.75
+          },
+          {
+            "k": "build",
+            "a": 2025.75,
+            "b": 2026.25
+          },
+          {
+            "k": "fitout",
+            "a": 2026.25,
+            "b": 2026.75
+          },
+          {
+            "k": "production",
+            "a": 2026.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Pilot run from Q3 2026",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "US$200m first large-panel PLP line, pilot 2026"
+        },
+        "note": "Wafer-based packaging wastes area at the edge of a round wafer; rectangular panels do not. Panel-level packaging is the structural answer to AI package sizes outgrowing the reticle, and this is ASE's first large-panel line. Pilot only in 2026 \u2014 do not read it as volume.",
+        "source": {
+          "name": "Taipei Times \u2014 ASE launches Malaysia facility",
+          "url": "https://www.taipeitimes.com/News/biz/archives/2025/02/19/2003832097"
+        }
+      },
+      {
+        "id": "tsmc_copos",
+        "company": "TSMC",
+        "site": "Taiwan",
+        "region": "Taiwan",
+        "fab": "CoPoS pilot line",
+        "device": "Advanced packaging",
+        "node": "Chip-on-Panel-on-Substrate",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2025.5,
+            "b": 2025.75
+          },
+          {
+            "k": "build",
+            "a": 2025.75,
+            "b": 2026.25
+          },
+          {
+            "k": "fitout",
+            "a": 2026.25,
+            "b": 2027.5
+          },
+          {
+            "k": "production",
+            "a": 2028.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Pilot mid-2026; volume 2028-29",
+        "confidence": "low",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Roadmap pulled forward in late 2025"
+        },
+        "note": "TSMC's panel-level successor to CoWoS. NVIDIA's Rubin-generation parts are increasingly expected to sit on it, which is why the roadmap was pulled forward. Volume is 2028-29, so CoPoS relieves nothing in the current shortage \u2014 it is the shape of the next one. Low confidence: TSMC has not published these dates.",
+        "source": {
+          "name": "Photoncap \u2014 glass substrate cycle investment map",
+          "url": "https://photoncap.net/p/investment-map-15-companies-in-the"
+        }
+      },
+      {
+        "id": "amkor_songdo",
+        "company": "Amkor",
+        "site": "Songdo, Incheon",
+        "region": "South Korea",
+        "fab": "Songdo K5",
+        "device": "Advanced packaging",
+        "node": "EMIB 2.5D",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.0,
+            "b": 2022.5
+          },
+          {
+            "k": "build",
+            "a": 2022.5,
+            "b": 2024.0
+          },
+          {
+            "k": "fitout",
+            "a": 2024.0,
+            "b": 2025.5
+          },
+          {
+            "k": "production",
+            "a": 2025.5,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "EMIB production from late 2025",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Running Intel EMIB \u2014 Intel's first outsourcing of it"
+        },
+        "note": "Notable for what it signifies rather than its size: Intel outsourcing EMIB for the first time, to keep up with AI orders. EMIB is now being weighed by MediaTek, Google, Qualcomm and Tesla as a CoWoS alternative, and is reportedly targeting 120x120mm packages against the 100x100mm industry standard.",
+        "source": {
+          "name": "ETNews via TrendForce",
+          "url": "https://www.trendforce.com/news/2026/03/18/news-intel-ramps-up-advanced-packaging-malaysia-complex-operational-in-2026-emib-update/"
+        }
+      },
+      {
+        "id": "semco_glass",
+        "company": "Samsung Electro-Mechanics",
+        "site": "Sejong",
+        "region": "South Korea",
+        "fab": "Glass substrate pilot line",
+        "device": "Advanced packaging",
+        "node": "Glass substrate",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2024.25,
+            "b": 2024.75
+          },
+          {
+            "k": "build",
+            "a": 2024.75,
+            "b": 2025.5
+          },
+          {
+            "k": "fitout",
+            "a": 2025.5,
+            "b": 2027.5
+          },
+          {
+            "k": "production",
+            "a": 2028.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Samsung targets glass interposer adoption 2028",
+        "confidence": "low",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Pilot line operating; volume targeted 2028"
+        },
+        "note": "A Samsung Electronics / Electro-Mechanics / Display alliance, with a Sumitomo Chemical JV for glass cores. Samsung has said it plans to adopt glass interposers by 2028. LG Innotek is building a comparable pilot line at Gumi. All three Korean efforts are pilot-stage \u2014 dates here are targets, not schedules.",
+        "source": {
+          "name": "TrendForce \u2014 Korea challenges Intel on glass substrate standards",
+          "url": "https://www.trendforce.com/news/2026/04/15/news-korea-challenges-intel-on-glass-substrate-standards-as-absolics-samsung-accelerate-commercialization/"
+        }
+      },
+      {
+        "id": "intel_penang_ap",
+        "company": "Intel",
+        "site": "Penang, Malaysia",
+        "region": "Southeast Asia",
+        "fab": "Penang advanced packaging (Project Pelican)",
+        "device": "Advanced packaging",
+        "node": "EMIB / Foveros",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2021.5,
+            "b": 2022.0
+          },
+          {
+            "k": "build",
+            "a": 2022.0,
+            "b": 2025.0
+          },
+          {
+            "k": "paused",
+            "a": 2025.0,
+            "b": 2025.75
+          },
+          {
+            "k": "fitout",
+            "a": 2025.75,
+            "b": 2026.75
+          },
+          {
+            "k": "production",
+            "a": 2026.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "First phase operations later in 2026",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "99% complete after a 2025 hold; first phase starts 2026"
+        },
+        "note": "Intel's largest advanced packaging investment, RM12bn, and a near-death project: by early 2025 it was on indefinite hold and the last Penang engineers had been moved to New Mexico. It was 99% built, which is why abandoning it never made sense once AI packaging demand arrived. Malaysia is roughly 13% of world packaging, assembly and test.",
+        "source": {
+          "name": "CRN Asia \u2014 Intel's Malaysian packaging complex",
+          "url": "https://www.crnasia.com/news/2026/components-and-peripherals/intel-s-malaysian-packaging-complex-set-for-first-phase-oper"
+        }
+      },
+      {
+        "id": "micron_sg_hbm",
+        "company": "Micron",
+        "site": "Singapore",
+        "region": "Southeast Asia",
+        "fab": "Singapore HBM advanced packaging",
+        "device": "Advanced packaging",
+        "node": "HBM",
+        "status": "fitout",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2025.0,
+            "b": 2025.25
+          },
+          {
+            "k": "build",
+            "a": 2025.25,
+            "b": 2026.25
+          },
+          {
+            "k": "fitout",
+            "a": 2026.25,
+            "b": 2026.75
+          },
+          {
+            "k": "production",
+            "a": 2026.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Operations 2026; meaningful HBM supply 2027",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Groundbreaking Jan 2025; operations 2026, meaningful HBM contribution 2027"
+        },
+        "note": "About $7bn, Singapore's first HBM advanced packaging plant, and the reason Micron's HBM story is not gated on US construction. It contributes meaningfully in 2027 \u2014 a year before SK hynix Indiana and roughly when Micron's own ID1 wafers arrive. Adjacent to the Singapore fab complex, so DRAM and NAND share infrastructure with it.",
+        "source": {
+          "name": "EE Times Asia \u2014 Micron Singapore HBM packaging",
+          "url": "https://www.eetasia.com/micron-building-new-hbm-advanced-packaging-factory-in-singapore/"
+        }
+      },
+      {
+        "id": "micron_sg_fab",
+        "company": "Micron",
+        "site": "Singapore",
+        "region": "Southeast Asia",
+        "fab": "Singapore NAND fab",
+        "device": "NAND",
+        "node": "Advanced NAND",
+        "status": "building",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2026.0,
+            "b": 2026.25
+          },
+          {
+            "k": "build",
+            "a": 2026.25,
+            "b": 2028.5
+          },
+          {
+            "k": "fitout",
+            "a": 2028.5,
+            "b": 2029.5
+          },
+          {
+            "k": "production",
+            "a": 2029.5,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Not disclosed",
+        "confidence": "low",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "$24bn announced Jan 2026; groundbreaking under way"
+        },
+        "note": "Announced Jan 2026 at roughly $24bn \u2014 larger than any single US fab on this chart. Micron's NAND Centre of Excellence. No production date has been given and the ramp pace is explicitly flexible to demand, so the bars here are inferred.",
+        "source": {
+          "name": "CNBC \u2014 Micron $24bn Singapore expansion",
+          "url": "https://www.cnbc.com/2026/01/27/micron-24-billion-singapore-nand-dram-expansion-ai-memory-shortages.html"
+        }
+      },
+      {
+        "id": "amkor_vietnam",
+        "company": "Amkor",
+        "site": "Bac Ninh, Vietnam",
+        "region": "Southeast Asia",
+        "fab": "Bac Ninh campus",
+        "device": "Advanced packaging",
+        "node": "SiP / memory packaging",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2022.25,
+            "b": 2022.75
+          },
+          {
+            "k": "build",
+            "a": 2022.75,
+            "b": 2023.75
+          },
+          {
+            "k": "fitout",
+            "a": 2023.75,
+            "b": 2024.75
+          },
+          {
+            "k": "production",
+            "a": 2024.75,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "2024, expanding through 2026",
+        "confidence": "medium",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Producing; $1.6bn expansion accelerating"
+        },
+        "note": "Amkor's alternative-geography play for advanced system-in-package and memory packaging, with a $1.6bn expansion being pulled forward. Worth reading alongside Peoria: Amkor is building the same capability in Arizona for 2028 and in Vietnam now, which tells you where the near-term volume will actually be packaged.",
+        "source": {
+          "name": "Windows Forum / Amkor coverage",
+          "url": "https://windowsforum.com/windows-news.4/intel-shifts-costa-rica-chip-assembly-to-vietnam-malaysia.442746/"
+        }
+      },
+      {
+        "id": "samsung_vietnam",
+        "company": "Samsung",
+        "site": "Vietnam",
+        "region": "Southeast Asia",
+        "fab": "Vietnam packaging & test plant",
+        "device": "Advanced packaging",
+        "node": "Assembly / test",
+        "status": "planned",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2026.5,
+            "b": 2027.0
+          },
+          {
+            "k": "build",
+            "a": 2027.0,
+            "b": 2028.75
+          },
+          {
+            "k": "production",
+            "a": 2029.0,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Not disclosed",
+        "confidence": "low",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "$4bn plan reported Apr 2026"
+        },
+        "note": "Reported at about $4bn in April 2026. Samsung has been in Bac Ninh since 2008 and runs its largest phone-manufacturing base in Vietnam, so the site logic is established even though the semiconductor back-end use is new. No official schedule \u2014 every bar here is inferred.",
+        "source": {
+          "name": "TrendForce \u2014 OSAT capacity race",
+          "url": "https://www.trendforce.com/news/2026/04/20/news-semiconductor-packaging-and-testing-capacity-race-intensifies-as-ase-samsung-and-amkor-announced-new-moves/"
+        }
+      },
+      {
+        "id": "ase_penang_p5",
+        "company": "ASE",
+        "site": "Penang, Malaysia",
+        "region": "Southeast Asia",
+        "fab": "Penang Plant 5",
+        "device": "Advanced packaging",
+        "node": "Advanced packaging / test",
+        "status": "producing",
+        "phases": [
+          {
+            "k": "start",
+            "a": 2023.0,
+            "b": 2023.5
+          },
+          {
+            "k": "build",
+            "a": 2023.5,
+            "b": 2024.75
+          },
+          {
+            "k": "fitout",
+            "a": 2024.75,
+            "b": 2025.1
+          },
+          {
+            "k": "production",
+            "a": 2025.1,
+            "b": 2034.0
+          }
+        ],
+        "first_output": "Launched Feb 2025",
+        "confidence": "high",
+        "revision": {
+          "direction": "new",
+          "was": "Absent from sheet",
+          "now": "Producing since Feb 2025"
+        },
+        "note": "US$300m. Takes ASE's Malaysian floor space from about 1m to roughly 3.4m sq ft, and exists explicitly so US, European, Japanese, Korean and Chinese customers can assemble and test outside Taiwan. This is the concrete form of supply-chain diversification, and it is already running.",
+        "source": {
+          "name": "ASE \u2014 Penang Plant 5 launch",
+          "url": "https://www.aseglobal.com/press-room/asem-launch-p5/"
+        }
+      }
+    ],
+    "regions": [
+      "United States",
+      "South Korea",
+      "Japan",
+      "Taiwan",
+      "Southeast Asia"
+    ]
   }
 };
 
@@ -66730,7 +69905,9 @@ function setNote(el, text, leadChars) {
 // ---------- header meta ----------
 document.getElementById('subtitle').textContent = DATA.meta.subtitle;
 document.getElementById('meta-line').textContent =
-  'Data as of: ' + DATA.meta.data_as_of + '  ·  Last updated: ' + DATA.meta.last_updated + '  ·  Rebuilt on request; no automatic refresh is running.';
+  'Data as of: ' + DATA.meta.data_as_of + '  ·  Data last updated: ' + DATA.meta.last_updated +
+  (DATA.meta.built_at ? '  ·  Site rebuilt ' + DATA.meta.built_at : '') +
+  '  ·  Rebuilds weekly from the committed dataset; data is refreshed on demand.';
 
 // ---------- theme toggle ----------
 const themeBtn = document.getElementById('theme-toggle');
@@ -68551,6 +71728,325 @@ document.getElementById('src-toggle').addEventListener('click', function () {
   list.style.display = open ? '' : 'none';
   this.textContent = open ? 'Hide sources' : `Show all ${allSources.length} sources`;
 });
+
+// ================= fab construction timeline =================
+// Forward-looking counterpart to the rest of the dashboard: every other card
+// reports what already happened, this one reports what is being poured.
+const FAB = DATA.fab_construction;
+if (FAB && FAB.projects && FAB.projects.length) {
+  const FAB_MIN = FAB.axis.min, FAB_MAX = FAB.axis.max, FAB_NOW = FAB.axis.today;
+  const FAB_SPAN = FAB_MAX - FAB_MIN;
+  const fabPct = y => ((Math.max(FAB_MIN, Math.min(FAB_MAX, y)) - FAB_MIN) / FAB_SPAN) * 100;
+
+  const REGION_ORDER = (FAB.regions && FAB.regions.length)
+    ? FAB.regions.slice()
+    : Array.from(new Set(FAB.projects.map(p => p.region)));
+  const DEVICES = [];
+  FAB.projects.forEach(p => { if (!DEVICES.includes(p.device)) DEVICES.push(p.device); });
+  DEVICES.sort();
+
+  const STATUS_LABEL = {
+    producing: 'In production', ramping: 'Ramping', fitout: 'Cleanroom / tooling',
+    building: 'Under construction', planned: 'Planned', delayed: 'Delayed', cancelled: 'Cancelled'
+  };
+
+  let fabRegion = 'all', fabDevice = 'all', fabSort = 'output', fabAudit = 'all';
+
+  const fabChart  = document.getElementById('fab-chart');
+  const fabStats  = document.getElementById('fab-stats');
+  const fabLegend = document.getElementById('fab-legend');
+
+  document.getElementById('fab-sub').textContent =
+    FAB.projects.length + ' projects across ' + REGION_ORDER.length + ' regions, ' +
+    Math.round(FAB_MIN) + '\u2013' + Math.round(FAB_MAX) +
+    '. A production bar marks FIRST wafer output, not full capacity \u2014 ramps run one to three years behind it. ' +
+    'Audited ' + FAB.as_of + '.';
+
+  FAB.phase_legend.forEach(l => {
+    const it = document.createElement('div');
+    it.className = 'fab-legend-item';
+    it.innerHTML = '<span class="fab-key ' + l.k + '"></span>' + l.label;
+    fabLegend.appendChild(it);
+  });
+  const softKey = document.createElement('div');
+  softKey.className = 'fab-legend-item';
+  softKey.innerHTML = '<span class="fab-key" style="border:1px dashed var(--good);opacity:.5"></span>Date inferred, not disclosed';
+  fabLegend.appendChild(softKey);
+
+  function fabFirstOutput(p) {
+    const prod = p.phases.find(f => f.k === 'production');
+    return prod ? prod.a : 9999;
+  }
+
+  // The audit is a filter rather than an overlay. Dimming 41 unchanged rows to
+  // surface 14 changed ones just made the whole chart muddy; showing only the
+  // rows in question answers the question directly.
+  const fabMoved = p => p.revision.direction === 'later' || p.revision.direction === 'earlier';
+  const fabAdded = p => p.revision.direction === 'new' || p.revision.direction === 'cancelled';
+
+  function fabFiltered() {
+    return FAB.projects.filter(p =>
+      (fabRegion === 'all' || p.region === fabRegion) &&
+      (fabDevice === 'all' || p.device === fabDevice) &&
+      (fabAudit === 'all' || (fabAudit === 'moved' ? fabMoved(p) : fabAdded(p))));
+  }
+
+  function fabRowEl(p) {
+    const row = document.createElement('div');
+    row.className = 'fab-row';
+    row.tabIndex = 0;
+    if (p.confidence === 'low') row.classList.add('soft');
+    if (p.status === 'cancelled') row.classList.add('dead');
+    const moved = fabMoved(p);
+    if (moved) row.classList.add('moved');
+
+    const label = document.createElement('div');
+    label.className = 'fab-label';
+    let deltaHtml = '';
+    if (moved && p.revision.was_year) {
+      const prod0 = p.phases.find(f => f.k === 'production');
+      if (prod0) {
+        const d = prod0.a - p.revision.was_year;
+        deltaHtml = '<span class="fab-delta ' + p.revision.direction + '">' +
+                    (d > 0 ? '+' : '\u2212') + Math.abs(d).toFixed(1) + 'y</span>';
+      }
+    }
+    label.innerHTML = '<b>' + p.company + '</b> ' + p.fab + deltaHtml;
+    label.title = p.company + ' ' + p.fab + ' \u2014 ' + p.site;
+
+    const track = document.createElement('div');
+    track.className = 'fab-track';
+
+    p.phases.forEach(f => {
+      const bar = document.createElement('div');
+      bar.className = 'fab-bar ' + f.k;
+      bar.style.left = fabPct(f.a) + '%';
+      bar.style.width = Math.max(0.35, fabPct(f.b) - fabPct(f.a)) + '%';
+      track.appendChild(bar);
+    });
+
+    const prod = p.phases.find(f => f.k === 'production');
+    if (prod && p.status !== 'cancelled') {
+      const tick = document.createElement('div');
+      tick.className = 'fab-first';
+      tick.style.left = fabPct(prod.a) + '%';
+      track.appendChild(tick);
+    }
+    if (p.status === 'cancelled') {
+      const x = document.createElement('div');
+      x.className = 'fab-x';
+      x.textContent = '\u2715';
+      x.style.left = fabPct(p.phases[0].b) + '%';
+      track.appendChild(x);
+    }
+
+    // Revision overlay: hollow bar at the old date, connector to the new one.
+    if (moved && p.revision.was_year && prod) {
+      const from = p.revision.was_year, to = prod.a;
+      const ghost = document.createElement('div');
+      ghost.className = 'fab-ghost fab-rev';
+      ghost.style.left = fabPct(from) + '%';
+      ghost.style.width = Math.max(0.6, fabPct(Math.min(FAB_MAX, from + 0.75)) - fabPct(from)) + '%';
+      track.appendChild(ghost);
+      const arrow = document.createElement('div');
+      arrow.className = 'fab-arrow fab-rev ' + p.revision.direction;
+      const lo = Math.min(from, to), hi = Math.max(from, to);
+      arrow.style.left = fabPct(lo) + '%';
+      arrow.style.width = Math.max(0.5, fabPct(hi) - fabPct(lo)) + '%';
+      track.appendChild(arrow);
+    }
+
+    row.appendChild(label);
+    row.appendChild(track);
+
+    const tip =
+      '<strong>' + p.company + ' \u2014 ' + p.fab + '</strong><br>' +
+      p.site + '<br>' + p.device + (p.node && p.node !== 'Not disclosed' ? ' \u00b7 ' + p.node : '') + '<br>' +
+      '<span style="opacity:.75">Status</span> ' + (STATUS_LABEL[p.status] || p.status) + '<br>' +
+      '<span style="opacity:.75">First output</span> ' + p.first_output + '<br>' +
+      '<span style="opacity:.75">Confidence</span> ' + p.confidence +
+      (moved ? '<br><span style="opacity:.75">Moved</span> ' + p.revision.direction : '') +
+      (p.revision.direction === 'new' ? '<br><em>Added \u2014 not on the source tracker</em>' : '');
+    row.addEventListener('mouseenter', e => showTip(e, tip));
+    row.addEventListener('mousemove', moveTip);
+    row.addEventListener('mouseleave', hideTip);
+    row.addEventListener('click', () => openFabModal(p));
+    row.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFabModal(p); } });
+    return row;
+  }
+
+  function openFabModal(p) {
+    modalCard.classList.remove('wide');
+    modalTitle.textContent = p.company + ' \u2014 ' + p.fab;
+    modalSub.textContent = p.site + '  \u00b7  ' + p.device +
+      (p.node && p.node !== 'Not disclosed' ? '  \u00b7  ' + p.node : '');
+    modalLegend.innerHTML = '';
+    modalChart.innerHTML = '';
+
+    const revWord = { later: 'Schedule slipped', earlier: 'Pulled forward',
+                      unchanged: 'Confirmed unchanged', new: 'Added in this audit',
+                      cancelled: 'Cancelled' }[p.revision.direction] || p.revision.direction;
+
+    const dl = document.createElement('dl');
+    dl.className = 'fab-detail';
+    dl.innerHTML =
+      '<dt>Status</dt><dd>' + (STATUS_LABEL[p.status] || p.status) + '</dd>' +
+      '<dt>First output</dt><dd>' + p.first_output + '</dd>' +
+      '<dt>Audit result</dt><dd><span class="fab-flag">' + revWord + '</span>' +
+        '<span class="fab-flag">' + p.confidence + ' confidence</span></dd>' +
+      '<dt>Was</dt><dd>' + p.revision.was + '</dd>' +
+      '<dt>Now</dt><dd>' + p.revision.now + '</dd>' +
+      (p.note ? '<dt>Notes</dt><dd>' + p.note + '</dd>' : '');
+    modalChart.appendChild(dl);
+
+    modalFoot.innerHTML = p.source && p.source.url
+      ? 'Source: <a href="' + p.source.url + '" target="_blank" rel="noopener">' + p.source.name + '</a>'
+      : '';
+    modalBackdrop.classList.add('open');
+  }
+
+  function renderFabChart() {
+    fabChart.innerHTML = '';
+    fabChart.classList.toggle('revs', fabAudit === 'moved');
+
+    // axis
+    const axis = document.createElement('div');
+    axis.className = 'fab-axis';
+    for (let y = Math.ceil(FAB_MIN); y <= FAB_MAX; y++) {
+      const t = document.createElement('span');
+      t.className = 'fab-axis-tick';
+      t.style.left = fabPct(y) + '%';
+      t.textContent = y;
+      axis.appendChild(t);
+    }
+    fabChart.appendChild(axis);
+
+    const body = document.createElement('div');
+    body.className = 'fab-body';
+    const grid = document.createElement('div');
+    grid.className = 'fab-grid';
+    for (let y = Math.ceil(FAB_MIN); y <= FAB_MAX; y++) {
+      const g = document.createElement('div');
+      g.className = 'fab-gl';
+      g.style.left = fabPct(y) + '%';
+      grid.appendChild(g);
+    }
+    const now = document.createElement('div');
+    now.className = 'fab-now';
+    now.style.left = fabPct(FAB_NOW) + '%';
+    grid.appendChild(now);
+    body.appendChild(grid);
+
+    const rows = fabFiltered();
+    if (!rows.length) {
+      const e = document.createElement('div');
+      e.className = 'fab-empty';
+      e.textContent = 'No projects match this combination. Widen the region, segment or audit filter.';
+      body.appendChild(e);
+      fabChart.appendChild(body);
+      return;
+    }
+
+    const nowTag = document.createElement('span');
+    nowTag.className = 'fab-now-tag';
+    nowTag.style.left = fabPct(FAB_NOW) + '%';
+    nowTag.textContent = 'today';
+    axis.appendChild(nowTag);
+
+    if (fabSort === 'output') {
+      rows.sort((a, b) => fabFirstOutput(a) - fabFirstOutput(b) || a.company.localeCompare(b.company));
+    } else if (fabSort === 'company') {
+      rows.sort((a, b) => a.company.localeCompare(b.company) || fabFirstOutput(a) - fabFirstOutput(b));
+    } else {
+      rows.sort((a, b) => REGION_ORDER.indexOf(a.region) - REGION_ORDER.indexOf(b.region) ||
+                          a.company.localeCompare(b.company) || fabFirstOutput(a) - fabFirstOutput(b));
+    }
+
+    // Group headings only when grouping by region — under any other sort a
+    // heading would break the very ordering the reader just asked for.
+    if (fabSort === 'region') {
+      let last = null;
+      rows.forEach(p => {
+        if (p.region !== last) {
+          last = p.region;
+          const n = rows.filter(r => r.region === p.region).length;
+          const h = document.createElement('div');
+          h.className = 'fab-group';
+          h.innerHTML = '<span class="fab-group-name">' + p.region + '</span>' +
+                        '<span class="fab-group-meta">' + n + (n === 1 ? ' project' : ' projects') + '</span>' +
+                        '<span class="fab-group-rule"></span>';
+          body.appendChild(h);
+        }
+        body.appendChild(fabRowEl(p));
+      });
+    } else {
+      rows.forEach(p => body.appendChild(fabRowEl(p)));
+    }
+    fabChart.appendChild(body);
+
+    // stats
+    const producing = rows.filter(p => p.status === 'producing').length;
+    const by2028 = rows.filter(p => p.status !== 'cancelled' && fabFirstOutput(p) < 2029).length;
+    const later = rows.filter(p => p.revision.direction === 'later').length;
+    const added = rows.filter(p => p.revision.direction === 'new' || p.revision.direction === 'cancelled').length;
+    const packaging = rows.filter(p => p.device === 'Advanced packaging').length;
+    const stats = [
+      [rows.length, 'projects shown'],
+      [producing, 'already producing'],
+      [by2028, 'first output by end-2028'],
+      [packaging, 'advanced packaging'],
+      [later, 'schedules slipped in this audit'],
+      [added, 'added to the source tracker']
+    ];
+    fabStats.innerHTML = stats.map(s =>
+      '<div class="fab-stat"><b>' + s[0] + '</b>' + s[1] + '</div>').join('');
+  }
+
+  function renderFabChips() {
+    const rc = document.getElementById('fab-region-chips');
+    rc.innerHTML = '';
+    chip(rc, 'All', fabRegion === 'all', () => { fabRegion = 'all'; renderFabChips(); renderFabChart(); });
+    REGION_ORDER.forEach(r => chip(rc, r, fabRegion === r,
+      () => { fabRegion = r; renderFabChips(); renderFabChart(); }));
+
+    const dc = document.getElementById('fab-device-chips');
+    dc.innerHTML = '';
+    chip(dc, 'All', fabDevice === 'all', () => { fabDevice = 'all'; renderFabChips(); renderFabChart(); });
+    DEVICES.forEach(d => chip(dc, d, fabDevice === d,
+      () => { fabDevice = d; renderFabChips(); renderFabChart(); }));
+
+    const sc = document.getElementById('fab-sort-chips');
+    sc.innerHTML = '';
+    [['output', 'First output'], ['region', 'Region'], ['company', 'Company']].forEach(s =>
+      chip(sc, s[1], fabSort === s[0], () => { fabSort = s[0]; renderFabChips(); renderFabChart(); }));
+
+    const vc = document.getElementById('fab-rev-chips');
+    vc.innerHTML = '';
+    [['all', 'All rows'], ['moved', 'Schedules that moved'], ['added', 'Missing from the tracker']].forEach(a =>
+      chip(vc, a[1], fabAudit === a[0], () => { fabAudit = a[0]; renderFabChips(); renderFabChart(); }));
+  }
+
+  renderFabChips();
+  renderFabChart();
+
+  // Where the chart overflows (phones, mainly) the default scroll position of 0
+  // lands on 2021 — the least useful end. Bring "today" into view once.
+  (function scrollToToday() {
+    const box = document.querySelector('.fab-scroll');
+    if (!box) return;
+    requestAnimationFrame(() => {
+      const over = box.scrollWidth - box.clientWidth;
+      if (over <= 0) return;
+      const lw = parseFloat(getComputedStyle(document.querySelector('.fab-card')).getPropertyValue('--fab-lw')) || 0;
+      const plot = box.scrollWidth - lw;
+      const target = lw + (plot * fabPct(FAB_NOW) / 100) - (box.clientWidth * 0.45);
+      box.scrollLeft = Math.max(0, Math.min(over, target));
+    });
+  })();
+  setNote(document.getElementById('fab-note'),
+    FAB.audit_summary + ' ' + FAB.note, 260);
+}
+
 </script>
 </body>
 </html>
